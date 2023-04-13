@@ -1,0 +1,14 @@
+[package]
+name = "hacspec-sha1"
+version = "0.1.0"
+authors = ["PLR <51248199+plredmond@users.noreply.github.com>"]
+edition = "2018"
+
+[lib]
+path = "src/sha1.rs"
+
+[dependencies]
+hacspec-lib.workspace = true
+hacspec-derive.workspace = true
+secret_integers.workspace = true
+abstract_integers.workspace = true

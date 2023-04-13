@@ -10,5 +10,5 @@ edition = "2018"
 path = "src/edwards25519.rs"
 
 [dependencies]
-hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+hacspec-lib.workspace = true
 hacspec-sha512 = { path = "../sha512" }

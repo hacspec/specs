@@ -10,7 +10,7 @@ edition = "2018"
 path = "src/bls12-381-hash.rs"
 
 [dependencies]
-hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+hacspec-lib.workspace = true
 hacspec-bls12-381 = { path = "../bls12-381" }
 hacspec-sha256 = { path = "../sha256" }
 

@@ -1,13 +1,20 @@
 [workspace]
 members = [
-    "basic",
+    "protocols/tls_cryptolib",
     "curve25519",
     "chacha20",
+    "ristretto",
+    "linalg",
+    "merlin",
     "poly1305",
     "chacha20poly1305",
     "gimli",
+    "sha1",
     "sha256",
     "sha3",
+    "ntru-prime",
+    "riot-bootloader",
+    "riot-runqueue",
     "hmac",
     "hkdf",
     "p256",
@@ -18,6 +25,21 @@ members = [
     "gf128",
     "aes128-gcm",
     "bls12-381-hash",
-    "edwards25519",
     "ed25519",
+    "edwards25519",
+    "edwards25519-hash",
+    "edwards25519-ecvrf",
+    "rsa-pkcs1",
+    "bip-340",
+    "rsa-fdh-vrf",
+    # "coverage_test",
+    "xor",
 ]
+
+[workspace.dependencies]
+hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+hacspec-dev = { git = "https://github.com/hacspec/hacspec.git" }
+hacspec-derive = { git = "https://github.com/hacspec/hacspec.git" }
+abstract_integers = { git = "https://github.com/hacspec/hacspec.git" }
+secret_integers = { git = "https://github.com/hacspec/hacspec.git" }
+

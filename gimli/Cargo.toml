@@ -8,7 +8,7 @@ edition = "2018"
 path = "src/gimli.rs"
 
 [dependencies]
-hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+hacspec-lib.workspace = true
 
 [dev-dependencies]
-hacspec-dev = { git = "https://github.com/hacspec/hacspec.git" }
+hacspec-dev.workspace = true

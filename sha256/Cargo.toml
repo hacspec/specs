@@ -8,7 +8,7 @@ edition = "2018"
 path = "src/sha256.rs"
 
 [dependencies]
-hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
-hacspec-derive = { git = "https://github.com/hacspec/hacspec.git" }
-secret_integers = { git = "https://github.com/hacspec/hacspec.git" }
-abstract_integers = { git = "https://github.com/hacspec/hacspec.git" }
+hacspec-lib.workspace = true
+hacspec-derive.workspace = true
+secret_integers.workspace = true
+abstract_integers.workspace = true
