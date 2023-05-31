@@ -1,0 +1,32 @@
+[package]
+name = "noise-kkpsk0"
+version = "0.1.0"
+authors = ["Karthik Bhargavan <karthik@cryspen.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "hacspec chacha20 poly1305 authenticated encryption"
+readme = "README.md"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+hacspec-chacha20 = { path = "../chacha20", version = "0.1.0" }
+hacspec-poly1305 = { path = "../poly1305", version = "0.1.0" }
+hacspec-chacha20poly1305 = { path = "../chacha20poly1305", version = "0.1.0" }
+hacspec-curve25519 = { path = "../curve25519", version = "0.1.0" }
+hacspec-sha256 = { path = "../sha256", version = "0.1.0" }
+hacspec-hmac = { path = "../hmac", version = "0.1.0" }
+hacspec-hkdf = { path = "../hkdf", version = "0.1.0" }
+
+
+[dev-dependencies]
+serde_json = "1.0"
+serde = {version = "1.0", features = ["derive"]}
+rayon = "1.3.0"
+criterion = "0.4"
+rand = "0.8"
+hacspec-dev = { git = "https://github.com/hacspec/hacspec.git" }
+
+
