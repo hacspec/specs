@@ -41,7 +41,6 @@ pub struct Transport {
     handshake_hash: Seq<U8>
 }
 
-bytes!(ProtocolName, 36);
 #[allow(non_upper_case_globals)]
 const Noise_KKpsk0_25519_ChaChaPoly_SHA256: ProtocolName = ProtocolName(secret_bytes!([
                 78u8, 111u8, 105u8, 115u8, 101u8,
@@ -52,7 +51,10 @@ const Noise_KKpsk0_25519_ChaChaPoly_SHA256: ProtocolName = ProtocolName(secret_b
                 108u8, 121u8, 95u8, 83u8, 72u8, 65u8,
                 50u8, 53u8, 54u8]));
               
-
+///  KKpsk0:
+///    -> s
+///    <- s
+///    ...
 pub fn initialize_initiator(prologue:&Seq<U8>, psk:Seq<U8>, s: KeyPair, e:KeyPair, rs: &Seq<U8>) -> HandshakeStateI0 {
     let st = initialize_symmetric(&Seq::from_seq(&Noise_KKpsk0_25519_ChaChaPoly_SHA256));
     let st = mix_hash(st,prologue);
@@ -69,6 +71,9 @@ pub fn initialize_responder(prologue:&Seq<U8>, psk:Seq<U8>, s: KeyPair, e:KeyPai
     HandshakeStateR0 {st,psk,s,e,rs:rs.clone()}
 }
 
+///  KKpsk0:
+///    ...
+///    -> psk, e, es, ss
 pub fn write_message1(hs:HandshakeStateI0,payload:&Seq<U8>) -> Result<(HandshakeStateI1,Seq<U8>),Error> {
     let HandshakeStateI0 {st,psk,s,e,rs} = hs;
     let st = mix_key_and_hash(st,&psk);
@@ -99,6 +104,9 @@ pub fn read_message1(hs:HandshakeStateR0,ciphertext:&Seq<U8>) -> Result<(Handsha
     Ok((hs,plaintext))
 }
 
+///  KKpsk0:
+///    ...
+///     <- e, ee, se
 pub fn write_message2(hs:HandshakeStateR1,payload:&Seq<U8>) -> Result<(Transport,Seq<U8>),Error> {
     let HandshakeStateR1 {st,e,rs,re} = hs;
     let st = mix_hash(st,&e.public_key);
@@ -129,6 +137,9 @@ pub fn read_message2(hs:HandshakeStateI1,ciphertext:&Seq<U8>) -> Result<(Transpo
     Ok((tx,plaintext))
 }
 
+///  KKpsk0:
+///    ->
+///    <-
 pub fn write_transport(tx:Transport,ad:&Seq<U8>,payload:&Seq<U8>) -> Result<(Transport,Seq<U8>),Error> {
     let Transport {send,recv,handshake_hash} = tx;
     let (send,ciphertext) = encrypt_with_ad(send,ad,payload)?;

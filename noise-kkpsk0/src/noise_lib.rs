@@ -77,7 +77,7 @@ pub fn rekey(cs:CipherState) -> Result<CipherState,Error> {
 
 pub fn initialize_symmetric(protocol_name:&Seq<U8>) -> SymmetricState {
     let pnlen = protocol_name.len();
-    let hv:Seq<U8>;
+    let mut hv:Seq<U8> = Seq::new(0);
     if pnlen < HASHLEN {
         hv = protocol_name.concat(&Seq::new(32-pnlen));
     } else {
