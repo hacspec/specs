@@ -1,0 +1,17 @@
+[package]
+name = "hacspec-pasta"
+version = "1.0.0"
+authors = ["Lasse Bramer Schmidt <lassebramer@gmail.com>", "Rasmus Tomtava Bjerg <rs.bjerg@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+path = "src/pasta.rs"
+
+[dependencies]
+hacspec-lib = { path = "../../lib" }
+
+[dev-dependencies]
+quickcheck = "1"
+quickcheck_macros = "1"
