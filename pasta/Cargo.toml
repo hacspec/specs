@@ -10,7 +10,7 @@ edition = "2018"
 path = "src/pasta.rs"
 
 [dependencies]
-hacspec-lib = { path = "../../lib" }
+hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
 
 [dev-dependencies]
 quickcheck = "1"
