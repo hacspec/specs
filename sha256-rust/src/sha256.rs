@@ -140,7 +140,7 @@ fn u32s_to_be_bytes(state: Hash) -> Sha256Digest {
     out
 }
 
-pub fn hash(msg: &Vec<u8>) -> Sha256Digest {
+pub fn hash(msg: &[u8]) -> Sha256Digest {
     let mut h = HASH_INIT;
     let mut last_block: Block = [0; BLOCK_SIZE];
     let mut last_block_len = 0;
@@ -175,6 +175,6 @@ pub fn hash(msg: &Vec<u8>) -> Sha256Digest {
     u32s_to_be_bytes(h)
 }
 
-pub fn sha256(msg: &Vec<u8>) -> Sha256Digest {
+pub fn sha256(msg: &[u8]) -> Sha256Digest {
     hash(msg)
 }

@@ -10,6 +10,7 @@ members = [
     "sha256-rust",
     "sha3",
     "hmac",
+    "hmac-rust",
     "hkdf",
     "p256",
     "bls12-381",
