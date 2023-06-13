@@ -1,14 +1,16 @@
 [workspace]
 members = [
-    "basic",
     "curve25519",
     "chacha20",
+    "chacha20-rust",
     "poly1305",
     "chacha20poly1305",
     "gimli",
     "sha256",
+    "sha256-rust",
     "sha3",
     "hmac",
+    "hmac-rust",
     "hkdf",
     "p256",
     "bls12-381",
