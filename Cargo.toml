@@ -21,4 +21,5 @@ members = [
     "edwards25519",
     "ed25519",
     "pasta",
+    "halo2",
 ]
