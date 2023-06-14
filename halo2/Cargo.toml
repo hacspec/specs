@@ -1,5 +1,5 @@
 [package]
-name = "hacspec_halo2"
+name = "hacspec-halo2"
 version = "0.1.0"
 authors = ["Lasse Bramer Schmidt <lassebramer@gmail.com>", "Rasmus Tomtava Bjerg <rs.bjerg@gmail.com>"]
 edition = "2018"
