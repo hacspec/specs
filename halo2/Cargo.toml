@@ -8,7 +8,7 @@ edition = "2018"
 path = "src/halo2.rs"
 
 [dependencies]
-hacspec-lib = { path = "../../lib" }
+hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
 hacspec-pasta = { path = "../pasta" }
 
 [dev-dependencies]
