@@ -112,7 +112,7 @@ impl<T: Numeric + NumericCopy + PartialEq> Add<T> for Polynomial<T> {
     fn add(self, other: T) -> Self {
         let mut c = self.coefficients;
         c[usize::zero()] = c[usize::zero()] + other;
-        Polynomial { coefficients: c }
+        (Polynomial { coefficients: c }).trim()
     }
 }
 
@@ -175,7 +175,7 @@ impl<T: Numeric + NumericCopy + PartialEq> Mul<T> for Polynomial<T> {
         for i in 0..c.len() {
             c[i] = c[i] * rhs;
         }
-        Polynomial { coefficients: c }
+        (Polynomial { coefficients: c }).trim()
     }
 }
 
@@ -222,7 +222,7 @@ impl<T: Numeric + NumericCopy + PartialEq + hacspec_lib::Div<Output = T>> Div<T>
         for i in 0..c.len() {
             c[i] = c[i] / rhs;
         }
-        Polynomial { coefficients: c }
+        (Polynomial { coefficients: c }).trim()
     }
 }
 
@@ -517,4 +517,3 @@ fn test_scalar_div(p: Polynomial<FpPallas>, x: u128, scalar: u128) {
     let p_modified_eval = p_modified.evaluate(x);
     assert_eq!(p_eval / scalar, p_modified_eval);
 }
-
