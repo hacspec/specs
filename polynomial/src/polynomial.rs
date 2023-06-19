@@ -4,7 +4,7 @@
 
 use hacspec_lib::*;
 
-pub struct Polynomial<T: Numeric + NumericCopy + Clone> {
+pub struct Polynomial<T: Numeric + NumericCopy> {
     coefficients: Seq<T>,
 }
 
