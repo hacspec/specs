@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["x25519_scalarmult",""],["x25519_secret_to_public",""]],"struct":[["FieldCanvas",""],["Scalar",""],["ScalarCanvas",""],["X25519FieldElement",""],["X25519SerializedPoint","Fixed length byte array."],["X25519SerializedScalar","Fixed length byte array."]]};

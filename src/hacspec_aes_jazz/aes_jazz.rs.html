@@ -1,0 +1,562 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `aes_jazz/src/aes_jazz.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aes_jazz.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e963ab4a0d0c903e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"><link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css"
+  integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y"
+  crossorigin="anonymous"
+/>
+<script
+  src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"
+  integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx"
+  crossorigin="anonymous"
+></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"
+  integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe"
+  crossorigin="anonymous"
+></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "$", right: "$", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      macros: {
+        "\\prover": "\\mathcal{P}",
+        "\\verifier": "\\mathcal{V}",
+        "\\relation": "\\mathcal{R}",
+        "\\zero": "\\mathcal{O}",
+        "\\field": "\\mathbb{F}",
+        "\\group": "\\mathbb{G}",
+        "\\halo": "\\mathbf{Halo}",
+        "\\setup": "\\textrm{Setup}",
+        "\\pp": "\\textrm{pp}",
+        "\\innerprod": "\\langle #1,#2 \\rangle",
+        "\\sec": "\\lambda",
+        "\\lo": "_\{lo\}",
+        "\\hi": "_\{hi\}",
+      },
+    });
+  });
+</script>
+
+</head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../hacspec_aes_jazz/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+</pre><pre class="rust"><code><span class="kw">use </span>hacspec_lib::<span class="kw-2">*</span>;
+
+<span class="macro">public_bytes!</span>(SBox, <span class="number">256</span>);
+<span class="macro">public_bytes!</span>(RCon, <span class="number">15</span>);
+
+<span class="macro">public_bytes!</span>(PBytes256, <span class="number">256</span>);
+<span class="kw">const </span>SBOX: SBox = SBox([
+    <span class="number">0x63u8</span>, <span class="number">0x7Cu8</span>, <span class="number">0x77u8</span>, <span class="number">0x7Bu8</span>, <span class="number">0xF2u8</span>, <span class="number">0x6Bu8</span>, <span class="number">0x6Fu8</span>, <span class="number">0xC5u8</span>, <span class="number">0x30u8</span>, <span class="number">0x01u8</span>, <span class="number">0x67u8</span>, <span class="number">0x2Bu8</span>,
+    <span class="number">0xFEu8</span>, <span class="number">0xD7u8</span>, <span class="number">0xABu8</span>, <span class="number">0x76u8</span>, <span class="number">0xCAu8</span>, <span class="number">0x82u8</span>, <span class="number">0xC9u8</span>, <span class="number">0x7Du8</span>, <span class="number">0xFAu8</span>, <span class="number">0x59u8</span>, <span class="number">0x47u8</span>, <span class="number">0xF0u8</span>,
+    <span class="number">0xADu8</span>, <span class="number">0xD4u8</span>, <span class="number">0xA2u8</span>, <span class="number">0xAFu8</span>, <span class="number">0x9Cu8</span>, <span class="number">0xA4u8</span>, <span class="number">0x72u8</span>, <span class="number">0xC0u8</span>, <span class="number">0xB7u8</span>, <span class="number">0xFDu8</span>, <span class="number">0x93u8</span>, <span class="number">0x26u8</span>,
+    <span class="number">0x36u8</span>, <span class="number">0x3Fu8</span>, <span class="number">0xF7u8</span>, <span class="number">0xCCu8</span>, <span class="number">0x34u8</span>, <span class="number">0xA5u8</span>, <span class="number">0xE5u8</span>, <span class="number">0xF1u8</span>, <span class="number">0x71u8</span>, <span class="number">0xD8u8</span>, <span class="number">0x31u8</span>, <span class="number">0x15u8</span>,
+    <span class="number">0x04u8</span>, <span class="number">0xC7u8</span>, <span class="number">0x23u8</span>, <span class="number">0xC3u8</span>, <span class="number">0x18u8</span>, <span class="number">0x96u8</span>, <span class="number">0x05u8</span>, <span class="number">0x9Au8</span>, <span class="number">0x07u8</span>, <span class="number">0x12u8</span>, <span class="number">0x80u8</span>, <span class="number">0xE2u8</span>,
+    <span class="number">0xEBu8</span>, <span class="number">0x27u8</span>, <span class="number">0xB2u8</span>, <span class="number">0x75u8</span>, <span class="number">0x09u8</span>, <span class="number">0x83u8</span>, <span class="number">0x2Cu8</span>, <span class="number">0x1Au8</span>, <span class="number">0x1Bu8</span>, <span class="number">0x6Eu8</span>, <span class="number">0x5Au8</span>, <span class="number">0xA0u8</span>,
+    <span class="number">0x52u8</span>, <span class="number">0x3Bu8</span>, <span class="number">0xD6u8</span>, <span class="number">0xB3u8</span>, <span class="number">0x29u8</span>, <span class="number">0xE3u8</span>, <span class="number">0x2Fu8</span>, <span class="number">0x84u8</span>, <span class="number">0x53u8</span>, <span class="number">0xD1u8</span>, <span class="number">0x00u8</span>, <span class="number">0xEDu8</span>,
+    <span class="number">0x20u8</span>, <span class="number">0xFCu8</span>, <span class="number">0xB1u8</span>, <span class="number">0x5Bu8</span>, <span class="number">0x6Au8</span>, <span class="number">0xCBu8</span>, <span class="number">0xBEu8</span>, <span class="number">0x39u8</span>, <span class="number">0x4Au8</span>, <span class="number">0x4Cu8</span>, <span class="number">0x58u8</span>, <span class="number">0xCFu8</span>,
+    <span class="number">0xD0u8</span>, <span class="number">0xEFu8</span>, <span class="number">0xAAu8</span>, <span class="number">0xFBu8</span>, <span class="number">0x43u8</span>, <span class="number">0x4Du8</span>, <span class="number">0x33u8</span>, <span class="number">0x85u8</span>, <span class="number">0x45u8</span>, <span class="number">0xF9u8</span>, <span class="number">0x02u8</span>, <span class="number">0x7Fu8</span>,
+    <span class="number">0x50u8</span>, <span class="number">0x3Cu8</span>, <span class="number">0x9Fu8</span>, <span class="number">0xA8u8</span>, <span class="number">0x51u8</span>, <span class="number">0xA3u8</span>, <span class="number">0x40u8</span>, <span class="number">0x8Fu8</span>, <span class="number">0x92u8</span>, <span class="number">0x9Du8</span>, <span class="number">0x38u8</span>, <span class="number">0xF5u8</span>,
+    <span class="number">0xBCu8</span>, <span class="number">0xB6u8</span>, <span class="number">0xDAu8</span>, <span class="number">0x21u8</span>, <span class="number">0x10u8</span>, <span class="number">0xFFu8</span>, <span class="number">0xF3u8</span>, <span class="number">0xD2u8</span>, <span class="number">0xCDu8</span>, <span class="number">0x0Cu8</span>, <span class="number">0x13u8</span>, <span class="number">0xECu8</span>,
+    <span class="number">0x5Fu8</span>, <span class="number">0x97u8</span>, <span class="number">0x44u8</span>, <span class="number">0x17u8</span>, <span class="number">0xC4u8</span>, <span class="number">0xA7u8</span>, <span class="number">0x7Eu8</span>, <span class="number">0x3Du8</span>, <span class="number">0x64u8</span>, <span class="number">0x5Du8</span>, <span class="number">0x19u8</span>, <span class="number">0x73u8</span>,
+    <span class="number">0x60u8</span>, <span class="number">0x81u8</span>, <span class="number">0x4Fu8</span>, <span class="number">0xDCu8</span>, <span class="number">0x22u8</span>, <span class="number">0x2Au8</span>, <span class="number">0x90u8</span>, <span class="number">0x88u8</span>, <span class="number">0x46u8</span>, <span class="number">0xEEu8</span>, <span class="number">0xB8u8</span>, <span class="number">0x14u8</span>,
+    <span class="number">0xDEu8</span>, <span class="number">0x5Eu8</span>, <span class="number">0x0Bu8</span>, <span class="number">0xDBu8</span>, <span class="number">0xE0u8</span>, <span class="number">0x32u8</span>, <span class="number">0x3Au8</span>, <span class="number">0x0Au8</span>, <span class="number">0x49u8</span>, <span class="number">0x06u8</span>, <span class="number">0x24u8</span>, <span class="number">0x5Cu8</span>,
+    <span class="number">0xC2u8</span>, <span class="number">0xD3u8</span>, <span class="number">0xACu8</span>, <span class="number">0x62u8</span>, <span class="number">0x91u8</span>, <span class="number">0x95u8</span>, <span class="number">0xE4u8</span>, <span class="number">0x79u8</span>, <span class="number">0xE7u8</span>, <span class="number">0xC8u8</span>, <span class="number">0x37u8</span>, <span class="number">0x6Du8</span>,
+    <span class="number">0x8Du8</span>, <span class="number">0xD5u8</span>, <span class="number">0x4Eu8</span>, <span class="number">0xA9u8</span>, <span class="number">0x6Cu8</span>, <span class="number">0x56u8</span>, <span class="number">0xF4u8</span>, <span class="number">0xEAu8</span>, <span class="number">0x65u8</span>, <span class="number">0x7Au8</span>, <span class="number">0xAEu8</span>, <span class="number">0x08u8</span>,
+    <span class="number">0xBAu8</span>, <span class="number">0x78u8</span>, <span class="number">0x25u8</span>, <span class="number">0x2Eu8</span>, <span class="number">0x1Cu8</span>, <span class="number">0xA6u8</span>, <span class="number">0xB4u8</span>, <span class="number">0xC6u8</span>, <span class="number">0xE8u8</span>, <span class="number">0xDDu8</span>, <span class="number">0x74u8</span>, <span class="number">0x1Fu8</span>,
+    <span class="number">0x4Bu8</span>, <span class="number">0xBDu8</span>, <span class="number">0x8Bu8</span>, <span class="number">0x8Au8</span>, <span class="number">0x70u8</span>, <span class="number">0x3Eu8</span>, <span class="number">0xB5u8</span>, <span class="number">0x66u8</span>, <span class="number">0x48u8</span>, <span class="number">0x03u8</span>, <span class="number">0xF6u8</span>, <span class="number">0x0Eu8</span>,
+    <span class="number">0x61u8</span>, <span class="number">0x35u8</span>, <span class="number">0x57u8</span>, <span class="number">0xB9u8</span>, <span class="number">0x86u8</span>, <span class="number">0xC1u8</span>, <span class="number">0x1Du8</span>, <span class="number">0x9Eu8</span>, <span class="number">0xE1u8</span>, <span class="number">0xF8u8</span>, <span class="number">0x98u8</span>, <span class="number">0x11u8</span>,
+    <span class="number">0x69u8</span>, <span class="number">0xD9u8</span>, <span class="number">0x8Eu8</span>, <span class="number">0x94u8</span>, <span class="number">0x9Bu8</span>, <span class="number">0x1Eu8</span>, <span class="number">0x87u8</span>, <span class="number">0xE9u8</span>, <span class="number">0xCEu8</span>, <span class="number">0x55u8</span>, <span class="number">0x28u8</span>, <span class="number">0xDFu8</span>,
+    <span class="number">0x8Cu8</span>, <span class="number">0xA1u8</span>, <span class="number">0x89u8</span>, <span class="number">0x0Du8</span>, <span class="number">0xBFu8</span>, <span class="number">0xE6u8</span>, <span class="number">0x42u8</span>, <span class="number">0x68u8</span>, <span class="number">0x41u8</span>, <span class="number">0x99u8</span>, <span class="number">0x2Du8</span>, <span class="number">0x0Fu8</span>,
+    <span class="number">0xB0u8</span>, <span class="number">0x54u8</span>, <span class="number">0xBBu8</span>, <span class="number">0x16u8
+</span>]);
+
+<span class="kw">const </span>RCON: RCon = RCon([
+    <span class="number">0x8du8</span>, <span class="number">0x01u8</span>, <span class="number">0x02u8</span>, <span class="number">0x04u8</span>, <span class="number">0x08u8</span>, <span class="number">0x10u8</span>, <span class="number">0x20u8</span>, <span class="number">0x40u8</span>, <span class="number">0x80u8</span>, <span class="number">0x1bu8</span>, <span class="number">0x36u8</span>, <span class="number">0x6cu8</span>,
+    <span class="number">0xd8u8</span>, <span class="number">0xabu8</span>, <span class="number">0x4du8
+</span>]);
+
+<span class="kw">fn </span>index_u32 (s : u128, i : usize) -&gt; u32 {
+    ((s &gt;&gt; i * <span class="number">32</span>) % (<span class="number">1_u128 </span>&lt;&lt; <span class="number">32</span>)) <span class="kw">as </span>u32
+}
+<span class="kw">fn </span>index_u8 (s : u32, i : usize) -&gt; u8 {
+    ((s &gt;&gt; i * <span class="number">8</span>) % (<span class="number">1_u32 </span>&lt;&lt; <span class="number">8</span>)) <span class="kw">as </span>u8
+}
+
+<span class="kw">fn </span>rebuild_u32(s0 : u8, s1 : u8, s2 : u8, s3 : u8) -&gt; u32 {
+    (s0 <span class="kw">as </span>u32) | (((s1 <span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>) | (((s2 <span class="kw">as </span>u32) &lt;&lt; <span class="number">16</span>) | ((s3 <span class="kw">as </span>u32) &lt;&lt; <span class="number">24</span>)))
+}
+<span class="kw">fn </span>rebuild_u128(s0 : u32, s1 : u32, s2 : u32, s3 : u32) -&gt; u128 {
+    (s0 <span class="kw">as </span>u128) | (((s1 <span class="kw">as </span>u128) &lt;&lt; <span class="number">32</span>) | (((s2 <span class="kw">as </span>u128) &lt;&lt; <span class="number">64</span>) | ((s3 <span class="kw">as </span>u128) &lt;&lt; <span class="number">96</span>)))
+}
+
+<span class="kw">fn </span>subword(v : u32) -&gt; u32 {
+    rebuild_u32(SBOX[index_u8(v, <span class="number">0</span>)],
+                SBOX[index_u8(v, <span class="number">1</span>)],
+                SBOX[index_u8(v, <span class="number">2</span>)],
+                SBOX[index_u8(v, <span class="number">3</span>)])
+}
+
+<span class="kw">fn </span>rotword(v: u32) -&gt; u32 {
+    <span class="comment">// (v &gt;&gt; 8) | (v &lt;&lt; 24)
+    </span>rebuild_u32 (
+        index_u8(v, <span class="number">1</span>),
+        index_u8(v, <span class="number">2</span>),
+        index_u8(v, <span class="number">3</span>),
+        index_u8(v, <span class="number">0</span>))
+}
+
+<span class="kw">fn </span>vpshufd1 (s: u128, o: u8, i : usize) -&gt; u32 {
+    index_u32(s &gt;&gt; <span class="number">32 </span>* ((o &gt;&gt; (<span class="number">2 </span>* i)) % <span class="number">4_u8</span>) <span class="kw">as </span>usize, <span class="number">0</span>)
+}
+
+<span class="kw">fn </span>vpshufd (s: u128, o: u8) -&gt; u128 {
+    <span class="kw">let </span>d1 : u32 = vpshufd1(s, o, <span class="number">0</span>);
+    <span class="kw">let </span>d2 : u32 = vpshufd1(s, o, <span class="number">1</span>);
+    <span class="kw">let </span>d3 : u32 = vpshufd1(s, o, <span class="number">2</span>);
+    <span class="kw">let </span>d4 : u32 = vpshufd1(s, o, <span class="number">3</span>);
+
+    rebuild_u128(d1, d2, d3, d4)
+}
+
+<span class="kw">fn </span>vshufps(s1: u128, s2: u128, o: u8) -&gt; u128 {
+    <span class="kw">let </span>d1 : u32 = vpshufd1(s1, o, <span class="number">0</span>);
+    <span class="kw">let </span>d2 : u32 = vpshufd1(s1, o, <span class="number">1</span>);
+    <span class="kw">let </span>d3 : u32 = vpshufd1(s2, o, <span class="number">2</span>);
+    <span class="kw">let </span>d4 : u32 = vpshufd1(s2, o, <span class="number">3</span>);
+
+    rebuild_u128(d1, d2, d3, d4)
+}
+
+<span class="comment">// note the constants might be off, I&#39;ve interpreted arrays from `aes.jinc` as low endian, they might be big endian
+</span><span class="kw">fn </span>key_combine(rkey: u128, temp1: u128, temp2: u128) -&gt; (u128, u128) {
+    <span class="kw">let </span>temp1 = vpshufd(temp1, <span class="number">0xFF</span>);
+    <span class="kw">let </span>temp2 = vshufps(temp2, rkey, <span class="number">16u8</span>); <span class="comment">// 4u8
+    </span><span class="kw">let </span>rkey = rkey ^ temp2;
+    <span class="kw">let </span>temp2 = vshufps(temp2, rkey, <span class="number">140u8</span>); <span class="comment">// 50u8
+    </span><span class="kw">let </span>rkey = rkey ^ temp2;
+    <span class="kw">let </span>rkey = rkey ^ temp1;
+    (rkey, temp2)
+}
+
+<span class="comment">// See: https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf
+</span><span class="kw">fn </span>aeskeygenassist(v1: u128, v2: u8) -&gt; u128 {
+    <span class="kw">let </span>x1 = index_u32(v1, <span class="number">1</span>);
+    <span class="kw">let </span>x3 = index_u32(v1, <span class="number">3</span>);
+    <span class="kw">let </span>y0 = subword(x1);
+    <span class="kw">let </span>y1 = rotword(y0) ^ ((v2 <span class="kw">as </span>u32));
+    <span class="kw">let </span>y2 = subword(x3);
+    <span class="kw">let </span>y3 = rotword(y2) ^ ((v2 <span class="kw">as </span>u32));
+    rebuild_u128(y0, y1, y2, y3)
+}
+
+<span class="kw">fn </span>key_expand(rcon: u8, rkey: u128, temp2: u128) -&gt; (u128, u128) {
+    <span class="kw">let </span>temp1 = aeskeygenassist(rkey, rcon);
+    <span class="kw">let </span>(rkey, temp2) = key_combine(rkey, temp1, temp2);
+    (rkey, temp2)
+}
+
+<span class="kw">type </span>KeyList = Seq&lt;u128&gt;;
+
+<span class="kw">fn </span>keys_expand(key : u128) -&gt; KeyList {
+    <span class="kw">let </span><span class="kw-2">mut </span>rkeys : KeyList = KeyList::new(<span class="number">0</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>key = key;
+    rkeys = rkeys.push(<span class="kw-2">&amp;</span>key);
+    <span class="kw">let </span><span class="kw-2">mut </span>temp2 : u128 = <span class="number">0</span>;
+    <span class="kw">for </span>round <span class="kw">in </span><span class="number">1 </span>.. <span class="number">11 </span>{
+        <span class="kw">let </span>rcon = RCON[round];
+        <span class="kw">let </span>(key_temp, temp2_temp) = key_expand(rcon, key, temp2);
+        key = key_temp;
+        temp2 = temp2_temp;
+        rkeys = rkeys.push(<span class="kw-2">&amp;</span>key);
+    }
+    rkeys
+}
+
+<span class="kw">fn </span>subbytes (s : u128) -&gt; u128 {
+    rebuild_u128(subword(index_u32(s, <span class="number">0</span>)),
+                 subword(index_u32(s, <span class="number">1</span>)),
+                 subword(index_u32(s, <span class="number">2</span>)),
+                 subword(index_u32(s, <span class="number">3</span>)))
+}
+
+<span class="kw">fn </span>matrix_index (s : u128, i : usize, j : usize) -&gt; u8 {
+    index_u8(index_u32(s, j), i)
+}
+
+<span class="kw">fn </span>shiftrows (s : u128) -&gt; u128 {
+    rebuild_u128(
+        rebuild_u32(matrix_index(s,<span class="number">0</span>,<span class="number">0</span>),matrix_index(s,<span class="number">1</span>,<span class="number">1</span>),matrix_index(s,<span class="number">2</span>,<span class="number">2</span>),matrix_index(s,<span class="number">3</span>,<span class="number">3</span>)),
+        rebuild_u32(matrix_index(s,<span class="number">0</span>,<span class="number">1</span>),matrix_index(s,<span class="number">1</span>,<span class="number">2</span>),matrix_index(s,<span class="number">2</span>,<span class="number">3</span>),matrix_index(s,<span class="number">3</span>,<span class="number">0</span>)),
+        rebuild_u32(matrix_index(s,<span class="number">0</span>,<span class="number">2</span>),matrix_index(s,<span class="number">1</span>,<span class="number">3</span>),matrix_index(s,<span class="number">2</span>,<span class="number">0</span>),matrix_index(s,<span class="number">3</span>,<span class="number">1</span>)),
+        rebuild_u32(matrix_index(s,<span class="number">0</span>,<span class="number">3</span>),matrix_index(s,<span class="number">1</span>,<span class="number">0</span>),matrix_index(s,<span class="number">2</span>,<span class="number">1</span>),matrix_index(s,<span class="number">3</span>,<span class="number">2</span>)))
+}
+
+<span class="kw">fn </span>xtime(x: u8) -&gt; u8 {
+    <span class="kw">let </span>x1 = x &lt;&lt; <span class="number">1</span>;
+    <span class="kw">let </span>x7 = x &gt;&gt; <span class="number">7</span>;
+    <span class="kw">let </span>x71 = x7 &amp; <span class="number">0x01u8</span>;
+    <span class="kw">let </span>x711b = x71 * <span class="number">0x1bu8</span>;
+    x1 ^ x711b
+}
+
+<span class="kw">fn </span>mixcolumn(c: usize, state: u128) -&gt; u32 {
+    <span class="kw">let </span>s0 = matrix_index(state, <span class="number">0</span>, c);
+    <span class="kw">let </span>s1 = matrix_index(state, <span class="number">1</span>, c);
+    <span class="kw">let </span>s2 = matrix_index(state, <span class="number">2</span>, c);
+    <span class="kw">let </span>s3 = matrix_index(state, <span class="number">3</span>, c);
+    <span class="kw">let </span>tmp = s0 ^ s1 ^ s2 ^ s3;
+    <span class="kw">let </span>r0 = s0 ^ tmp ^ (xtime(s0 ^ s1));
+    <span class="kw">let </span>r1 = s1 ^ tmp ^ (xtime(s1 ^ s2));
+    <span class="kw">let </span>r2 = s2 ^ tmp ^ (xtime(s2 ^ s3));
+    <span class="kw">let </span>r3 = s3 ^ tmp ^ (xtime(s3 ^ s0));
+    rebuild_u32(r0, r1, r2, r3)
+}
+
+<span class="kw">fn </span>mixcolumns(state: u128) -&gt; u128 {
+    <span class="kw">let </span>c0 = mixcolumn(<span class="number">0</span>, state);
+    <span class="kw">let </span>c1 = mixcolumn(<span class="number">1</span>, state);
+    <span class="kw">let </span>c2 = mixcolumn(<span class="number">2</span>, state);
+    <span class="kw">let </span>c3 = mixcolumn(<span class="number">3</span>, state);
+    rebuild_u128(c0, c1, c2, c3)
+}
+
+<span class="kw">fn </span>aesenc (state : u128, rkey : u128) -&gt; u128 {
+    <span class="kw">let </span>state = shiftrows(state);
+    <span class="kw">let </span>state = subbytes(state);
+    <span class="kw">let </span>state = mixcolumns(state);
+    state ^ rkey
+}
+
+<span class="kw">fn </span>aesenclast (state : u128, rkey : u128) -&gt; u128 {
+    <span class="kw">let </span>state = shiftrows(state);
+    <span class="kw">let </span>state = subbytes(state);
+    state ^ rkey
+}
+
+<span class="kw">fn </span>aes_rounds (rkeys : KeyList, inp : u128) -&gt; u128 {
+    <span class="kw">let </span><span class="kw-2">mut </span>state : u128 = inp ^ rkeys[<span class="number">0</span>];
+    <span class="comment">// TODO:
+    </span><span class="kw">for </span>round <span class="kw">in </span><span class="number">1 </span>.. <span class="number">10 </span>{
+        state = aesenc(state, rkeys[round])
+    }
+    aesenclast(state, rkeys[<span class="number">10</span>])
+}
+
+<span class="kw">fn </span>aes(key : u128, inp : u128) -&gt; u128 {
+    <span class="kw">let </span>rkeys = keys_expand(key);
+    aes_rounds(rkeys, inp)
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_aeskeygenassist() {
+
+    <span class="kw">let </span>key = <span class="number">0x3c4fcf098815f7aba6d2ae2816157e2bu128</span>;
+    <span class="macro">println!</span>(<span class="string">&quot;{:X?} vs {:X?}&quot;</span>, aeskeygenassist(key, RCON[<span class="number">1</span>]), <span class="number">0x01eb848beb848a013424b5e524b5e434u128</span>);
+    <span class="macro">assert_eq!</span>(aeskeygenassist(<span class="number">0x3c4fcf098815f7aba6d2ae2816157e2bu128</span>, RCON[<span class="number">1</span>]), <span class="number">0x01eb848beb848a013424b5e524b5e434u128</span>);
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_key_combine() {
+    <span class="kw">let </span>key = <span class="number">0x3c4fcf098815f7aba6d2ae2816157e2bu128</span>;
+    <span class="kw">let </span>(lhs, <span class="kw">_</span>) = key_combine(key, aeskeygenassist(key, RCON[<span class="number">1</span>]), <span class="number">0</span>);
+
+    <span class="kw">let </span>rhs = <span class="number">0x05766c2a3939a323b12c548817fefaa0u128</span>;
+
+    <span class="macro">println!</span>(<span class="string">&quot;{:X?} vs {:X?}&quot;</span>, lhs, rhs);
+    <span class="macro">assert_eq!</span>(lhs, rhs, <span class="string">&quot;left: {:x} \n right: {:x}&quot;</span>, lhs, rhs);
+}
+
+<span class="comment">// test vector from
+// https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf
+</span><span class="attr">#[test]
+</span><span class="kw">fn </span>test_mixcolumns() {
+    <span class="kw">let </span>inp = <span class="number">0x627a6f6644b109c82b18330a81c3b3e5</span>;
+    <span class="kw">let </span>lhs = mixcolumns(inp);
+    <span class="kw">let </span>rhs = <span class="number">0x7b5b54657374566563746f725d53475d</span>;
+    <span class="macro">assert_eq!</span>(lhs, rhs, <span class="string">&quot;\n left: {:x}\nright: {:x}\n&quot;</span>, lhs, rhs)
+}
+
+<span class="comment">// test vector from
+// https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf
+</span><span class="attr">#[test]
+</span><span class="kw">fn </span>test_aesenc() {
+    <span class="kw">let </span>rkey = <span class="number">0x48692853686179295b477565726f6e5d</span>;
+    <span class="kw">let </span>state = <span class="number">0x7b5b54657374566563746f725d53475d</span>;
+    <span class="kw">let </span>lhs = aesenc(state, rkey);
+    <span class="kw">let </span>rhs = <span class="number">0xa8311c2f9fdba3c58b104b58ded7e595</span>;
+    <span class="macro">assert_eq!</span>(lhs, rhs, <span class="string">&quot;\n left: {:x}\nright: {:x}\n&quot;</span>, lhs, rhs)
+}
+
+<span class="comment">// NIST test vector: https://csrc.nist.gov/publications/detail/fips/197/final -- (p.33)
+</span><span class="attr">#[test]
+</span><span class="kw">fn </span>test_aes() {
+    <span class="kw">let </span>key = <span class="number">0x3c4fcf098815f7aba6d2ae2816157e2bu128</span>;
+    <span class="kw">let </span>msg = <span class="number">0x340737e0a29831318d305a88a8f64332u128</span>;
+    <span class="kw">let </span>ctx = <span class="number">0x320b6a19978511dcfb09dc021d842539u128</span>;
+
+    <span class="kw">let </span>c = aes(key, msg);
+    <span class="macro">assert_eq!</span>(ctx, c);
+}
+</code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="hacspec_aes_jazz" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e1d819583 2022-12-05)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

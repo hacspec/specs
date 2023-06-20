@@ -1,0 +1,27 @@
+var sourcesIndex = JSON.parse('{\
+"example":["",[],["lib.rs"]],\
+"hacspec_aes":["",[],["aes.rs"]],\
+"hacspec_aes128_gcm":["",[],["aes128-gcm.rs"]],\
+"hacspec_aes_jazz":["",[],["aes_jazz.rs"]],\
+"hacspec_bls12_381":["",[],["bls12-381.rs"]],\
+"hacspec_bls12_381_hash":["",[],["bls12-381-hash.rs"]],\
+"hacspec_chacha20":["",[],["chacha20.rs"]],\
+"hacspec_chacha20poly1305":["",[],["chacha20poly1305.rs"]],\
+"hacspec_curve25519":["",[],["curve25519.rs"]],\
+"hacspec_ecdsa_p256_sha256":["",[],["ecdsa.rs"]],\
+"hacspec_ed25519":["",[],["ed25519.rs"]],\
+"hacspec_edwards25519":["",[],["edwards25519.rs"]],\
+"hacspec_gf128":["",[],["gf128.rs"]],\
+"hacspec_gimli":["",[],["gimli.rs"]],\
+"hacspec_halo2":["",[],["halo2.rs"]],\
+"hacspec_hkdf":["",[],["hkdf.rs"]],\
+"hacspec_hmac":["",[],["hmac.rs"]],\
+"hacspec_p256":["",[],["p256.rs"]],\
+"hacspec_pasta":["",[],["pasta.rs"]],\
+"hacspec_poly1305":["",[],["poly1305.rs"]],\
+"hacspec_sha256":["",[],["sha256.rs"]],\
+"hacspec_sha3":["",[],["sha3.rs"]],\
+"hacspec_sha512":["",[],["sha512.rs"]],\
+"hacspec_weierstrass":["",[],["weierstrass.rs"]]\
+}');
+createSourceSidebar();
