@@ -4,14 +4,14 @@ open FStar.Mul
 open Core
 
 
-let update_array (_: array u8 64sz) (v: slice u8) : array u8 64sz = admit ()
+// let update_array (array: array u8 64sz) (valx: slice u8) : array u8 64sz = admit ()
 let add_state (state other: array u32 16sz) : array u32 16sz = admit ()
 let xor_state (state other: array u32 16sz) : array u32 16sz = admit ()
 let u32s_to_le_bytes (state: array u32 16sz) : array u8 64sz = admit ()
 let to_le_u32s_16_ (bytes: slice u8) : array u32 16sz = admit ()
 let to_le_u32s_8_ (bytes: slice u8) : array u32 8sz = admit ()
 let to_le_u32s_3_ (bytes: slice u8) : array u32 3sz = admit ()
- 
+
 // let to_le_u32s_3_ (bytes: slice u8) : array u32 3sz =
 //   let _:never =
 //     match 3sz, Core.Slice.len_under_impl bytes / 4sz with

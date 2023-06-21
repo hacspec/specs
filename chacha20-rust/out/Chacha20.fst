@@ -1,224 +1,197 @@
 module Chacha20
 #set-options "--fuel 0 --ifuel 1 --z3rlimit 15"
-open FStar.Mul
-open Hacspec.Lib
-open Hacspec_lib_tc
+open Core
+open Hax.Lib 
 
-let state = x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}
+let t_State = array u32 16sz
 
-let block = x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64}
+let t_Block = array u8 64sz
 
-let chaChaIV = x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 12}
+let t_ChaChaIV = array u8 12sz
 
-let chaChaKey = x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 32}
+let t_ChaChaKey = array u8 32sz
 
-let chacha20_line
-      (a b d: uint_size)
-      (s: UInt32.t)
-      (m: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-    : x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} = m in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    state.[ a ] <-
-      Core.Num.wrapping_add (Core.Ops.Index.index state a) (Core.Ops.Index.index state b)
+let t_StateIdx = bounded_index 16sz
+
+let v__StateIdx (x: usize {SizeT.v x < 16}) : t_StateIdx = Bounded x
+
+let chacha20_line (a b d: t_StateIdx) (s: u32) (m: array u32 16sz) : array u32 16sz =
+  let state:array u32 16sz = m in
+  let state:array u32 16sz =
+    state.[ a ] <- Core.Num.wrapping_add_under_impl_8 state.[ a ] state.[ b ]
   in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    state.[ d ] <- Hacspec_lib.^. (Core.Ops.Index.index state d) (Core.Ops.Index.index state a)
-  in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    state.[ d ] <- Core.Num.rotate_left (Core.Ops.Index.index state d) s
-  in
+  let state:array u32 16sz = state.[ d ] <- state.[ d ] ^. state.[ a ] in
+  let state:array u32 16sz = state.[ d ] <- Core.Num.rotate_left_under_impl_8 state.[ d ] s in
   state
 
-let chacha20_quarter_round
-      (a b c d: uint_size)
-      (state: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-    : x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_line a b d 16ul state
-  in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_line c d b 12ul state
-  in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_line a b d 8ul state
-  in
+let chacha20_quarter_round (a b c d: t_StateIdx) (state: array u32 16sz) : array u32 16sz =
+  let state:array u32 16sz = chacha20_line a b d 16ul state in
+  let state:array u32 16sz = chacha20_line c d b 12ul state in
+  let state:array u32 16sz = chacha20_line a b d 8ul state in
   chacha20_line c d b 7ul state
 
-let chacha20_double_round
-      (state: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-    : x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_quarter_round 0 4 8 12 state
+let chacha20_double_round (state: array u32 16sz) : array u32 16sz =
+  let state:array u32 16sz =
+    chacha20_quarter_round (v__StateIdx 0sz)
+      (v__StateIdx 4sz)
+      (v__StateIdx 8sz)
+      (v__StateIdx 12sz)
+      state
   in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_quarter_round 1 5 9 13 state
+  let state:array u32 16sz =
+    chacha20_quarter_round (v__StateIdx 1sz)
+      (v__StateIdx 5sz)
+      (v__StateIdx 9sz)
+      (v__StateIdx 13sz)
+      state
   in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_quarter_round 2 6 10 14 state
+  let state:array u32 16sz =
+    chacha20_quarter_round (v__StateIdx 2sz)
+      (v__StateIdx 6sz)
+      (v__StateIdx 10sz)
+      (v__StateIdx 14sz)
+      state
   in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_quarter_round 3 7 11 15 state
+  let state:array u32 16sz =
+    chacha20_quarter_round (v__StateIdx 3sz)
+      (v__StateIdx 7sz)
+      (v__StateIdx 11sz)
+      (v__StateIdx 15sz)
+      state
   in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_quarter_round 0 5 10 15 state
+  let state:array u32 16sz =
+    chacha20_quarter_round (v__StateIdx 0sz)
+      (v__StateIdx 5sz)
+      (v__StateIdx 10sz)
+      (v__StateIdx 15sz)
+      state
   in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_quarter_round 1 6 11 12 state
+  let state:array u32 16sz =
+    chacha20_quarter_round (v__StateIdx 1sz)
+      (v__StateIdx 6sz)
+      (v__StateIdx 11sz)
+      (v__StateIdx 12sz)
+      state
   in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_quarter_round 2 7 8 13 state
+  let state:array u32 16sz =
+    chacha20_quarter_round (v__StateIdx 2sz)
+      (v__StateIdx 7sz)
+      (v__StateIdx 8sz)
+      (v__StateIdx 13sz)
+      state
   in
-  chacha20_quarter_round 3 4 9 14 state
+  chacha20_quarter_round (v__StateIdx 3sz)
+    (v__StateIdx 4sz)
+    (v__StateIdx 9sz)
+    (v__StateIdx 14sz)
+    state
 
-let chacha20_rounds
-      (state: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-    : x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-  let st:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} = state in
-  let st:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    Core.Iter.Iterator.fold (Core.Iter.Traits.Collect.IntoIterator.into_iter ({
-              start = 0l;
-              end = 10l
+let chacha20_rounds (state: array u32 16sz) : array u32 16sz =
+  let st:array u32 16sz = state in
+  let st:array u32 16sz =
+    Core.Iter.fold (Core.Iter.into_iter ({
+              Core.Ops.Range.Range.f_start = 0sz;
+              Core.Ops.Range.Range.f_end = 10sz
             }))
       st
-      (fun _i st -> chacha20_double_round st)
+      (fun st _i -> chacha20_double_round st)
   in
   st
 
-let chacha20_core
-      (ctr: UInt32.t)
-      (st0: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-    : x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} = st0 in
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    state.[ 12 ] <- Core.Ops.Index.index state 12 + ctr
+let chacha20_core (ctr: u32) (st0: array u32 16sz) : array u32 16sz =
+  let state:array u32 16sz = st0 in
+  let state:array u32 16sz =
+    state.[ 12sz ] <- Core.Num.wrapping_add_under_impl_8 state.[ 12sz ] ctr
   in
-  let k:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_rounds state
-  in
+  let k:array u32 16sz = chacha20_rounds state in
   Chacha20.Hacspec_helper.add_state state k
 
-let chacha20_init
-      (key: (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 32}))
-      (iv: (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 12}))
-      (ctr: UInt32.t)
-    : x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-  let (key_u32: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 8})):x:
-  Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 8} =
-    Chacha20.Hacspec_helper.to_le_u32s_8 (Hacspec.Lib.unsize key)
+let chacha20_init (key: array u8 32sz) (iv: array u8 12sz) (ctr: u32) : array u32 16sz =
+  let (key_u32: array u32 8sz):array u32 8sz =
+    Chacha20.Hacspec_helper.to_le_u32s_8_ (Hax.CoerceUnsize.unsize key)
   in
-  let (iv_u32: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 3})):x:
-  Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 3} =
-    Chacha20.Hacspec_helper.to_le_u32s_3 (Hacspec.Lib.unsize iv)
+  let (iv_u32: array u32 3sz):array u32 3sz =
+    Chacha20.Hacspec_helper.to_le_u32s_3_ (Hax.CoerceUnsize.unsize iv)
   in
-  [
-    1634760805ul; 857760878ul; 2036477234ul; 1797285236ul; Core.Ops.Index.index key_u32 0;
-    Core.Ops.Index.index key_u32 1; Core.Ops.Index.index key_u32 2; Core.Ops.Index.index key_u32 3;
-    Core.Ops.Index.index key_u32 4; Core.Ops.Index.index key_u32 5; Core.Ops.Index.index key_u32 6;
-    Core.Ops.Index.index key_u32 7; ctr; Core.Ops.Index.index iv_u32 0;
-    Core.Ops.Index.index iv_u32 1; Core.Ops.Index.index iv_u32 2
-  ]
+  let l = [
+    1634760805ul; 857760878ul; 2036477234ul; 1797285236ul; key_u32.[ 0sz ]; key_u32.[ 1sz ];
+    key_u32.[ 2sz ]; key_u32.[ 3sz ]; key_u32.[ 4sz ]; key_u32.[ 5sz ]; key_u32.[ 6sz ];
+    key_u32.[ 7sz ]; ctr; iv_u32.[ 0sz ]; iv_u32.[ 1sz ]; iv_u32.[ 2sz ]
+  ] in
+  assert_norm (List.Tot.length l = 16);
+  array_of_list l
 
-let chacha20_key_block
-      (state: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-    : x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64} =
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_core 0ul state
-  in
+let chacha20_key_block (state: array u32 16sz) : array u8 64sz =
+  let state:array u32 16sz = chacha20_core 0ul state in
   Chacha20.Hacspec_helper.u32s_to_le_bytes state
 
-let chacha20_key_block0
-      (key: (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 32}))
-      (iv: (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 12}))
-    : x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64} =
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_init key iv 0ul
-  in
+let chacha20_key_block0 (key: array u8 32sz) (iv: array u8 12sz) : array u8 64sz =
+  let state:array u32 16sz = chacha20_init key iv 0ul in
   chacha20_key_block state
 
-let chacha20_encrypt_block
-      (st0: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-      (ctr: UInt32.t)
-      (plain: (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64}))
-    : x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64} =
-  let st:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_core ctr st0
+let chacha20_encrypt_block (st0: array u32 16sz) (ctr: u32) (plain: array u8 64sz) : array u8 64sz =
+  let st:array u32 16sz = chacha20_core ctr st0 in
+  let (pl: array u32 16sz):array u32 16sz =
+    Chacha20.Hacspec_helper.to_le_u32s_16_ (Hax.CoerceUnsize.unsize plain)
   in
-  let (pl: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16})):x:
-  Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    Chacha20.Hacspec_helper.to_le_u32s_16 (Hacspec.Lib.unsize plain)
-  in
-  let encrypted:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    Chacha20.Hacspec_helper.xor_state st pl
-  in
+  let encrypted:array u32 16sz = Chacha20.Hacspec_helper.xor_state st pl in
   Chacha20.Hacspec_helper.u32s_to_le_bytes encrypted
 
-let chacha20_encrypt_last
-      (st0: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-      (ctr: UInt32.t)
-      (plain: FStar.Seq.seq UInt8.t)
-    : Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t =
-  let (b: (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64})):Alloc.Boxed.box_t
-    (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64})
-    Alloc.Alloc.global_t =
-    Hacspec.Lib.repeat 0uy 64
-  in
-  let b:x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64} =
-    Chacha20.Hacspec_helper.update_array b plain
-  in
-  let b:x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64} =
-    chacha20_encrypt_block st0 ctr b
-  in
-  Alloc.Slice.to_vec b.[ { end = Core.Slice.len plain } ]
+let chacha20_encrypt_last (st0: array u32 16sz) (ctr: u32) (plain: slice u8 {Seq.length plain < 64})
+    : Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
+  let (b: array u8 64sz):array u8 64sz = Hax.Array.repeat 0uy 64sz in
+  let b:array u8 64sz = Chacha20.Hacspec_helper.update_array b plain in
+  let b:array u8 64sz = chacha20_encrypt_block st0 ctr b in
+  Alloc.Slice.to_vec_under_impl b.[ {
+        Core.Ops.Range.RangeTo.f_end = Core.Slice.len_under_impl plain
+      } ]
 
-let chacha20_update
-      (st0: (x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16}))
-      (m: FStar.Seq.seq UInt8.t)
-    : Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t =
-  let blocks_out:Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t = Alloc.Vec.new_ in
-  let num_blocks:uint_size = Prims.op_Division (Core.Slice.len m) 64 in
-  let remainder_len:uint_size = Prims.op_Modulus (Core.Slice.len m) 64 in
-  let blocks_out:Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t =
-    Core.Iter.Iterator.fold (Core.Iter.Traits.Collect.IntoIterator.into_iter ({
-              start = 0;
-              end = num_blocks
+let cast = id
+
+
+let chacha20_update (st0: array u32 16sz) (m: slice u8) : Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
+  let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global = Alloc.Vec.new_under_impl in
+  let num_blocks:usize = Core.Slice.len_under_impl m /. 64sz in
+  let remainder_len:usize = Core.Slice.len_under_impl m %. 64sz in
+  let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
+    Core.Iter.fold (Core.Iter.into_iter ({
+              Core.Ops.Range.Range.f_start = 0sz;
+              Core.Ops.Range.Range.f_end = num_blocks
             }))
       blocks_out
-      (fun i blocks_out ->
-          let b:x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 64} =
+      (fun blocks_out i ->
+          admit ();
+          let b:array u8 64sz =
             chacha20_encrypt_block st0
-              (cast i)
-              (Core.Result.unwrap (Core.Convert.TryInto.try_into m.[ {
-                          start = 64 * i;
-                          end = 64 * i + 64
-                        } ]))
+              (SizeT.sizet_to_uint32 i <: u32)
+              (Core.Result.unwrap_under_impl (Core.Convert.try_into (m.[ {
+                          Core.Ops.Range.Range.f_start = 64sz *. i;
+                          Core.Ops.Range.Range.f_end = 64sz *. i +. 64sz
+                        } ] <: slice u8)))
           in
-          let blocks_out:Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t =
-            Alloc.Vec.extend_from_slice blocks_out (Hacspec.Lib.unsize b)
+          let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
+            Alloc.Vec.extend_from_slice_under_impl_2 blocks_out (Hax.CoerceUnsize.unsize b)
           in
           blocks_out)
   in
-  let blocks_out:Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t =
-    if remainder_len <> 0
+  let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
+    if remainder_len <>. 0sz
     then
-      let b:Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t =
-        chacha20_encrypt_last st0 (cast num_blocks) m.[ { start = 64 * num_blocks } ]
+      let b:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
+        admit ();
+        chacha20_encrypt_last st0
+          (SizeT.sizet_to_uint32 num_blocks)
+          m.[ { Core.Ops.Range.RangeFrom.f_start = 64sz *. num_blocks } ]
       in
-      let blocks_out:Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t =
-        Alloc.Vec.extend_from_slice blocks_out (Core.Ops.Deref.Deref.deref b)
+      let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
+        Alloc.Vec.extend_from_slice_under_impl_2 blocks_out (Core.Ops.Deref.Deref.deref b)
       in
       blocks_out
     else blocks_out
   in
   blocks_out
 
-let chacha20
-      (m: FStar.Seq.seq UInt8.t)
-      (key: (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 32}))
-      (iv: (x: Prims.list UInt8.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 12}))
-      (ctr: UInt32.t)
-    : Alloc.Vec.vec_t UInt8.t Alloc.Alloc.global_t =
-  let state:x: Prims.list UInt32.t {Prims.op_Equality (FStar.List.Tot.Base.length x) 16} =
-    chacha20_init key iv ctr
-  in
+let chacha20 (m: slice u8) (key: array u8 32sz) (iv: array u8 12sz) (ctr: u32)
+    : Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
+  let state:array u32 16sz = chacha20_init key iv ctr in
   chacha20_update state m
