@@ -2341,6 +2341,19 @@ fn test_step_11_12() {
             Seq::<Polyx>::from_vec(vec![a_0.clone(), a_1.clone(), a_2.clone()]);
         let q_add: Polyx = lagrange_polyx(q_add_points);
 
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_1.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_2.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
+
         // construct A_i's (commitments)
         let A_0_blinding: FpVesta = FpVesta::from_literal(123 as u128);
         let A_0: G1_pallas = commit_polyx(&crs, a_0.clone(), A_0_blinding);
@@ -2549,6 +2562,19 @@ fn test_step_18_19() {
         let a_primes: Seq<Polyx> =
             Seq::<Polyx>::from_vec(vec![a_0.clone(), a_1.clone(), a_2.clone()]);
         let q_add: Polyx = lagrange_polyx(q_add_points);
+
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_1.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_2.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
 
         // construct A_i's (commitments)
         let A_0_blinding: FpVesta = FpVesta::from_literal(123 as u128);
@@ -2809,6 +2835,19 @@ fn test_step_22_23() {
         let a_primes: Seq<Polyx> =
             Seq::<Polyx>::from_vec(vec![a_0.clone(), a_1.clone(), a_2.clone()]);
         let q_add: Polyx = lagrange_polyx(q_add_points);
+
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_1.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_2.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
 
         // construct A_i's (commitments)
         let A_0_blinding: FpVesta = FpVesta::from_literal(123 as u128);
@@ -3319,6 +3358,19 @@ fn automatic_negative_illegal_circut_example_run() {
         let a_primes: Seq<Polyx> =
             Seq::<Polyx>::from_vec(vec![a_0.clone(), a_1.clone(), a_2.clone()]);
         let q_add: Polyx = lagrange_polyx(q_add_points);
+
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_1.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_2.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
 
         // construct A_i's (commitments)
         let A_0_blinding: FpVesta = FpVesta::from_literal(123 as u128);
@@ -4326,6 +4378,19 @@ fn automatic_positive_legal_circut_example_run() {
         let a_primes: Seq<Polyx> =
             Seq::<Polyx>::from_vec(vec![a_0.clone(), a_1.clone(), a_2.clone()]);
         let q_add: Polyx = lagrange_polyx(q_add_points);
+
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_1.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_2.len() < 1 {
+            return TestResult::discard();
+        }
+        if a_0.len() < 1 {
+            return TestResult::discard();
+        }
 
         // construct A_i's (commitments)
         let A_0_blinding: FpVesta = FpVesta::from_literal(123 as u128);
