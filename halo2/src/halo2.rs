@@ -2849,6 +2849,7 @@ fn test_step_22_23() {
             return TestResult::discard();
         }
 
+
         // construct A_i's (commitments)
         let A_0_blinding: FpVesta = FpVesta::from_literal(123 as u128);
         let A_0: G1_pallas = commit_polyx(&crs, a_0.clone(), A_0_blinding);
@@ -3371,6 +3372,7 @@ fn automatic_negative_illegal_circut_example_run() {
         if a_0.len() < 1 {
             return TestResult::discard();
         }
+
 
         // construct A_i's (commitments)
         let A_0_blinding: FpVesta = FpVesta::from_literal(123 as u128);
