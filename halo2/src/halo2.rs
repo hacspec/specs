@@ -5565,6 +5565,10 @@ impl Arbitrary for PolyxContainer {
             let new_val: FpVesta = FpVesta::from_literal(u128::arbitrary(g));
             v.push(new_val);
         }
+        if size == 0 {
+            v.push(FpVesta::ZERO())
+        }
+
         PolyxContainer(Seq::<FpVesta>::from_vec(v))
     }
 }
