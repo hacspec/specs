@@ -72,8 +72,9 @@ fn inner_product(u: Polyx, v: Polyx) -> FpVesta {
 /// * `a` - sequence of scalars (LHS)
 /// * `g` - sequence of group (curve) elements (RHS)
 fn msm(a: Polyx, g: Seq<G1_pallas>) -> G1_pallas {
-    let mut res: G1_pallas = g1mul_pallas(a[usize::zero()], g[usize::zero()]);
-    for i in 1..a.len() {
+    // initial value is zero
+    let mut res: G1_pallas = (FpPallas::ZERO(), FpPallas::ZERO(), true);
+    for i in 0..a.len() {
         res = g1add_pallas(res, g1mul_pallas(a[i], g[i]));
     }
 
@@ -1239,8 +1240,10 @@ fn test_step_5_6_7_8() {
 
         // STEP 6
         let H_s = step_6(h_s.clone(), &(G.clone(), W), h_blindings.clone());
+
         // STEP 7
         let H_prime = step_7(H_s, x, n);
+
         // STEP 8
         let (h_prime, h_prime_blinding) = step_8(h_s, x, n, h_blindings.clone());
 
@@ -5364,7 +5367,7 @@ pub fn check_not_zero_polyx(p: Polyx) -> bool {
 ///
 /// * `p` - the polynomial
 pub fn trim_polyx(p: Polyx) -> Polyx {
-    let mut last_val_idx = 0;
+    let mut last_val_idx = 1;
     for i in 0..p.len() {
         if p[i] != FpVesta::ZERO() {
             last_val_idx = i + 1;
@@ -5562,6 +5565,10 @@ impl Arbitrary for PolyxContainer {
             let new_val: FpVesta = FpVesta::from_literal(u128::arbitrary(g));
             v.push(new_val);
         }
+        if size == 0 {
+            v.push(FpVesta::ZERO())
+        }
+
         PolyxContainer(Seq::<FpVesta>::from_vec(v))
     }
 }
