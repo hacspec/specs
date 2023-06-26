@@ -1,7 +1,6 @@
 module Chacha20
 #set-options "--fuel 0 --ifuel 1 --z3rlimit 15"
 open Core
-open Hax.Lib 
 
 let t_State = array u32 16sz
 
@@ -11,11 +10,11 @@ let t_ChaChaIV = array u8 12sz
 
 let t_ChaChaKey = array u8 32sz
 
-let t_StateIdx = bounded_index 16sz
+let t_StateIdx = usize
 
-let v__StateIdx (x: usize {SizeT.v x < 16}) : t_StateIdx = Bounded x
+let v_BoundedIndex (x: usize) : usize = x
 
-let chacha20_line (a b d: t_StateIdx) (s: u32) (m: array u32 16sz) : array u32 16sz =
+let chacha20_line (a b d: usize) (s: u32) (m: array u32 16sz) : array u32 16sz =
   let state:array u32 16sz = m in
   let state:array u32 16sz =
     state.[ a ] <- Core.Num.wrapping_add_under_impl_8 state.[ a ] state.[ b ]
@@ -24,7 +23,7 @@ let chacha20_line (a b d: t_StateIdx) (s: u32) (m: array u32 16sz) : array u32 1
   let state:array u32 16sz = state.[ d ] <- Core.Num.rotate_left_under_impl_8 state.[ d ] s in
   state
 
-let chacha20_quarter_round (a b c d: t_StateIdx) (state: array u32 16sz) : array u32 16sz =
+let chacha20_quarter_round (a b c d: usize) (state: array u32 16sz) : array u32 16sz =
   let state:array u32 16sz = chacha20_line a b d 16ul state in
   let state:array u32 16sz = chacha20_line c d b 12ul state in
   let state:array u32 16sz = chacha20_line a b d 8ul state in
@@ -32,64 +31,64 @@ let chacha20_quarter_round (a b c d: t_StateIdx) (state: array u32 16sz) : array
 
 let chacha20_double_round (state: array u32 16sz) : array u32 16sz =
   let state:array u32 16sz =
-    chacha20_quarter_round (v__StateIdx 0sz)
-      (v__StateIdx 4sz)
-      (v__StateIdx 8sz)
-      (v__StateIdx 12sz)
+    chacha20_quarter_round (v_BoundedIndex 0sz)
+      (v_BoundedIndex 4sz)
+      (v_BoundedIndex 8sz)
+      (v_BoundedIndex 12sz)
       state
   in
   let state:array u32 16sz =
-    chacha20_quarter_round (v__StateIdx 1sz)
-      (v__StateIdx 5sz)
-      (v__StateIdx 9sz)
-      (v__StateIdx 13sz)
+    chacha20_quarter_round (v_BoundedIndex 1sz)
+      (v_BoundedIndex 5sz)
+      (v_BoundedIndex 9sz)
+      (v_BoundedIndex 13sz)
       state
   in
   let state:array u32 16sz =
-    chacha20_quarter_round (v__StateIdx 2sz)
-      (v__StateIdx 6sz)
-      (v__StateIdx 10sz)
-      (v__StateIdx 14sz)
+    chacha20_quarter_round (v_BoundedIndex 2sz)
+      (v_BoundedIndex 6sz)
+      (v_BoundedIndex 10sz)
+      (v_BoundedIndex 14sz)
       state
   in
   let state:array u32 16sz =
-    chacha20_quarter_round (v__StateIdx 3sz)
-      (v__StateIdx 7sz)
-      (v__StateIdx 11sz)
-      (v__StateIdx 15sz)
+    chacha20_quarter_round (v_BoundedIndex 3sz)
+      (v_BoundedIndex 7sz)
+      (v_BoundedIndex 11sz)
+      (v_BoundedIndex 15sz)
       state
   in
   let state:array u32 16sz =
-    chacha20_quarter_round (v__StateIdx 0sz)
-      (v__StateIdx 5sz)
-      (v__StateIdx 10sz)
-      (v__StateIdx 15sz)
+    chacha20_quarter_round (v_BoundedIndex 0sz)
+      (v_BoundedIndex 5sz)
+      (v_BoundedIndex 10sz)
+      (v_BoundedIndex 15sz)
       state
   in
   let state:array u32 16sz =
-    chacha20_quarter_round (v__StateIdx 1sz)
-      (v__StateIdx 6sz)
-      (v__StateIdx 11sz)
-      (v__StateIdx 12sz)
+    chacha20_quarter_round (v_BoundedIndex 1sz)
+      (v_BoundedIndex 6sz)
+      (v_BoundedIndex 11sz)
+      (v_BoundedIndex 12sz)
       state
   in
   let state:array u32 16sz =
-    chacha20_quarter_round (v__StateIdx 2sz)
-      (v__StateIdx 7sz)
-      (v__StateIdx 8sz)
-      (v__StateIdx 13sz)
+    chacha20_quarter_round (v_BoundedIndex 2sz)
+      (v_BoundedIndex 7sz)
+      (v_BoundedIndex 8sz)
+      (v_BoundedIndex 13sz)
       state
   in
-  chacha20_quarter_round (v__StateIdx 3sz)
-    (v__StateIdx 4sz)
-    (v__StateIdx 9sz)
-    (v__StateIdx 14sz)
+  chacha20_quarter_round (v_BoundedIndex 3sz)
+    (v_BoundedIndex 4sz)
+    (v_BoundedIndex 9sz)
+    (v_BoundedIndex 14sz)
     state
 
 let chacha20_rounds (state: array u32 16sz) : array u32 16sz =
   let st:array u32 16sz = state in
   let st:array u32 16sz =
-    Core.Iter.fold (Core.Iter.into_iter ({
+    Core.Iter.Traits.Iterator.Iterator.fold (Core.Iter.Traits.Collect.IntoIterator.into_iter ({
               Core.Ops.Range.Range.f_start = 0sz;
               Core.Ops.Range.Range.f_end = 10sz
             }))
@@ -113,13 +112,15 @@ let chacha20_init (key: array u8 32sz) (iv: array u8 12sz) (ctr: u32) : array u3
   let (iv_u32: array u32 3sz):array u32 3sz =
     Chacha20.Hacspec_helper.to_le_u32s_3_ (Hax.CoerceUnsize.unsize iv)
   in
-  let l = [
-    1634760805ul; 857760878ul; 2036477234ul; 1797285236ul; key_u32.[ 0sz ]; key_u32.[ 1sz ];
-    key_u32.[ 2sz ]; key_u32.[ 3sz ]; key_u32.[ 4sz ]; key_u32.[ 5sz ]; key_u32.[ 6sz ];
-    key_u32.[ 7sz ]; ctr; iv_u32.[ 0sz ]; iv_u32.[ 1sz ]; iv_u32.[ 2sz ]
-  ] in
-  assert_norm (List.Tot.length l = 16);
-  array_of_list l
+  (let l =
+      [
+        1634760805ul; 857760878ul; 2036477234ul; 1797285236ul; key_u32.[ 0sz ]; key_u32.[ 1sz ];
+        key_u32.[ 2sz ]; key_u32.[ 3sz ]; key_u32.[ 4sz ]; key_u32.[ 5sz ]; key_u32.[ 6sz ];
+        key_u32.[ 7sz ]; ctr; iv_u32.[ 0sz ]; iv_u32.[ 1sz ]; iv_u32.[ 2sz ]
+      ]
+    in
+    assert_norm (List.Tot.length l == 16);
+    Hax.Array.array_of_list l)
 
 let chacha20_key_block (state: array u32 16sz) : array u8 64sz =
   let state:array u32 16sz = chacha20_core 0ul state in
@@ -137,7 +138,7 @@ let chacha20_encrypt_block (st0: array u32 16sz) (ctr: u32) (plain: array u8 64s
   let encrypted:array u32 16sz = Chacha20.Hacspec_helper.xor_state st pl in
   Chacha20.Hacspec_helper.u32s_to_le_bytes encrypted
 
-let chacha20_encrypt_last (st0: array u32 16sz) (ctr: u32) (plain: slice u8 {Seq.length plain < 64})
+let chacha20_encrypt_last (st0: array u32 16sz) (ctr: u32) (plain: slice u8)
     : Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
   let (b: array u8 64sz):array u8 64sz = Hax.Array.repeat 0uy 64sz in
   let b:array u8 64sz = Chacha20.Hacspec_helper.update_array b plain in
@@ -146,28 +147,25 @@ let chacha20_encrypt_last (st0: array u32 16sz) (ctr: u32) (plain: slice u8 {Seq
         Core.Ops.Range.RangeTo.f_end = Core.Slice.len_under_impl plain
       } ]
 
-let cast = id
-
-
+#push-options "--lax"
 let chacha20_update (st0: array u32 16sz) (m: slice u8) : Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
   let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global = Alloc.Vec.new_under_impl in
   let num_blocks:usize = Core.Slice.len_under_impl m /. 64sz in
   let remainder_len:usize = Core.Slice.len_under_impl m %. 64sz in
   let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
-    Core.Iter.fold (Core.Iter.into_iter ({
+    Core.Iter.Traits.Iterator.Iterator.fold (Core.Iter.Traits.Collect.IntoIterator.into_iter ({
               Core.Ops.Range.Range.f_start = 0sz;
               Core.Ops.Range.Range.f_end = num_blocks
             }))
       blocks_out
       (fun blocks_out i ->
-          admit ();
           let b:array u8 64sz =
             chacha20_encrypt_block st0
-              (SizeT.sizet_to_uint32 i <: u32)
-              (Core.Result.unwrap_under_impl (Core.Convert.try_into (m.[ {
+              (cast i)
+              (Core.Result.unwrap_under_impl (Core.Convert.TryInto.try_into m.[ {
                           Core.Ops.Range.Range.f_start = 64sz *. i;
                           Core.Ops.Range.Range.f_end = 64sz *. i +. 64sz
-                        } ] <: slice u8)))
+                        } ]))
           in
           let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
             Alloc.Vec.extend_from_slice_under_impl_2 blocks_out (Hax.CoerceUnsize.unsize b)
@@ -178,9 +176,8 @@ let chacha20_update (st0: array u32 16sz) (m: slice u8) : Alloc.Vec.t_Vec u8 All
     if remainder_len <>. 0sz
     then
       let b:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =
-        admit ();
         chacha20_encrypt_last st0
-          (SizeT.sizet_to_uint32 num_blocks)
+          (cast num_blocks)
           m.[ { Core.Ops.Range.RangeFrom.f_start = 64sz *. num_blocks } ]
       in
       let blocks_out:Alloc.Vec.t_Vec u8 Alloc.Alloc.t_Global =

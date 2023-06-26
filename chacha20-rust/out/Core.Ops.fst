@@ -24,8 +24,11 @@ instance _: add_tc SizeT.t SizeT.t = {
 
 
 let ( ^. ) x y = x
-let ( /. ) x y = x
-let ( %. ) x y = x
-let ( *. ) x y = x
+let ( /. ) = SizeT.div
+let ( %. ) = SizeT.rem  
+let ( *. ) = SizeT.mul
 
 let ( <>. ) (x y: SizeT.t) = x <> y
+
+let cast = id
+

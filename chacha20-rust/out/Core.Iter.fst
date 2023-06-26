@@ -6,21 +6,23 @@ class iterator self = {
   item: Type;
   next: self -> self * option item;
   size_hint: self -> option usize;
-  fold: #b:Type -> self -> b -> (b -> item -> b) -> b
+  in_range: self -> item -> Type0;
+  fold: #b:Type -> s:self -> b -> (b -> i:item{in_range s i} -> b) -> b
 }
 
 open Core.Ops.Range.Range
 
-instance iterator_array t len: iterator (array t len) = {
+instance iterator_array (t: eqtype) len: iterator (array t len) = {
   item = t;
   next = (fun s -> admit ());
   size_hint = (fun s -> Some (admit ()));
+  in_range = (fun (arr: array t len) i -> Seq.mem i arr);
   fold = (fun #b s init f -> admit ())
 }
 
 let rec fold_range'
   (min: SizeT.t) (max: SizeT.t {SizeT.v min <= SizeT.v max})
-  (init: 'a) (f: 'a -> usize -> 'a)
+  (init: 'a) (f: ('a -> i:usize{SizeT.v i < SizeT.v max /\ SizeT.v i >= SizeT.v min} -> 'a))
   : Tot 'a (decreases (SizeT.v max - SizeT.v min))
   = let open FStar.SizeT in
     if min = max
@@ -41,9 +43,10 @@ instance iterator_range: iterator range =
           then f_end -^ f_start 
           else 0sz)
   );
+  in_range = (fun x i -> SizeT.v i < SizeT.v x.f_end /\ SizeT.v i >= SizeT.v x.f_start);
   fold = (fun #b r init f -> 
     if r.f_start <^ r.f_end
-    then fold_range' r.f_start r.f_end init f
+    then fold_range' r.f_start r.f_end init (fun x i -> f x i)
     else init
   );
 }
@@ -108,4 +111,3 @@ instance rangeFrom_index_slice t : index (slice t) RangeFrom.range = {
     );
 }
 
-let into_iter = id

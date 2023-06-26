@@ -1,3 +1,6 @@
+mod bounded_index;
+// use bounded_index::BoundedIndex;
+
 mod hacspec_helper;
 use hacspec_helper::*;
 
@@ -6,23 +9,12 @@ type Block = [u8; 64];
 type ChaChaIV = [u8; 12];
 type ChaChaKey = [u8; 32];
 
-// #[derive(Copy, Clone)]
-// pub struct StateIdx(usize);
-
-// impl std::ops::Index<StateIdx> for State {
-//     type Output = u32;
-//     fn index(&self, StateIdx(i): StateIdx) -> &u32 {
-//         self.index(i)
-//     }
-// }
-// impl std::ops::IndexMut<StateIdx> for State {
-//     fn index_mut(&mut self, StateIdx(i): StateIdx) -> &mut u32 {
-//         self.index_mut(i)
-//     }
-// }
-
+// type StateIdx = BoundedIndex<16>;
 type StateIdx = usize;
-fn _StateIdx(x: usize) -> usize {x}
+
+fn BoundedIndex(x: usize) -> usize {
+    x
+}
 
 fn chacha20_line(a: StateIdx, b: StateIdx, d: StateIdx, s: u32, m: State) -> State {
     let mut state = m;
@@ -40,15 +32,15 @@ pub fn chacha20_quarter_round(a: StateIdx, b: StateIdx, c: StateIdx, d: StateIdx
 }
 
 fn chacha20_double_round(state: State) -> State {
-    let state = chacha20_quarter_round(_StateIdx(0), _StateIdx(4), _StateIdx(8), _StateIdx(12), state);
-    let state = chacha20_quarter_round(_StateIdx(1), _StateIdx(5), _StateIdx(9), _StateIdx(13), state);
-    let state = chacha20_quarter_round(_StateIdx(2), _StateIdx(6), _StateIdx(10), _StateIdx(14), state);
-    let state = chacha20_quarter_round(_StateIdx(3), _StateIdx(7), _StateIdx(11), _StateIdx(15), state);
+    let state = chacha20_quarter_round(BoundedIndex(0), BoundedIndex(4), BoundedIndex(8), BoundedIndex(12), state);
+    let state = chacha20_quarter_round(BoundedIndex(1), BoundedIndex(5), BoundedIndex(9), BoundedIndex(13), state);
+    let state = chacha20_quarter_round(BoundedIndex(2), BoundedIndex(6), BoundedIndex(10), BoundedIndex(14), state);
+    let state = chacha20_quarter_round(BoundedIndex(3), BoundedIndex(7), BoundedIndex(11), BoundedIndex(15), state);
 
-    let state = chacha20_quarter_round(_StateIdx(0), _StateIdx(5), _StateIdx(10), _StateIdx(15), state);
-    let state = chacha20_quarter_round(_StateIdx(1), _StateIdx(6), _StateIdx(11), _StateIdx(12), state);
-    let state = chacha20_quarter_round(_StateIdx(2), _StateIdx(7), _StateIdx(8), _StateIdx(13), state);
-    chacha20_quarter_round(_StateIdx(3), _StateIdx(4), _StateIdx(9), _StateIdx(14), state)
+    let state = chacha20_quarter_round(BoundedIndex(0), BoundedIndex(5), BoundedIndex(10), BoundedIndex(15), state);
+    let state = chacha20_quarter_round(BoundedIndex(1), BoundedIndex(6), BoundedIndex(11), BoundedIndex(12), state);
+    let state = chacha20_quarter_round(BoundedIndex(2), BoundedIndex(7), BoundedIndex(8), BoundedIndex(13), state);
+    chacha20_quarter_round(BoundedIndex(3), BoundedIndex(4), BoundedIndex(9), BoundedIndex(14), state)
 }
 
 pub fn chacha20_rounds(state: State) -> State {
@@ -122,6 +114,7 @@ pub fn chacha20_update(st0: State, m: &[u8]) -> Vec<u8> {
         // if msg_block.len() != 64 {
         // } else {
         // Full block
+        // blocks_out[64 * i..(64 * i + 64)] = chacha20_encrypt_block(st0, i as u32, &m[64 * i..(64 * i + 64)].try_into().unwrap());
         let b =
             chacha20_encrypt_block(st0, i as u32, &m[64 * i..(64 * i + 64)].try_into().unwrap());
         blocks_out.extend_from_slice(&b);

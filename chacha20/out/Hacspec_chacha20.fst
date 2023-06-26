@@ -27,7 +27,8 @@ let chacha20_line (a b d s: uint_size) (m: state_t) : state_t =
   let state:state_t = m in
   let state:state_t = state.[ a ] <- state.[ a ] +. state.[ b ] in
   let state:state_t = state.[ d ] <- state.[ d ] ^. state.[ a ] in
-  state.[ d ] <- Secret_integers.rotate_left state.[ d ] s
+  let state:state_t = state.[ d ] <- Secret_integers.rotate_left state.[ d ] s in
+  state
 
 let chacha20_quarter_round (a b c d: uint_size) (state: state_t) : state_t =
   let state:state_t = chacha20_line a b d 16 state in
@@ -47,9 +48,17 @@ let chacha20_double_round (state: state_t) : state_t =
 
 let chacha20_rounds (state: state_t) : state_t =
   let st:state_t = state in
-  Hacspec.Lib.foldi 0l 10l (fun _i st -> chacha20_double_round st) st
+  let st:state_t =
+    Core.Iter.Iterator.fold (Core.Iter.Traits.Collect.IntoIterator.into_iter ({
+              start = 0l;
+              end = 10l
+            }))
+      st
+      (fun _i st -> chacha20_double_round st)
+  in
+  st
 
-let chacha20_core (ctr: Secret_integers.u32_t) (st0: state_t) : state_t =
+let chacha20_core (ctr: Secret_integers.u32_t) (st0: state_t) : _ =
   let state:state_t = st0 in
   let state:state_t = state.[ 12l ] <- state.[ 12l ] +. ctr in
   let k:state_t = chacha20_rounds state in
@@ -60,14 +69,16 @@ let chacha20_constants_init: constants_t =
   let constants:constants_t = constants.[ 0l ] <- Hacspec_lib_tc.secret 1634760805ul in
   let constants:constants_t = constants.[ 1l ] <- Hacspec_lib_tc.secret 857760878ul in
   let constants:constants_t = constants.[ 2l ] <- Hacspec_lib_tc.secret 2036477234ul in
-  constants.[ 3l ] <- Hacspec_lib_tc.secret 1797285236ul
+  let constants:constants_t = constants.[ 3l ] <- Hacspec_lib_tc.secret 1797285236ul in
+  constants
 
 let chacha20_init (key: chaChaKey_t) (iv: chaChaIV_t) (ctr: Secret_integers.u32_t) : state_t =
   let st:state_t = new_ in
   let st:state_t = Hacspec_lib_tc.update st 0 chacha20_constants_init in
   let st:state_t = Hacspec_lib_tc.update st 4 (to_le_U32s key) in
   let st:state_t = st.[ 12l ] <- ctr in
-  Hacspec_lib_tc.update st 13 (to_le_U32s iv)
+  let st:state_t = Hacspec_lib_tc.update st 13 (to_le_U32s iv) in
+  st
 
 let chacha20_key_block (state: state_t) : block_t =
   let state:state_t = chacha20_core (Hacspec_lib_tc.secret 0ul) state in
@@ -80,7 +91,7 @@ let chacha20_key_block0 (key: chaChaKey_t) (iv: chaChaIV_t) : block_t =
 let chacha20_encrypt_block (st0: state_t) (ctr: Secret_integers.u32_t) (plain: block_t) : block_t =
   let st:state_t = chacha20_core ctr st0 in
   let pl:state_t = from_seq (to_le_U32s plain) in
-  let st:state_t = pl ^. st in
+  let st = pl ^. st in
   from_seq (to_le_bytes st)
 
 let chacha20_encrypt_last
@@ -100,28 +111,39 @@ let chacha20_update (st0: state_t) (m: Hacspec_lib_tc.seq_t Secret_integers.u8_t
   in
   let n_blocks:uint_size = Hacspec_lib_tc.num_exact_chunks m 64 in
   let blocks_out:Hacspec_lib_tc.seq_t Secret_integers.u8_t =
-    Hacspec.Lib.foldi 0
-      n_blocks
+    Core.Iter.Iterator.fold (Core.Iter.Traits.Collect.IntoIterator.into_iter ({
+              start = 0;
+              end = n_blocks
+            }))
+      blocks_out
       (fun i blocks_out ->
           let msg_block:Hacspec_lib_tc.seq_t Secret_integers.u8_t =
             Hacspec_lib_tc.get_exact_chunk m 64 i
           in
           let b:block_t =
-            chacha20_encrypt_block st0 (Hacspec_lib_tc.secret i) (from_seq msg_block)
+            chacha20_encrypt_block st0 (Hacspec_lib_tc.secret (cast i)) (from_seq msg_block)
           in
-          Hacspec_lib_tc.set_exact_chunk blocks_out 64 i b)
-      blocks_out
+          let blocks_out:Hacspec_lib_tc.seq_t Secret_integers.u8_t =
+            Hacspec_lib_tc.set_exact_chunk blocks_out 64 i b
+          in
+          blocks_out)
   in
   let last_block:Hacspec_lib_tc.seq_t Secret_integers.u8_t =
     Hacspec_lib_tc.get_remainder_chunk m 64
   in
-  if Hacspec_lib_tc.len last_block <> 0
-  then
-    let b:Hacspec_lib_tc.seq_t Secret_integers.u8_t =
-      chacha20_encrypt_last st0 (Hacspec_lib_tc.secret n_blocks) last_block
-    in
-    Hacspec_lib_tc.set_chunk blocks_out 64 n_blocks b
-  else blocks_out
+  let blocks_out:Hacspec_lib_tc.seq_t Secret_integers.u8_t =
+    if Hacspec_lib_tc.len last_block <> 0
+    then
+      let b:Hacspec_lib_tc.seq_t Secret_integers.u8_t =
+        chacha20_encrypt_last st0 (Hacspec_lib_tc.secret (cast n_blocks)) last_block
+      in
+      let blocks_out:Hacspec_lib_tc.seq_t Secret_integers.u8_t =
+        Hacspec_lib_tc.set_chunk blocks_out 64 n_blocks b
+      in
+      blocks_out
+    else blocks_out
+  in
+  blocks_out
 
 let chacha20
       (key: chaChaKey_t)
