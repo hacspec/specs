@@ -23,4 +23,5 @@ members = [
     "pasta",
     "halo2",
     "weierstrass-curves",
+    "ovn",
 ]
