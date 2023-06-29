@@ -1,6 +1,5 @@
-use num_bigint::BigUint;
-
-pub struct NatMod<const L: usize> {
-    value: BigUint,
-    modulus: BigUint,
+/// This has to come from the lib.
+pub trait NatMod<T> {
+    const MODULUS: T;
+    const MODULUS_STR: &'static str;
 }
