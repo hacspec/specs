@@ -1,5 +1,4 @@
-mod bounded_index;
-// use bounded_index::BoundedIndex;
+use bounded_indexes::BoundedIndex;
 
 mod hacspec_helper;
 use hacspec_helper::*;
@@ -9,12 +8,7 @@ type Block = [u8; 64];
 type ChaChaIV = [u8; 12];
 type ChaChaKey = [u8; 32];
 
-// type StateIdx = BoundedIndex<16>;
-type StateIdx = usize;
-
-fn BoundedIndex(x: usize) -> usize {
-    x
-}
+type StateIdx = BoundedIndex<16>;
 
 fn chacha20_line(a: StateIdx, b: StateIdx, d: StateIdx, s: u32, m: State) -> State {
     let mut state = m;

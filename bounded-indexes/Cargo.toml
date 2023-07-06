@@ -1,0 +1,7 @@
+[package]
+name = "bounded-indexes"
+version = "0.1.0"
+authors = ["Lucas Franceschino <lucas.franceschino@inria.fr>"]
+edition = "2021"
+
+[dependencies]
