@@ -20,7 +20,7 @@ pub trait NatMod<const LEN: usize> {
         let rhs = num_bigint::BigUint::from_bytes_be(rhs.value());
         let modulus = num_bigint::BigUint::from_bytes_be(&Self::MODULUS);
         let res = if lhs < rhs {
-            modulus.clone() - lhs + rhs
+            modulus.clone() + lhs - rhs
         } else {
             lhs - rhs
         };
