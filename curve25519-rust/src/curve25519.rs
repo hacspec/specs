@@ -1,3 +1,5 @@
+//! x25519 as specified in https://www.rfc-editor.org/rfc/rfc7748
+
 mod hacspec_helper;
 use hacspec_helper::*;
 
@@ -25,18 +27,16 @@ fn decode_scalar(s: X25519SerializedScalar) -> Scalar {
     Scalar::from_le_bytes(&k)
 }
 
-fn decode_point(u: X25519SerializedPoint) -> Point {
-    let mut u_ = u;
-    u_[31] = u_[31] & U8(127u8);
+fn decode_point(mut u: X25519SerializedPoint) -> Point {
+    u[31] = u[31] & U8(127);
     (
-        X25519FieldElement::from_le_bytes(&u_),
+        X25519FieldElement::from_le_bytes(&u),
         X25519FieldElement::from_u128(1),
     )
 }
 
 fn encode_point(p: Point) -> X25519SerializedPoint {
-    let (x, y) = p;
-    let b = x * y.inv();
+    let b = p.0 * p.1.inv();
     b.to_le_bytes()
 }
 
@@ -55,8 +55,8 @@ fn point_add_and_double(q: Point, np: (Point, Point)) -> (Point, Point) {
     let da = d * a;
     let cb = c * b;
 
-    let x_3 = (da + cb).pow(2u128);
-    let z_3 = x_1 * ((da - cb).pow(2u128));
+    let x_3 = (da + cb).pow(2);
+    let z_3 = x_1 * ((da - cb).pow(2));
     let x_2 = aa * bb;
     let e121665 = X25519FieldElement::from_u128(121_665);
     let z_2 = e * (aa + (e121665 * e));
@@ -64,8 +64,7 @@ fn point_add_and_double(q: Point, np: (Point, Point)) -> (Point, Point) {
 }
 
 fn swap(x: (Point, Point)) -> (Point, Point) {
-    let (x0, x1) = x;
-    (x1, x0)
+    (x.1, x.0)
 }
 
 fn montgomery_ladder(k: Scalar, init: Point) -> Point {
@@ -83,17 +82,16 @@ fn montgomery_ladder(k: Scalar, init: Point) -> Point {
             acc = point_add_and_double(init, acc);
         }
     }
-    let (out, _) = acc;
-    out
+    acc.0
 }
 
 pub fn x25519_scalarmult(
     s: X25519SerializedScalar,
     p: X25519SerializedPoint,
 ) -> X25519SerializedPoint {
-    let s_ = decode_scalar(s);
-    let p_ = decode_point(p);
-    let r = montgomery_ladder(s_, p_);
+    let s = decode_scalar(s);
+    let p = decode_point(p);
+    let r = montgomery_ladder(s, p);
     encode_point(r)
 }
 

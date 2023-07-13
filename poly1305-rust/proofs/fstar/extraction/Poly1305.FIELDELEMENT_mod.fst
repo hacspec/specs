@@ -66,3 +66,12 @@ let impl: Core.Ops.Arith.t_Mul Poly1305.t_FieldElement Poly1305.t_FieldElement =
     fun (self: Poly1305.t_FieldElement) (rhs: Poly1305.t_FieldElement) ->
       Poly1305.Hacspec_helper.NatMod.fmul self rhs
   }
+
+let impl: Core.Ops.Arith.t_Sub Poly1305.t_FieldElement Poly1305.t_FieldElement =
+  {
+    output = Poly1305.t_FieldElement;
+    sub
+    =
+    fun (self: Poly1305.t_FieldElement) (rhs: Poly1305.t_FieldElement) ->
+      Poly1305.Hacspec_helper.NatMod.fsub self rhs
+  }

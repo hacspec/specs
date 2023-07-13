@@ -63,7 +63,7 @@ pub fn nat_mod(attr: TokenStream, item: TokenStream) -> TokenStream {
     );
 
     let out_struct = quote! {
-        #[derive(Clone, Copy, PartialEq, Eq)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub struct #ident {
             value: [u8; #num_bytes],
         }
