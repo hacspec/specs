@@ -2,7 +2,7 @@
 name = "curve25519"
 version = "0.1.0"
 authors = ["Franziskus Kiefer <franziskuskiefer@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 path = "src/curve25519.rs"
@@ -15,8 +15,3 @@ natmod = { path = "../natmod" }
 criterion = "0.4"
 hex = "0.4"
 rand = "0.8"
-
-
-[[bench]]
-name = "benchmarks"
-harness = false

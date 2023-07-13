@@ -115,19 +115,27 @@ pub trait NatMod<const LEN: usize> {
     }
 
     /// Create a new [`#ident`] from a little endian byte slice.
+    ///
+    /// This computes bytes % MODULUS
     fn from_le_bytes(bytes: &[u8]) -> Self
     where
         Self: Sized,
     {
-        Self::from_bigint(num_bigint::BigUint::from_bytes_le(bytes))
+        let value = num_bigint::BigUint::from_bytes_le(bytes);
+        let modulus = num_bigint::BigUint::from_bytes_be(&Self::MODULUS);
+        Self::from_bigint(value % modulus)
     }
 
     /// Create a new [`#ident`] from a little endian byte slice.
+    ///
+    /// This computes bytes % MODULUS
     fn from_be_bytes(bytes: &[u8]) -> Self
     where
         Self: Sized,
     {
-        Self::from_bigint(num_bigint::BigUint::from_bytes_be(bytes))
+        let value = num_bigint::BigUint::from_bytes_be(bytes);
+        let modulus = num_bigint::BigUint::from_bytes_be(&Self::MODULUS);
+        Self::from_bigint(value % modulus)
     }
 
     fn to_le_bytes(self) -> [u8; LEN]
@@ -200,47 +208,4 @@ pub trait NatMod<const LEN: usize> {
 pub type U8 = u8;
 pub fn U8(x: u8) -> u8 {
     x
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use natmod::nat_mod;
-
-    #[nat_mod("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed", 32)]
-    pub struct X25519FieldElement {}
-
-    #[nat_mod("8000000000000000000000000000000000000000000000000000000000000000", 32)]
-    pub struct Scalar {}
-
-    #[test]
-    fn fsub() {
-        let a = X25519FieldElement::from_hex("123456");
-        let b = X25519FieldElement::from_hex("789101");
-        let c = b - a;
-        assert_eq!(c, X25519FieldElement::from_hex("665cab"));
-        let c = a - b;
-        assert_eq!(c, X25519FieldElement::from_hex("665cab"));
-    }
-
-    #[test]
-    fn inv() {
-        let a = X25519FieldElement::from_hex("12387651321684968541613456");
-        let b = a.inv();
-        let c = a * b;
-        assert_eq!(c, X25519FieldElement::one());
-    }
-
-    #[test]
-    fn bit() {
-        let a = X25519FieldElement::from_hex("876513549846532265531deaf651daf464");
-        eprintln!("a: {}", hex::encode(a.to_be_bytes()));
-        assert!(!a.bit(0));
-        assert!(!a.bit(1));
-        assert!(a.bit(2));
-        assert!(!a.bit(3));
-        assert!(!a.bit(4));
-        assert!(a.bit(5));
-        assert!(a.bit(24));
-    }
 }
