@@ -13,7 +13,7 @@ path = "src/poly1305.rs"
 
 [dependencies]
 num-bigint = "0.4"
-natmod = { path = "./natmod" }
+natmod = { path = "../natmod" }
 
 [dev-dependencies]
 serde_json = "1.0"

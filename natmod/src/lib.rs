@@ -63,7 +63,7 @@ pub fn nat_mod(attr: TokenStream, item: TokenStream) -> TokenStream {
     );
 
     let out_struct = quote! {
-        #[derive(Clone, Copy, PartialEq, Eq)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub struct #ident {
             value: [u8; #num_bytes],
         }
@@ -119,12 +119,19 @@ pub fn nat_mod(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
 
-
             impl core::ops::Mul for #ident {
                 type Output = Self;
 
                 fn mul(self, rhs: Self) -> Self::Output {
                     self.fmul(rhs)
+                }
+            }
+
+            impl core::ops::Sub for #ident {
+                type Output = Self;
+
+                fn sub(self, rhs: Self) -> Self::Output {
+                    self.fsub(rhs)
                 }
             }
         }

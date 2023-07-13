@@ -28,19 +28,27 @@ let poly1305_encode_r (b: array u8 16sz) : t_FieldElement =
   Poly1305.Hacspec_helper.NatMod.from_u128 n
 
 let poly1305_encode_block (b: array u8 16sz) : _ =
-  let f:t_FieldElement = Poly1305.Hacspec_helper.NatMod.from_le_bytes (Rust_primitives.unsize b) in
-  f +. Poly1305.Hacspec_helper.NatMod.pow2 128sz
+  let f:t_FieldElement =
+    Poly1305.Hacspec_helper.NatMod.from_le_bytes (Rust_primitives.unsize b <: slice u8)
+  in
+  f +. (Poly1305.Hacspec_helper.NatMod.pow2 128sz <: t_FieldElement)
 
 let poly1305_encode_last (pad_len: usize) (b: slice u8) : _ =
   let f:t_FieldElement = Poly1305.Hacspec_helper.NatMod.from_le_bytes b in
-  f +. Poly1305.Hacspec_helper.NatMod.pow2 (8sz *. pad_len)
+  f +. (Poly1305.Hacspec_helper.NatMod.pow2 (8sz *. pad_len <: usize) <: t_FieldElement)
 
 let poly1305_init (key: array u8 32sz) : t_PolyState =
   let r:t_FieldElement =
-    poly1305_encode_r (Core.Result.unwrap_under_impl (Core.Convert.TryInto.try_into key.[ {
-                  Core.Ops.Range.Range.f_start = 0sz;
-                  Core.Ops.Range.Range.f_end = 16sz
-                } ]))
+    poly1305_encode_r (Core.Result.unwrap_under_impl (Core.Convert.TryInto.try_into (key.[ {
+                    Core.Ops.Range.Range.f_start = 0sz;
+                    Core.Ops.Range.Range.f_end = 16sz
+                  } ]
+                <:
+                slice u8)
+            <:
+            Core.Result.t_Result (array u8 16sz) _)
+        <:
+        array u8 16sz)
   in
   {
     Poly1305.PolyState.f_acc = Poly1305.Hacspec_helper.NatMod.zero;
@@ -54,7 +62,8 @@ let poly1305_update_block (b: array u8 16sz) (st: t_PolyState) : t_PolyState =
       st with
       Poly1305.PolyState.f_acc
       =
-      (poly1305_encode_block b +. st.Poly1305.PolyState.f_acc) *. st.Poly1305.PolyState.f_r
+      ((poly1305_encode_block b <: t_FieldElement) +. st.Poly1305.PolyState.f_acc <: _) *.
+      st.Poly1305.PolyState.f_r
     }
   in
   st
@@ -63,26 +72,35 @@ let poly1305_update_blocks (m: slice u8) (st: t_PolyState) : t_PolyState =
   let st:t_PolyState =
     Core.Iter.Traits.Iterator.Iterator.fold (Core.Iter.Traits.Collect.IntoIterator.into_iter (Core.Slice.chunks_exact_under_impl
               m
-              v_BLOCKSIZE))
+              v_BLOCKSIZE
+            <:
+            Core.Slice.Iter.t_ChunksExact u8)
+        <:
+        _)
       st
       (fun st chunk ->
-          poly1305_update_block (Core.Result.unwrap_under_impl (Core.Convert.TryInto.try_into chunk)
-            )
-            st)
+          poly1305_update_block (Core.Result.unwrap_under_impl (Core.Convert.TryInto.try_into chunk
+                  <:
+                  Core.Result.t_Result (array u8 16sz) _)
+              <:
+              array u8 16sz)
+            st
+          <:
+          t_PolyState)
   in
   st
 
 let poly1305_update_last (pad_len: usize) (b: slice u8) (st: t_PolyState) : t_PolyState =
   let st:t_PolyState = st in
   let st:t_PolyState =
-    if Core.Slice.len_under_impl b <>. 0sz
+    if (Core.Slice.len_under_impl b <: usize) <>. 0sz
     then
       let st:t_PolyState =
         {
           st with
           Poly1305.PolyState.f_acc
           =
-          (poly1305_encode_last pad_len b +. st.Poly1305.PolyState.f_acc) *.
+          ((poly1305_encode_last pad_len b <: t_FieldElement) +. st.Poly1305.PolyState.f_acc <: _) *.
           st.Poly1305.PolyState.f_r
         }
       in
@@ -94,24 +112,38 @@ let poly1305_update_last (pad_len: usize) (b: slice u8) (st: t_PolyState) : t_Po
 let poly1305_update (m: slice u8) (st: t_PolyState) : t_PolyState =
   let st:t_PolyState = poly1305_update_blocks m st in
   let last:slice u8 =
-    Core.Slice.Iter.remainder_under_impl_87 (Core.Slice.chunks_exact_under_impl m v_BLOCKSIZE)
+    Core.Slice.Iter.remainder_under_impl_87 (Core.Slice.chunks_exact_under_impl m v_BLOCKSIZE
+        <:
+        Core.Slice.Iter.t_ChunksExact u8)
   in
-  poly1305_update_last (Core.Slice.len_under_impl last) last st
+  poly1305_update_last (Core.Slice.len_under_impl last <: usize) last st
 
 let poly1305_finish (st: t_PolyState) : array u8 16sz =
   let n:u128 =
     Core.Num.from_le_bytes_under_impl_10 (Core.Result.unwrap_under_impl (Core.Convert.TryInto.try_into
-              st.Poly1305.PolyState.f_key.[ {
-                  Core.Ops.Range.Range.f_start = 16sz;
-                  Core.Ops.Range.Range.f_end = 32sz
-                } ]))
+              (st.Poly1305.PolyState.f_key.[ {
+                    Core.Ops.Range.Range.f_start = 16sz;
+                    Core.Ops.Range.Range.f_end = 32sz
+                  } ]
+                <:
+                slice u8)
+            <:
+            Core.Result.t_Result (array u8 16sz) _)
+        <:
+        array u8 16sz)
   in
   let aby:array u8 17sz = Poly1305.Hacspec_helper.NatMod.to_le_bytes st.Poly1305.PolyState.f_acc in
   let a:u128 =
     Core.Num.from_le_bytes_under_impl_10 (Core.Result.unwrap_under_impl (Core.Convert.TryInto.try_into
-              aby.[ { Core.Ops.Range.Range.f_start = 0sz; Core.Ops.Range.Range.f_end = 16sz } ]))
+              (aby.[ { Core.Ops.Range.Range.f_start = 0sz; Core.Ops.Range.Range.f_end = 16sz } ]
+                <:
+                slice u8)
+            <:
+            Core.Result.t_Result (array u8 16sz) _)
+        <:
+        array u8 16sz)
   in
-  Core.Num.to_le_bytes_under_impl_10 (Core.Num.wrapping_add_under_impl_10 a n)
+  Core.Num.to_le_bytes_under_impl_10 (Core.Num.wrapping_add_under_impl_10 a n <: u128)
 
 let poly1305 (m: slice u8) (key: array u8 32sz) : array u8 16sz =
   let st:t_PolyState = poly1305_init key in

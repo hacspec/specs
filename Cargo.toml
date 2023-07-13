@@ -2,6 +2,7 @@
 members = [
     "basic",
     "curve25519",
+    "curve25519-rust",
     "chacha20",
     "poly1305",
     "poly1305-rust",

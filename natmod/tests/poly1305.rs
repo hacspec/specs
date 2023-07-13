@@ -10,6 +10,13 @@ pub trait NatMod<const LEN: usize> {
     fn new(value: [u8; LEN]) -> Self;
     fn value(&self) -> &[u8];
 
+    fn fsub(self, rhs: Self) -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
+    }
+
     /// Add self with `rhs` and return the result `self + rhs % MODULUS`.
     fn fadd(self, rhs: Self) -> Self
     where
