@@ -1,0 +1,7 @@
+-R . Examples
+-arg -w
+-arg all
+
+Hacspec_lib.v
+Core.v
+Hacspec_ovn.v

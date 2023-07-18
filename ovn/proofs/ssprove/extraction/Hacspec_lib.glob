@@ -1,0 +1,747 @@
+DIGEST e5f7624baf82764e7a994b8423d3c6dc
+FExamples.Hacspec_lib
+R74:84 Hacspec.Hacspec_Lib <> <> lib
+R112:117 Coq.ZArith.ZArith <> <> lib
+R127:144 Coq.Lists.List ListNotations <> mod
+R206:208 Coq.micromega.Lia <> <> lib
+R226:259 Coq.Logic.FunctionalExtensionality <> <> lib
+R277:283 Coq.Bool.Sumbool <> <> lib
+R316:322 mathcomp.ssreflect.fintype <> <> lib
+R352:362 Crypt.choice_type <> <> lib
+R364:370 Crypt.Package <> <> lib
+R372:378 Crypt.Prelude <> <> lib
+R388:402 Crypt.package.pkg_notation PackageNotation <> mod
+R437:439 extructures.ord <> <> lib
+R441:444 extructures.fset <> <> lib
+R446:449 extructures.fmap <> <> lib
+R482:485 mathcomp.zify.ssrZ <> <> lib
+R487:490 mathcomp.word.word <> <> lib
+R520:523 Jasmin.word <> <> lib
+R551:556 Coq.ZArith.ZArith <> <> lib
+R558:561 Coq.Lists.List <> <> lib
+R571:583 Coq.Lists.List ListNotations <> mod
+R615:628 Hacspec.ChoiceEquality <> <> lib
+R659:673 Hacspec.LocationUtility <> <> lib
+R704:725 Hacspec.Hacspec_Lib_Comparable <> <> lib
+R756:770 Hacspec.Hacspec_Lib_Pre <> <> lib
+R801:811 Hacspec.Hacspec_Lib <> <> lib
+R970:990 mathcomp.ssreflect.choice Choice.Exports <> mod
+def 1122:1127 <> int_xI
+R1135:1139 Jasmin.wsize <> wsize variant
+binder 1130:1131 <> WS:1
+R1184:1186 Hacspec.Hacspec_Lib_Pre <> int syndef
+R1188:1189 Examples.Hacspec_lib <> WS:1 var
+binder 1143:1143 <> a:2
+R1232:1234 Hacspec.Hacspec_Lib_Pre <> int syndef
+R1236:1237 Examples.Hacspec_lib <> WS:1 var
+R1245:1267 Hacspec.Hacspec_Lib_Pre <> int_add def
+R1401:1403 Hacspec.Hacspec_Lib_Pre <> one def
+R1405:1406 Examples.Hacspec_lib <> WS:1 var
+R1270:1292 Hacspec.Hacspec_Lib_Pre <> int_mul def
+R1342:1345 Hacspec.Hacspec_Lib_Pre <> repr syndef
+R1347:1348 Examples.Hacspec_lib <> WS:1 var
+R1294:1294 Examples.Hacspec_lib <> a:2 var
+def 1583:1588 <> int_xO
+R1596:1600 Jasmin.wsize <> wsize variant
+binder 1591:1592 <> WS:3
+R1608:1610 Hacspec.Hacspec_Lib_Pre <> int syndef
+R1612:1613 Examples.Hacspec_lib <> WS:3 var
+binder 1604:1604 <> a:4
+R1618:1620 Hacspec.Hacspec_Lib_Pre <> int syndef
+R1622:1623 Examples.Hacspec_lib <> WS:3 var
+R1630:1652 Hacspec.Hacspec_Lib_Pre <> int_mul def
+R1658:1661 Hacspec.Hacspec_Lib_Pre <> repr syndef
+R1663:1664 Examples.Hacspec_lib <> WS:3 var
+R1654:1654 Examples.Hacspec_lib <> a:4 var
+def 1824:1835 <> both_int_one
+R1843:1847 Jasmin.wsize <> wsize variant
+binder 1838:1839 <> WS:5
+R1852:1855 Hacspec.ChoiceEquality <> both rec
+R1883:1885 Hacspec.Hacspec_Lib_Pre <> int syndef
+R1887:1888 Examples.Hacspec_lib <> WS:5 var
+R1868:1878 Crypt.package.pkg_notation PackageNotation ::package_scope:'['_'interface'_']' not
+R1858:1861 extructures.fset <> fset def
+R1863:1864 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R1894:1901 Hacspec.ChoiceEquality <> ret_both def
+R1919:1921 Hacspec.Hacspec_Lib_Pre <> one def
+R1909:1912 extructures.fset <> fset def
+R1914:1915 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R1935:1957 Hacspec.Hacspec_Lib_Pre <> int_add def
+R1975:1978 Hacspec.Hacspec_Lib_Pre <> repr syndef
+R1980:1982 Jasmin.wsize <> U32 constr
+R1960:1963 Hacspec.Hacspec_Lib_Pre <> repr syndef
+R1965:1967 Jasmin.wsize <> U32 constr
+def 2029:2035 <> int_num
+R2043:2047 Jasmin.wsize <> wsize variant
+binder 2038:2039 <> WS:6
+R2053:2055 Hacspec.Hacspec_Lib_Pre <> int syndef
+R2057:2058 Examples.Hacspec_lib <> WS:6 var
+R2120:2127 Coq.Numbers.BinNums <> positive ind
+R2085:2098 Coq.PArith.BinPos Pos of_num_int def
+R2120:2127 Coq.Numbers.BinNums <> positive ind
+R2085:2098 Coq.PArith.BinPos Pos of_num_int def
+R2120:2127 Coq.Numbers.BinNums <> positive ind
+R2100:2113 Coq.PArith.BinPos Pos to_num_int def
+R2220:2223 Hacspec.Hacspec_Lib_Pre <> repr syndef
+not 2212:2212 <> ::hacspec_scope:'0'
+R2260:2263 Hacspec.Hacspec_Lib_Pre <> int8 syndef
+R2276:2279 Hacspec.Hacspec_Lib_Pre <> int8 syndef
+R2292:2295 Hacspec.Hacspec_Lib_Pre <> int8 syndef
+ind 2591:2598 <> Addition
+constr 2843:2845 <> add
+rec 2591:2598 <> Addition
+proj 2843:2845 <> add
+binder 2600:2601 <> L1:7
+binder 2603:2604 <> L2:8
+binder 2615:2616 <> I1:9
+binder 2618:2619 <> I2:10
+R2635:2645 Crypt.choice_type <> choice_type ind
+binder 2631:2631 <> A:11
+R2861:2864 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2849:2852 Hacspec.ChoiceEquality <> both rec
+R2860:2860 Examples.Hacspec_lib <> A:11 var
+R2857:2858 Examples.Hacspec_lib <> I1:9 var
+R2854:2855 Examples.Hacspec_lib <> L1:7 var
+R2877:2880 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2865:2868 Hacspec.ChoiceEquality <> both rec
+R2876:2876 Examples.Hacspec_lib <> A:11 var
+R2873:2874 Examples.Hacspec_lib <> I2:10 var
+R2870:2871 Examples.Hacspec_lib <> L2:8 var
+R2881:2884 Hacspec.ChoiceEquality <> both rec
+R2928:2928 Examples.Hacspec_lib <> A:11 var
+R2910:2914 extructures.fset <> ::fset_scope:x_':|:'_x not
+R2908:2909 Examples.Hacspec_lib <> I1:9 var
+R2915:2916 Examples.Hacspec_lib <> I2:10 var
+R2889:2893 extructures.fset <> ::fset_scope:x_':|:'_x not
+R2887:2888 Examples.Hacspec_lib <> L1:7 var
+R2894:2895 Examples.Hacspec_lib <> L2:8 var
+R2953:2955 Examples.Hacspec_lib <> add def
+not 2940:2940 <> :::x_'.+'_x
+inst 3122:3133 <> int_add_inst
+R3141:3145 Jasmin.wsize <> wsize variant
+binder 3136:3137 <> ws:14
+binder 3149:3150 <> L1:15
+binder 3152:3153 <> L2:16
+binder 3164:3165 <> I1:17
+binder 3167:3168 <> I2:18
+R3373:3380 Examples.Hacspec_lib <> Addition class
+R3414:3416 Hacspec.Hacspec_Lib_Pre <> int syndef
+R3418:3419 Examples.Hacspec_lib <> ws:14 var
+R3400:3401 Examples.Hacspec_lib <> I2:18 var
+R3397:3398 Examples.Hacspec_lib <> I1:17 var
+R3385:3386 Examples.Hacspec_lib <> L2:16 var
+R3382:3383 Examples.Hacspec_lib <> L1:15 var
+R3501:3503 Examples.Hacspec_lib <> add def
+binder 3505:3505 <> a:19
+binder 3507:3507 <> b:20
+R3512:3518 Hacspec.Hacspec_Lib <> int_add def
+R3672:3672 Examples.Hacspec_lib <> b:20 var
+R3670:3670 Examples.Hacspec_lib <> a:19 var
+ind 3684:3694 <> Subtraction
+constr 3940:3942 <> sub
+rec 3684:3694 <> Subtraction
+proj 3940:3942 <> sub
+binder 3697:3698 <> L1:21
+binder 3700:3701 <> L2:22
+binder 3712:3713 <> I1:23
+binder 3715:3716 <> I2:24
+R3732:3742 Crypt.choice_type <> choice_type ind
+binder 3728:3728 <> A:25
+R3958:3961 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3946:3949 Hacspec.ChoiceEquality <> both rec
+R3957:3957 Examples.Hacspec_lib <> A:25 var
+R3954:3955 Examples.Hacspec_lib <> I1:23 var
+R3951:3952 Examples.Hacspec_lib <> L1:21 var
+R3974:3977 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3962:3965 Hacspec.ChoiceEquality <> both rec
+R3973:3973 Examples.Hacspec_lib <> A:25 var
+R3970:3971 Examples.Hacspec_lib <> I2:24 var
+R3967:3968 Examples.Hacspec_lib <> L2:22 var
+R3978:3981 Hacspec.ChoiceEquality <> both rec
+R4025:4025 Examples.Hacspec_lib <> A:25 var
+R4007:4011 extructures.fset <> ::fset_scope:x_':|:'_x not
+R4005:4006 Examples.Hacspec_lib <> I1:23 var
+R4012:4013 Examples.Hacspec_lib <> I2:24 var
+R3986:3990 extructures.fset <> ::fset_scope:x_':|:'_x not
+R3984:3985 Examples.Hacspec_lib <> L1:21 var
+R3991:3992 Examples.Hacspec_lib <> L2:22 var
+R4050:4052 Examples.Hacspec_lib <> sub def
+not 4037:4037 <> :::x_'.-'_x
+inst 4244:4255 <> int_sub_inst
+R4263:4267 Jasmin.wsize <> wsize variant
+binder 4258:4259 <> ws:28
+binder 4271:4272 <> L1:29
+binder 4274:4275 <> L2:30
+binder 4277:4278 <> L3:31
+binder 4280:4281 <> I1:32
+binder 4283:4284 <> I2:33
+binder 4286:4287 <> I3:34
+R4311:4317 Coq.Init.Datatypes <> is_true def
+R4320:4326 extructures.fset <> fsubset def
+R4331:4332 Examples.Hacspec_lib <> L3:31 var
+R4328:4329 Examples.Hacspec_lib <> L1:29 var
+binder 4293:4307 <> H_loc_fsubset13:35
+R4358:4364 Coq.Init.Datatypes <> is_true def
+R4367:4373 extructures.fset <> fsubset def
+R4378:4379 Examples.Hacspec_lib <> I3:34 var
+R4375:4376 Examples.Hacspec_lib <> I1:32 var
+binder 4338:4354 <> H_opsig_fsubset13:36
+R4403:4409 Coq.Init.Datatypes <> is_true def
+R4412:4418 extructures.fset <> fsubset def
+R4423:4424 Examples.Hacspec_lib <> L3:31 var
+R4420:4421 Examples.Hacspec_lib <> L2:30 var
+binder 4385:4399 <> H_loc_fsubset23:37
+R4450:4456 Coq.Init.Datatypes <> is_true def
+R4459:4465 extructures.fset <> fsubset def
+R4470:4471 Examples.Hacspec_lib <> I3:34 var
+R4467:4468 Examples.Hacspec_lib <> I2:33 var
+binder 4430:4446 <> H_opsig_fsubset23:38
+R4477:4487 Examples.Hacspec_lib <> Subtraction class
+R4521:4523 Hacspec.Hacspec_Lib_Pre <> int syndef
+R4525:4526 Examples.Hacspec_lib <> ws:28 var
+R4507:4508 Examples.Hacspec_lib <> I2:33 var
+R4504:4505 Examples.Hacspec_lib <> I1:32 var
+R4492:4493 Examples.Hacspec_lib <> L2:30 var
+R4489:4490 Examples.Hacspec_lib <> L1:29 var
+R4608:4610 Examples.Hacspec_lib <> sub def
+binder 4612:4612 <> a:39
+binder 4614:4614 <> b:40
+R4619:4625 Hacspec.Hacspec_Lib <> int_sub def
+R4779:4779 Examples.Hacspec_lib <> b:40 var
+R4777:4777 Examples.Hacspec_lib <> a:39 var
+ind 4791:4804 <> Multiplication
+constr 5046:5048 <> mul
+rec 4791:4804 <> Multiplication
+proj 5046:5048 <> mul
+R4824:4829 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R4838:4838 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R4830:4837 Crypt.package.pkg_core_definition <> Location def
+binder 4807:4808 <> L1:41
+binder 4810:4811 <> L2:42
+R4859:4867 Crypt.package.pkg_core_definition <> Interface def
+binder 4842:4843 <> I1:43
+binder 4845:4846 <> I2:44
+binder 4870:4870 <> A:45
+R5064:5067 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5052:5055 Hacspec.ChoiceEquality <> both rec
+R5063:5063 Examples.Hacspec_lib <> A:45 var
+R5060:5061 Examples.Hacspec_lib <> I1:43 var
+R5057:5058 Examples.Hacspec_lib <> L1:41 var
+R5080:5083 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5068:5071 Hacspec.ChoiceEquality <> both rec
+R5079:5079 Examples.Hacspec_lib <> A:45 var
+R5076:5077 Examples.Hacspec_lib <> I2:44 var
+R5073:5074 Examples.Hacspec_lib <> L2:42 var
+R5084:5087 Hacspec.ChoiceEquality <> both rec
+R5132:5132 Examples.Hacspec_lib <> A:45 var
+R5113:5117 extructures.fset <> ::fset_scope:x_':|:'_x not
+R5111:5112 Examples.Hacspec_lib <> I1:43 var
+R5118:5119 Examples.Hacspec_lib <> I2:44 var
+R5092:5096 extructures.fset <> ::fset_scope:x_':|:'_x not
+R5090:5091 Examples.Hacspec_lib <> L1:41 var
+R5097:5098 Examples.Hacspec_lib <> L2:42 var
+R5157:5159 Examples.Hacspec_lib <> mul def
+not 5144:5144 <> :::x_'.*'_x
+inst 5342:5353 <> int_mul_inst
+R5361:5365 Jasmin.wsize <> wsize variant
+binder 5356:5357 <> ws:48
+R5387:5392 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R5401:5401 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R5393:5400 Crypt.package.pkg_core_definition <> Location def
+binder 5370:5371 <> L1:49
+binder 5373:5374 <> L2:50
+R5424:5432 Crypt.package.pkg_core_definition <> Interface def
+binder 5407:5408 <> I1:51
+binder 5410:5411 <> I2:52
+R5611:5624 Examples.Hacspec_lib <> Multiplication class
+R5658:5660 Hacspec.Hacspec_Lib_Pre <> int syndef
+R5662:5663 Examples.Hacspec_lib <> ws:48 var
+R5644:5645 Examples.Hacspec_lib <> I2:52 var
+R5641:5642 Examples.Hacspec_lib <> I1:51 var
+R5629:5630 Examples.Hacspec_lib <> L2:50 var
+R5626:5627 Examples.Hacspec_lib <> L1:49 var
+R5729:5731 Examples.Hacspec_lib <> mul def
+binder 5733:5733 <> a:53
+binder 5735:5735 <> b:54
+R5740:5746 Hacspec.Hacspec_Lib <> int_mul def
+R5750:5750 Examples.Hacspec_lib <> b:54 var
+R5748:5748 Examples.Hacspec_lib <> a:53 var
+ind 5784:5786 <> Xor
+constr 6028:6030 <> xor
+rec 5784:5786 <> Xor
+proj 6028:6030 <> xor
+R5806:5811 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R5820:5820 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R5812:5819 Crypt.package.pkg_core_definition <> Location def
+binder 5789:5790 <> L1:55
+binder 5792:5793 <> L2:56
+R5841:5849 Crypt.package.pkg_core_definition <> Interface def
+binder 5824:5825 <> I1:57
+binder 5827:5828 <> I2:58
+binder 5852:5852 <> A:59
+R6046:6049 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6034:6037 Hacspec.ChoiceEquality <> both rec
+R6045:6045 Examples.Hacspec_lib <> A:59 var
+R6042:6043 Examples.Hacspec_lib <> I1:57 var
+R6039:6040 Examples.Hacspec_lib <> L1:55 var
+R6062:6065 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6050:6053 Hacspec.ChoiceEquality <> both rec
+R6061:6061 Examples.Hacspec_lib <> A:59 var
+R6058:6059 Examples.Hacspec_lib <> I2:58 var
+R6055:6056 Examples.Hacspec_lib <> L2:56 var
+R6066:6069 Hacspec.ChoiceEquality <> both rec
+R6114:6114 Examples.Hacspec_lib <> A:59 var
+R6095:6099 extructures.fset <> ::fset_scope:x_':|:'_x not
+R6093:6094 Examples.Hacspec_lib <> I1:57 var
+R6100:6101 Examples.Hacspec_lib <> I2:58 var
+R6074:6078 extructures.fset <> ::fset_scope:x_':|:'_x not
+R6072:6073 Examples.Hacspec_lib <> L1:55 var
+R6079:6080 Examples.Hacspec_lib <> L2:56 var
+R6139:6141 Examples.Hacspec_lib <> xor def
+not 6126:6126 <> :::x_'.^'_x
+inst 6313:6324 <> int_xor_inst
+R6332:6336 Jasmin.wsize <> wsize variant
+binder 6327:6328 <> ws:62
+binder 6340:6341 <> L1:63
+binder 6343:6344 <> L2:64
+binder 6355:6356 <> I1:65
+binder 6358:6359 <> I2:66
+R6547:6549 Examples.Hacspec_lib <> Xor class
+R6583:6585 Hacspec.Hacspec_Lib_Pre <> int syndef
+R6587:6588 Examples.Hacspec_lib <> ws:62 var
+R6569:6570 Examples.Hacspec_lib <> I2:66 var
+R6566:6567 Examples.Hacspec_lib <> I1:65 var
+R6554:6555 Examples.Hacspec_lib <> L2:64 var
+R6551:6552 Examples.Hacspec_lib <> L1:63 var
+R6654:6656 Examples.Hacspec_lib <> xor def
+binder 6658:6658 <> a:67
+binder 6660:6660 <> b:68
+R6665:6671 Hacspec.Hacspec_Lib <> int_xor def
+R6675:6675 Examples.Hacspec_lib <> b:68 var
+R6673:6673 Examples.Hacspec_lib <> a:67 var
+rec 7356:7367 <> array_or_seq
+proj 7394:7400 <> as_nseq
+proj 7434:7439 <> as_seq
+binder 7369:7369 <> A:69
+binder 7371:7371 <> L:70
+binder 7373:7373 <> I:71
+R7382:7384 Coq.Init.Datatypes <> nat ind
+binder 7376:7378 <> len:72
+R7405:7408 Hacspec.ChoiceEquality <> both rec
+R7415:7419 Hacspec.Hacspec_Lib_Pre <> nseq_ def
+R7421:7421 Examples.Hacspec_lib <> A:69 var
+R7423:7425 Examples.Hacspec_lib <> len:72 var
+R7412:7412 Examples.Hacspec_lib <> I:71 var
+R7410:7410 Examples.Hacspec_lib <> L:70 var
+R7444:7447 Hacspec.ChoiceEquality <> both rec
+R7454:7456 Hacspec.Hacspec_Lib_Pre <> seq def
+R7458:7458 Examples.Hacspec_lib <> A:69 var
+R7451:7451 Examples.Hacspec_lib <> I:71 var
+R7449:7449 Examples.Hacspec_lib <> L:70 var
+R7472:7477 Examples.Hacspec_lib <> as_seq proj
+R7486:7492 Examples.Hacspec_lib <> as_nseq proj
+R7678:7683 Examples.Hacspec_lib <> as_seq proj
+R7678:7683 Examples.Hacspec_lib <> as_seq proj
+R7732:7738 Examples.Hacspec_lib <> as_nseq proj
+R7732:7738 Examples.Hacspec_lib <> as_nseq proj
+def 8184:8200 <> nseq_array_or_seq
+binder 8203:8203 <> A:76
+binder 8205:8205 <> L:77
+binder 8207:8207 <> I:78
+binder 8209:8211 <> len:79
+R8221:8224 Hacspec.ChoiceEquality <> both rec
+R8231:8235 Hacspec.Hacspec_Lib_Pre <> nseq_ def
+R8237:8237 Examples.Hacspec_lib <> A:76 var
+R8239:8241 Examples.Hacspec_lib <> len:79 var
+R8228:8228 Examples.Hacspec_lib <> I:78 var
+R8226:8226 Examples.Hacspec_lib <> L:77 var
+binder 8215:8217 <> val:80
+R8247:8258 Examples.Hacspec_lib <> array_or_seq rec
+R8275:8291 Examples.Hacspec_lib <> nseq_array_or_seq:83 def
+R8293:8295 Examples.Hacspec_lib <> val:82 var
+R8303:8308 Examples.Hacspec_lib <> as_seq proj
+R8303:8308 Examples.Hacspec_lib <> as_seq proj
+R8303:8308 Examples.Hacspec_lib <> as_seq proj
+R8332:8338 Examples.Hacspec_lib <> as_nseq proj
+R8332:8338 Examples.Hacspec_lib <> as_nseq proj
+R8313:8324 Hacspec.Hacspec_Lib <> array_to_seq def
+R8384:8400 Examples.Hacspec_lib <> nseq_array_or_seq def
+R8384:8400 Examples.Hacspec_lib <> nseq_array_or_seq def
+R8427:8443 Examples.Hacspec_lib <> nseq_array_or_seq def
+R8446:8495 Examples.Hacspec_lib <> nseq_array_or_seq def
+R8518:8534 Examples.Hacspec_lib <> nseq_array_or_seq def
+def 9350:9360 <> array_index
+R9366:9376 Crypt.choice_type <> choice_type ind
+binder 9363:9363 <> A:84
+R9386:9388 Coq.Init.Datatypes <> nat ind
+binder 9380:9382 <> len:85
+binder 9392:9393 <> L1:86
+binder 9395:9396 <> L2:87
+binder 9398:9399 <> I1:88
+binder 9401:9402 <> I2:89
+R9409:9420 Examples.Hacspec_lib <> array_or_seq rec
+R9422:9422 Examples.Hacspec_lib <> A:84 var
+R9424:9425 Examples.Hacspec_lib <> L1:86 var
+R9427:9428 Examples.Hacspec_lib <> I1:88 var
+R9430:9432 Examples.Hacspec_lib <> len:85 var
+binder 9406:9406 <> s:90
+binder 9436:9437 <> WS:91
+R9445:9448 Hacspec.ChoiceEquality <> both rec
+R9458:9460 Hacspec.Hacspec_Lib_Pre <> int syndef
+R9462:9463 Examples.Hacspec_lib <> WS:91 var
+R9453:9454 Examples.Hacspec_lib <> I2:89 var
+R9450:9451 Examples.Hacspec_lib <> L2:87 var
+binder 9441:9441 <> i:92
+R9469:9472 Hacspec.ChoiceEquality <> both rec
+R9498:9498 Examples.Hacspec_lib <> A:84 var
+R9489:9493 extructures.fset <> ::fset_scope:x_':|:'_x not
+R9487:9488 Examples.Hacspec_lib <> I1:88 var
+R9494:9495 Examples.Hacspec_lib <> I2:89 var
+R9477:9481 extructures.fset <> ::fset_scope:x_':|:'_x not
+R9475:9476 Examples.Hacspec_lib <> L1:86 var
+R9482:9483 Examples.Hacspec_lib <> L2:87 var
+R9530:9552 Hacspec.Hacspec_Lib <> array_index def
+R9566:9566 Examples.Hacspec_lib <> i:92 var
+R9555:9561 Examples.Hacspec_lib <> as_nseq proj
+R9563:9563 Examples.Hacspec_lib <> s:90 var
+def 11333:11350 <> n_seq_array_or_seq
+binder 11353:11353 <> L:93
+binder 11355:11355 <> I:94
+binder 11357:11357 <> A:95
+binder 11361:11361 <> B:96
+R11369:11372 Hacspec.ChoiceEquality <> both rec
+R11378:11378 Examples.Hacspec_lib <> B:96 var
+R11376:11376 Examples.Hacspec_lib <> I:94 var
+R11374:11374 Examples.Hacspec_lib <> L:93 var
+binder 11365:11365 <> x:97
+R11409:11409 Examples.Hacspec_lib <> B:96 var
+R11440:11445 Crypt.choice_type <> chUnit constr
+R11450:11453 Coq.Init.Logic <> True ind
+R11479:11483 Crypt.choice_type <> chMap constr
+R11486:11490 Crypt.choice_type <> chFin constr
+R11494:11498 Crypt.Prelude <> mkpos constr
+R11501:11501 Coq.Init.Datatypes <> S constr
+R11518:11520 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R11521:11521 Examples.Hacspec_lib <> A:95 var
+R11547:11551 Crypt.choice_type <> chMap constr
+R11553:11556 Crypt.package.pkg_notation PackageNotation ::package_scope:'''nat' not
+R11566:11568 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R11569:11569 Examples.Hacspec_lib <> A:95 var
+R11600:11604 Coq.Init.Logic <> False ind
+binder 11394:11399 <> contra:99
+R11655:11655 Examples.Hacspec_lib <> B:96 var
+R11907:11910 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11695:11695 Examples.Hacspec_lib <> K:100 var
+R11724:11729 Crypt.choice_type <> chUnit constr
+R11734:11737 Coq.Init.Logic <> True ind
+R11761:11765 Crypt.choice_type <> chMap constr
+R11768:11772 Crypt.choice_type <> chFin constr
+R11776:11780 Crypt.Prelude <> mkpos constr
+R11783:11783 Coq.Init.Datatypes <> S constr
+R11800:11802 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R11803:11803 Examples.Hacspec_lib <> A:95 var
+R11827:11831 Crypt.choice_type <> chMap constr
+R11833:11836 Crypt.package.pkg_notation PackageNotation ::package_scope:'''nat' not
+R11846:11848 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R11849:11849 Examples.Hacspec_lib <> A:95 var
+R11878:11882 Coq.Init.Logic <> False ind
+R11911:11913 Coq.Init.Datatypes <> nat ind
+R11950:11955 Crypt.choice_type <> chUnit constr
+R11991:11995 Crypt.choice_type <> chMap constr
+R11998:12002 Crypt.choice_type <> chFin constr
+R12006:12010 Crypt.Prelude <> mkpos constr
+binder 12045:12052 <> m_contra:102
+R12265:12268 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12105:12106 Examples.Hacspec_lib <> p_:103 var
+R12156:12156 Coq.Init.Datatypes <> O constr
+R12161:12165 Coq.Init.Logic <> False ind
+R12216:12218 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R12219:12219 Examples.Hacspec_lib <> A:95 var
+R12269:12271 Coq.Init.Datatypes <> nat ind
+R12324:12324 Coq.Init.Datatypes <> O constr
+binder 12333:12340 <> m_contra:105
+R12345:12354 Coq.Init.Logic <> False_rect scheme
+R12360:12367 Examples.Hacspec_lib <> m_contra:105 var
+R12356:12358 Coq.Init.Datatypes <> nat ind
+R12389:12389 Coq.Init.Datatypes <> S constr
+R12405:12405 Coq.Init.Datatypes <> S constr
+R12431:12438 Examples.Hacspec_lib <> m_contra:102 var
+R12456:12460 Crypt.choice_type <> chMap constr
+R12462:12465 Crypt.package.pkg_notation PackageNotation ::package_scope:'''nat' not
+binder 12494:12501 <> m_contra:106
+binder 12537:12544 <> m_contra:107
+R12549:12558 Coq.Init.Logic <> False_rect scheme
+R12564:12571 Examples.Hacspec_lib <> m_contra:107 var
+R12560:12562 Coq.Init.Datatypes <> nat ind
+R12591:12596 Examples.Hacspec_lib <> contra:99 var
+binder 11641:11643 <> len:108
+R12604:12615 Examples.Hacspec_lib <> array_or_seq rec
+R12617:12617 Examples.Hacspec_lib <> A:95 var
+R12619:12619 Examples.Hacspec_lib <> L:93 var
+R12621:12621 Examples.Hacspec_lib <> I:94 var
+R12623:12625 Examples.Hacspec_lib <> len:108 var
+R12697:12701 Crypt.package.pkg_notation PackageNotation ::package_scope:'''unit' not
+R12709:12713 Hacspec.Hacspec_Lib_Pre <> nseq_ def
+R12697:12701 Crypt.package.pkg_notation PackageNotation ::package_scope:'''unit' not
+R12709:12713 Hacspec.Hacspec_Lib_Pre <> nseq_ def
+R12741:12746 Examples.Hacspec_lib <> as_seq proj
+R12741:12746 Examples.Hacspec_lib <> as_seq proj
+R12741:12746 Examples.Hacspec_lib <> as_seq proj
+R12768:12774 Examples.Hacspec_lib <> as_nseq proj
+R12768:12774 Examples.Hacspec_lib <> as_nseq proj
+R12751:12762 Hacspec.Hacspec_Lib <> array_to_seq def
+R12741:12746 Examples.Hacspec_lib <> as_seq proj
+R12741:12746 Examples.Hacspec_lib <> as_seq proj
+R12741:12746 Examples.Hacspec_lib <> as_seq proj
+R12768:12774 Examples.Hacspec_lib <> as_nseq proj
+R12768:12774 Examples.Hacspec_lib <> as_nseq proj
+R12751:12762 Hacspec.Hacspec_Lib <> array_to_seq def
+R12869:12873 Crypt.choice_type <> chMap constr
+R12875:12878 Crypt.package.pkg_notation PackageNotation ::package_scope:'''nat' not
+R12889:12891 Hacspec.Hacspec_Lib_Pre <> seq def
+R12869:12873 Crypt.choice_type <> chMap constr
+R12875:12878 Crypt.package.pkg_notation PackageNotation ::package_scope:'''nat' not
+R12889:12891 Hacspec.Hacspec_Lib_Pre <> seq def
+R12918:12923 Examples.Hacspec_lib <> as_seq proj
+R12918:12923 Examples.Hacspec_lib <> as_seq proj
+R12918:12923 Examples.Hacspec_lib <> as_seq proj
+R12932:12938 Examples.Hacspec_lib <> as_nseq proj
+R12932:12938 Examples.Hacspec_lib <> as_nseq proj
+R12943:12956 Hacspec.Hacspec_Lib <> array_from_seq def
+R12918:12923 Examples.Hacspec_lib <> as_seq proj
+R12918:12923 Examples.Hacspec_lib <> as_seq proj
+R12918:12923 Examples.Hacspec_lib <> as_seq proj
+R12932:12938 Examples.Hacspec_lib <> as_nseq proj
+R12932:12938 Examples.Hacspec_lib <> as_nseq proj
+R12943:12956 Hacspec.Hacspec_Lib <> array_from_seq def
+R13062:13066 Crypt.choice_type <> chMap constr
+R13069:13073 Crypt.choice_type <> chFin constr
+R13087:13091 Hacspec.Hacspec_Lib_Pre <> nseq_ def
+R13062:13066 Crypt.choice_type <> chMap constr
+R13069:13073 Crypt.choice_type <> chFin constr
+R13087:13091 Hacspec.Hacspec_Lib_Pre <> nseq_ def
+R13190:13202 Coq.ssr.ssrbool <> elimT thm
+R13205:13216 Crypt.Prelude <> positive_eqP thm
+R13190:13202 Coq.ssr.ssrbool <> elimT thm
+R13205:13216 Crypt.Prelude <> positive_eqP thm
+R13242:13252 Crypt.Prelude <> positive_eq def
+R13271:13284 mathcomp.ssreflect.eqtype <> eq_refl thm
+R13271:13284 mathcomp.ssreflect.eqtype <> eq_refl thm
+R13314:13319 Examples.Hacspec_lib <> as_seq proj
+R13314:13319 Examples.Hacspec_lib <> as_seq proj
+R13314:13319 Examples.Hacspec_lib <> as_seq proj
+R13341:13347 Examples.Hacspec_lib <> as_nseq proj
+R13341:13347 Examples.Hacspec_lib <> as_nseq proj
+R13324:13335 Hacspec.Hacspec_Lib <> array_to_seq def
+R13314:13319 Examples.Hacspec_lib <> as_seq proj
+R13314:13319 Examples.Hacspec_lib <> as_seq proj
+R13314:13319 Examples.Hacspec_lib <> as_seq proj
+R13341:13347 Examples.Hacspec_lib <> as_nseq proj
+R13341:13347 Examples.Hacspec_lib <> as_nseq proj
+R13324:13335 Hacspec.Hacspec_Lib <> array_to_seq def
+R13393:13403 Examples.Hacspec_lib <> array_index def
+R13406:13423 Examples.Hacspec_lib <> n_seq_array_or_seq def
+not 13377:13377 <> :::x_'.['_x_']'
+def 13484:13492 <> array_upd
+R13498:13508 Crypt.choice_type <> choice_type ind
+binder 13495:13495 <> A:109
+R13518:13526 Hacspec.Hacspec_Lib_Pre <> uint_size def
+binder 13512:13514 <> len:110
+binder 13530:13530 <> L:111
+binder 13532:13532 <> I:112
+R13539:13542 Hacspec.ChoiceEquality <> both rec
+R13549:13558 Hacspec.Hacspec_Lib_Pre <> :::'nseq' not
+R13554:13554 Examples.Hacspec_lib <> A:109 var
+R13556:13558 Examples.Hacspec_lib <> len:110 var
+R13546:13546 Examples.Hacspec_lib <> I:112 var
+R13544:13544 Examples.Hacspec_lib <> L:111 var
+binder 13536:13536 <> s:113
+binder 13563:13564 <> WS:114
+R13571:13574 Hacspec.ChoiceEquality <> both rec
+R13582:13584 Hacspec.Hacspec_Lib_Pre <> int syndef
+R13586:13587 Examples.Hacspec_lib <> WS:114 var
+R13578:13578 Examples.Hacspec_lib <> I:112 var
+R13576:13576 Examples.Hacspec_lib <> L:111 var
+binder 13568:13568 <> i:115
+R13599:13602 Hacspec.ChoiceEquality <> both rec
+R13608:13608 Examples.Hacspec_lib <> A:109 var
+R13606:13606 Examples.Hacspec_lib <> I:112 var
+R13604:13604 Examples.Hacspec_lib <> L:111 var
+binder 13592:13596 <> new_v:116
+R13613:13616 Hacspec.ChoiceEquality <> both rec
+R13623:13632 Hacspec.Hacspec_Lib_Pre <> :::'nseq' not
+R13628:13628 Examples.Hacspec_lib <> A:109 var
+R13630:13632 Examples.Hacspec_lib <> len:110 var
+R13620:13620 Examples.Hacspec_lib <> I:112 var
+R13618:13618 Examples.Hacspec_lib <> L:111 var
+R13669:13689 Hacspec.Hacspec_Lib <> array_upd syndef
+R13691:13691 Examples.Hacspec_lib <> s:113 var
+R13693:13693 Examples.Hacspec_lib <> i:115 var
+R13695:13699 Examples.Hacspec_lib <> new_v:116 var
+R13753:13761 Examples.Hacspec_lib <> array_upd def
+not 13733:13733 <> :::x_'.['_x_']<-'_x
+syndef 14317:14321 <> t_Seq
+R14326:14328 Hacspec.Hacspec_Lib_Pre <> seq def
+syndef 14779:14794 <> num_exact_chunks
+R14799:14818 Hacspec.Hacspec_Lib <> seq_num_exact_chunks def
+syndef 14830:14844 <> get_exact_chunk
+R14849:14867 Hacspec.Hacspec_Lib <> seq_get_exact_chunk def
+syndef 15201:15219 <> get_remainder_chunk
+R15224:15246 Hacspec.Hacspec_Lib <> seq_get_remainder_chunk def
+R15271:15274 Hacspec.Hacspec_Lib <> negb def
+R15277:15279 Hacspec.Hacspec_Lib <> eqb def
+not 15258:15258 <> :::x_'<>'_x
+syndef 15298:15316 <> from_secret_literal
+R15321:15347 Hacspec.Hacspec_Lib <> nat_mod_from_secret_literal def
+syndef 15922:15925 <> zero
+R15930:15941 Hacspec.Hacspec_Lib <> nat_mod_zero def
+syndef 15953:15966 <> to_byte_seq_le
+R15971:15992 Hacspec.Hacspec_Lib <> nat_mod_to_byte_seq_le def
+syndef 16004:16019 <> U128_to_le_bytes
+R16024:16039 Hacspec.Hacspec_Lib <> u128_to_le_bytes def
+syndef 16051:16065 <> U64_to_le_bytes
+R16070:16084 Hacspec.Hacspec_Lib <> u64_to_le_bytes def
+syndef 16101:16116 <> from_byte_seq_le
+R16121:16144 Hacspec.Hacspec_Lib <> nat_mod_from_byte_seq_le def
+def 16158:16169 <> from_literal
+binder 16172:16172 <> m:117
+R16178:16197 Hacspec.Hacspec_Lib <> nat_mod_from_literal def
+R16199:16199 Examples.Hacspec_lib <> m:117 var
+syndef 16211:16213 <> inv
+R16218:16228 Hacspec.Hacspec_Lib <> nat_mod_inv def
+syndef 16240:16251 <> update_start
+R16256:16273 Hacspec.Hacspec_Lib <> array_update_start def
+syndef 16285:16287 <> pow
+R16292:16307 Hacspec.Hacspec_Lib <> nat_mod_pow_self def
+syndef 16319:16321 <> bit
+R16326:16336 Hacspec.Hacspec_Lib <> nat_mod_bit def
+syndef 16509:16520 <> Build_secret
+R16525:16530 Hacspec.Hacspec_Lib <> secret syndef
+R16525:16530 Hacspec.Hacspec_Lib <> secret syndef
+R16556:16559 Coq.Init.Datatypes <> prod ind
+not 16542:16542 <> ::hacspec_scope:x_'-×'_x
+syndef 16627:16634 <> Result_t
+R16639:16644 Hacspec.Hacspec_Lib_Pre <> result def
+ax 16653:16661 <> TODO_name
+syndef 16680:16682 <> ONE
+R16687:16697 Hacspec.Hacspec_Lib <> nat_mod_one def
+syndef 16709:16711 <> exp
+R16716:16726 Hacspec.Hacspec_Lib <> nat_mod_exp def
+syndef 17062:17064 <> TWO
+R17069:17079 Hacspec.Hacspec_Lib <> nat_mod_two def
+syndef 17091:17092 <> ne
+binder 17102:17102 <> x:119
+binder 17104:17104 <> y:120
+R17109:17112 Hacspec.Hacspec_Lib <> negb def
+R17115:17117 Hacspec.Hacspec_Lib <> eqb def
+R17121:17121 Examples.Hacspec_lib <> y:120 var
+R17119:17119 Examples.Hacspec_lib <> x:119 var
+syndef 17135:17136 <> eq
+R17142:17144 Hacspec.Hacspec_Lib <> eqb def
+syndef 17157:17168 <> rotate_right
+R17174:17176 Hacspec.Hacspec_Lib_Pre <> ror syndef
+R17174:17176 Hacspec.Hacspec_Lib_Pre <> ror syndef
+syndef 17189:17198 <> to_be_U32s
+R17203:17221 Hacspec.Hacspec_Lib <> array_to_be_uint32s def
+syndef 17233:17241 <> get_chunk
+R17246:17258 Hacspec.Hacspec_Lib <> seq_get_chunk def
+syndef 17270:17279 <> num_chunks
+R17284:17297 Hacspec.Hacspec_Lib <> seq_num_chunks def
+syndef 17309:17323 <> U64_to_be_bytes
+R17328:17345 Hacspec.Hacspec_Lib <> uint64_to_be_bytes def
+syndef 17357:17367 <> to_be_bytes
+R17372:17388 Hacspec.Hacspec_Lib <> array_to_be_bytes def
+syndef 17400:17412 <> U8_from_usize
+R17417:17432 Hacspec.Hacspec_Lib <> uint8_from_usize def
+syndef 17444:17449 <> concat
+R17454:17463 Hacspec.Hacspec_Lib <> seq_concat def
+syndef 17475:17484 <> declassify
+R17489:17490 Coq.Init.Datatypes <> id def
+syndef 17502:17519 <> U128_from_be_bytes
+R17524:17544 Hacspec.Hacspec_Lib <> uint128_from_be_bytes def
+syndef 17556:17571 <> U128_to_be_bytes
+R17576:17594 Hacspec.Hacspec_Lib <> uint128_to_be_bytes def
+syndef 17606:17616 <> slice_range
+R17621:17637 Hacspec.Hacspec_Lib <> array_slice_range def
+syndef 17649:17656 <> truncate
+R17661:17672 Hacspec.Hacspec_Lib <> seq_truncate def
+ax 17681:17699 <> array_to_be_uint64s
+binder 17711:17711 <> A:121
+binder 17713:17713 <> l:122
+R17725:17728 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R17717:17724 Hacspec.Hacspec_Lib_Pre <> :::'nseq' not
+R17722:17722 Examples.Hacspec_lib <> A:121 var
+R17724:17724 Examples.Hacspec_lib <> l:122 var
+R17729:17731 Hacspec.Hacspec_Lib_Pre <> seq def
+R17733:17738 Hacspec.Hacspec_Lib_Pre <> uint64 syndef
+syndef 17750:17759 <> to_be_U64s
+R17764:17782 Examples.Hacspec_lib <> array_to_be_uint64s prfax
+syndef 17794:17801 <> classify
+R17806:17807 Coq.Init.Datatypes <> id def
+syndef 17819:17829 <> U64_from_U8
+R17834:17850 Hacspec.Hacspec_Lib <> uint64_from_uint8 def
+def 18031:18043 <> Build_t_Range
+binder 18046:18047 <> WS:124
+binder 18049:18050 <> L1:125
+binder 18052:18053 <> L2:126
+binder 18055:18056 <> I1:127
+binder 18058:18059 <> I2:128
+R18067:18070 Hacspec.ChoiceEquality <> both rec
+R18079:18081 Hacspec.Hacspec_Lib_Pre <> int syndef
+R18083:18084 Examples.Hacspec_lib <> WS:124 var
+R18075:18076 Examples.Hacspec_lib <> I1:127 var
+R18072:18073 Examples.Hacspec_lib <> L1:125 var
+binder 18063:18063 <> a:129
+R18093:18096 Hacspec.ChoiceEquality <> both rec
+R18105:18107 Hacspec.Hacspec_Lib_Pre <> int syndef
+R18109:18110 Examples.Hacspec_lib <> WS:124 var
+R18101:18102 Examples.Hacspec_lib <> I2:128 var
+R18098:18099 Examples.Hacspec_lib <> L2:126 var
+binder 18089:18089 <> b:130
+R18117:18117 Coq.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18119:18119 Coq.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18121:18121 Coq.Init.Datatypes <> ::core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R18118:18118 Examples.Hacspec_lib <> a:129 var
+R18120:18120 Examples.Hacspec_lib <> b:130 var
+syndef 18133:18145 <> declassify_eq
+R18150:18151 Examples.Hacspec_lib <> eq syndef
+syndef 18163:18170 <> String_t
+R18175:18187 Coq.Strings.String <> string ind
+R18240:18243 Hacspec.ChoiceEquality <> both rec
+R18256:18266 Crypt.package.pkg_notation PackageNotation ::package_scope:'['_'interface'_']' not
+R18246:18249 extructures.fset <> fset def
+R18251:18252 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R18218:18225 Hacspec.ChoiceEquality <> ret_both def
+R18232:18235 Hacspec.Hacspec_Lib_Pre <> int8 syndef
+not 18200:18200 <> :::'i8('_x_')'
+R18324:18327 Hacspec.ChoiceEquality <> both rec
+R18340:18350 Crypt.package.pkg_notation PackageNotation ::package_scope:'['_'interface'_']' not
+R18330:18333 extructures.fset <> fset def
+R18335:18336 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R18301:18308 Hacspec.ChoiceEquality <> ret_both def
+R18315:18319 Hacspec.Hacspec_Lib_Pre <> int16 syndef
+not 18282:18282 <> :::'i16('_x_')'
+R18408:18411 Hacspec.ChoiceEquality <> both rec
+R18424:18434 Crypt.package.pkg_notation PackageNotation ::package_scope:'['_'interface'_']' not
+R18414:18417 extructures.fset <> fset def
+R18419:18420 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R18385:18392 Hacspec.ChoiceEquality <> ret_both def
+R18399:18403 Hacspec.Hacspec_Lib_Pre <> int32 syndef
+not 18366:18366 <> :::'i32('_x_')'
+R18492:18495 Hacspec.ChoiceEquality <> both rec
+R18508:18518 Crypt.package.pkg_notation PackageNotation ::package_scope:'['_'interface'_']' not
+R18498:18501 extructures.fset <> fset def
+R18503:18504 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R18469:18476 Hacspec.ChoiceEquality <> ret_both def
+R18483:18487 Hacspec.Hacspec_Lib_Pre <> int64 syndef
+not 18450:18450 <> :::'i64('_x_')'
+R18578:18581 Hacspec.ChoiceEquality <> both rec
+R18594:18604 Crypt.package.pkg_notation PackageNotation ::package_scope:'['_'interface'_']' not
+R18584:18587 extructures.fset <> fset def
+R18589:18590 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R18554:18561 Hacspec.ChoiceEquality <> ret_both def
+R18568:18573 Hacspec.Hacspec_Lib_Pre <> int128 syndef
+not 18534:18534 <> :::'i128('_x_')'
+syndef 18621:18629 <> into_iter
+binder 18639:18639 <> x:131
+R18644:18644 Examples.Hacspec_lib <> x:131 var
