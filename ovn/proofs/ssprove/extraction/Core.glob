@@ -1,4 +1,4 @@
-DIGEST 265cab0b506d10f1ada8bbe5826ce1eb
+DIGEST 1d70d72b4eae36876b570fe4cf0d5092
 FExamples.Core
 R74:84 Hacspec.Hacspec_Lib <> <> lib
 R112:117 Coq.ZArith.ZArith <> <> lib
@@ -741,137 +741,17 @@ binder 7914:7914 <> x:181
 R7938:7945 Hacspec.ChoiceEquality <> ret_both def
 R7948:7960 Hacspec.Hacspec_Lib_Pre <> seq_from_list def
 R7964:7964 Examples.Core <> x:181 var
-syndef 8054:8056 <> get
-R8061:8062 Coq.Init.Datatypes <> id def
-def 8076:8082 <> t_Never
-R8087:8091 Coq.Init.Logic <> False ind
-syndef 8103:8109 <> v_Break
-R8114:8115 Coq.Init.Datatypes <> id def
-syndef 8127:8136 <> Result_Err
-R8141:8143 Hacspec.Hacspec_Lib <> Err def
-def 8157:8168 <> never_to_any
-R8173:8174 Coq.Init.Datatypes <> tt constr
-syndef 8186:8194 <> Result_Ok
-R8199:8200 Hacspec.Hacspec_Lib <> Ok def
-def 8224:8230 <> if_both
-binder 8233:8234 <> L1:182
-binder 8236:8237 <> L2:183
-binder 8239:8240 <> L3:184
-binder 8242:8243 <> I1:185
-binder 8245:8246 <> I2:186
-binder 8248:8249 <> I3:187
-binder 8253:8253 <> A:188
-R8261:8264 Hacspec.ChoiceEquality <> both rec
-R8272:8276 Crypt.package.pkg_notation PackageNotation ::package_scope:'''bool' not
-R8269:8270 Examples.Core <> I1:185 var
-R8266:8267 Examples.Core <> L1:182 var
-binder 8257:8257 <> c:189
-R8289:8292 Hacspec.ChoiceEquality <> both rec
-R8300:8300 Examples.Core <> A:188 var
-R8297:8298 Examples.Core <> I2:186 var
-R8294:8295 Examples.Core <> L2:183 var
-binder 8280:8285 <> e_then:190
-R8313:8316 Hacspec.ChoiceEquality <> both rec
-R8324:8324 Examples.Core <> A:188 var
-R8321:8322 Examples.Core <> I3:187 var
-R8318:8319 Examples.Core <> L3:184 var
-binder 8304:8309 <> e_else:191
-R8329:8332 Hacspec.ChoiceEquality <> both rec
-R8372:8372 Examples.Core <> A:188 var
-R8363:8367 extructures.fset <> ::fset_scope:x_':|:'_x not
-R8356:8360 extructures.fset <> ::fset_scope:x_':|:'_x not
-R8354:8355 Examples.Core <> I1:185 var
-R8361:8362 Examples.Core <> I2:186 var
-R8368:8369 Examples.Core <> I3:187 var
-R8344:8348 extructures.fset <> ::fset_scope:x_':|:'_x not
-R8337:8341 extructures.fset <> ::fset_scope:x_':|:'_x not
-R8335:8336 Examples.Core <> L1:182 var
-R8342:8343 Examples.Core <> L2:183 var
-R8349:8350 Examples.Core <> L3:184 var
-R8379:8387 Hacspec.ChoiceEquality <> bind_both def
-binder 8436:8436 <> b:192
-R8444:8444 Examples.Core <> b:192 var
-R8513:8521 Hacspec.ChoiceEquality <> lift_both def
-R8564:8569 Examples.Core <> e_else:191 var
-R8451:8459 Hacspec.ChoiceEquality <> lift_both def
-R8501:8506 Examples.Core <> e_then:190 var
-R8429:8429 Examples.Core <> c:189 var
-def 8669:8678 <> match_both
-binder 8681:8682 <> L1:193
-binder 8684:8685 <> L2:194
-binder 8687:8688 <> L3:195
-binder 8690:8691 <> I1:196
-binder 8693:8694 <> I2:197
-binder 8696:8697 <> I3:198
-binder 8701:8701 <> A:199
-binder 8703:8703 <> B:200
-R8711:8714 Hacspec.ChoiceEquality <> both rec
-R8723:8728 Hacspec.Hacspec_Lib_Pre <> option def
-R8730:8730 Examples.Core <> A:199 var
-R8719:8720 Examples.Core <> I3:198 var
-R8716:8717 Examples.Core <> L3:195 var
-binder 8707:8707 <> x:201
-R8752:8755 Coq.Init.Logic <> ::type_scope:x_'->'_x not
-R8740:8743 Hacspec.ChoiceEquality <> both rec
-R8751:8751 Examples.Core <> A:199 var
-R8748:8749 Examples.Core <> I3:198 var
-R8745:8746 Examples.Core <> L3:195 var
-R8756:8759 Hacspec.ChoiceEquality <> both rec
-R8767:8767 Examples.Core <> B:200 var
-R8764:8765 Examples.Core <> I1:196 var
-R8761:8762 Examples.Core <> L1:193 var
-binder 8735:8736 <> fa:202
-R8776:8779 Hacspec.ChoiceEquality <> both rec
-R8787:8787 Examples.Core <> B:200 var
-R8784:8785 Examples.Core <> I2:197 var
-R8781:8782 Examples.Core <> L2:194 var
-binder 8771:8772 <> fb:203
-R8807:8813 Coq.Init.Datatypes <> is_true def
-R8816:8822 extructures.fset <> fsubset def
-R8827:8828 Examples.Core <> L1:193 var
-R8824:8825 Examples.Core <> L3:195 var
-binder 8792:8803 <> fsubset_loc1:204
-R8850:8856 Coq.Init.Datatypes <> is_true def
-R8859:8865 extructures.fset <> fsubset def
-R8870:8871 Examples.Core <> L2:194 var
-R8867:8868 Examples.Core <> L3:195 var
-binder 8835:8846 <> fsubset_loc2:205
-R8895:8901 Coq.Init.Datatypes <> is_true def
-R8904:8910 extructures.fset <> fsubset def
-R8915:8916 Examples.Core <> I1:196 var
-R8912:8913 Examples.Core <> I3:198 var
-binder 8878:8891 <> fsubset_opsig1:206
-R8940:8946 Coq.Init.Datatypes <> is_true def
-R8949:8955 extructures.fset <> fsubset def
-R8960:8961 Examples.Core <> I2:197 var
-R8957:8958 Examples.Core <> I3:198 var
-binder 8923:8936 <> fsubset_opsig2:207
-R8967:8970 Hacspec.ChoiceEquality <> both rec
-R8996:8996 Examples.Core <> B:200 var
-R8987:8991 extructures.fset <> ::fset_scope:x_':|:'_x not
-R8985:8986 Examples.Core <> I1:196 var
-R8992:8993 Examples.Core <> I2:197 var
-R8975:8979 extructures.fset <> ::fset_scope:x_':|:'_x not
-R8973:8974 Examples.Core <> L1:193 var
-R8980:8981 Examples.Core <> L2:194 var
-R9003:9011 Hacspec.ChoiceEquality <> bind_both def
-binder 9060:9060 <> y:208
-R9071:9071 Examples.Core <> y:208 var
-R9089:9092 Coq.Init.Datatypes <> Some constr
-R9099:9107 Hacspec.ChoiceEquality <> lift_both def
-R9151:9152 Examples.Core <> fa:202 var
-R9155:9162 Hacspec.ChoiceEquality <> ret_both def
-R9179:9182 Coq.Init.Datatypes <> None constr
-R9187:9195 Hacspec.ChoiceEquality <> lift_both def
-R9238:9239 Examples.Core <> fb:203 var
-R9053:9053 Examples.Core <> x:201 var
-R9440:9449 Examples.Core <> match_both def
-binder 9458:9458 <> a:210
-not 9354:9354 <> :::'matchb'_x_'with'_'|'_'Option_Some'_x_'=>'_x_'|'_'Option_None'_'=>'_x_'end'
-R9642:9651 Examples.Core <> match_both def
-binder 9660:9660 <> a:211
-not 9566:9566 <> :::'matchb'_x_'with'_'|'_'Option_Some'_x_'=>'_x_'|'_'''_'''_'=>'_x_'end'
-R9790:9797 Hacspec.ChoiceEquality <> ret_both def
-R9805:9809 Crypt.package.pkg_notation PackageNotation ::package_scope:'''unit' not
-R9800:9801 Coq.Init.Datatypes <> tt constr
-not 9768:9768 <> :::'ret_both'_'tt'
+def 8056:8062 <> t_Never
+R8067:8071 Coq.Init.Logic <> False ind
+syndef 8083:8089 <> v_Break
+R8094:8095 Coq.Init.Datatypes <> id def
+syndef 8107:8116 <> Result_Err
+R8121:8123 Hacspec.Hacspec_Lib <> Err def
+def 8137:8148 <> never_to_any
+R8153:8154 Coq.Init.Datatypes <> tt constr
+syndef 8166:8174 <> Result_Ok
+R8179:8180 Hacspec.Hacspec_Lib <> Ok def
+R8215:8222 Hacspec.ChoiceEquality <> ret_both def
+R8230:8234 Crypt.package.pkg_notation PackageNotation ::package_scope:'''unit' not
+R8225:8226 Coq.Init.Datatypes <> tt constr
+not 8193:8193 <> :::'ret_both'_'tt'

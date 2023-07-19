@@ -183,31 +183,10 @@ Equations deref {L I A} : both L I (t_Vec A t_Global) -> both L I (seq A) :=
   deref X := bind_both X (fun x : t_Vec A t_Global => ret_both (seq_from_list A x)).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
-Notation get := id.
 Definition t_Never := False.
 Notation v_Break := id.
 Notation Result_Err := Err.
 Definition never_to_any := tt.
 Notation Result_Ok := Ok.
-
-
-Program Definition if_both {L1 L2 L3 I1 I2 I3} {A} (c : both L1 I1 'bool) (e_then : both L2 I2 A) (e_else : both L3 I3 A) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) A :=
-  bind_both (fsubset_loc := _) (fsubset_opsig := _) c (fun b => if b then lift_both (fsubset_loc := _) (fsubset_opsig := _) e_then else lift_both  (fsubset_loc := _) (fsubset_opsig := _) e_else).
-Solve All Obligations with solve_ssprove_obligations.
-Fail Next Obligation.
-
-Program Definition match_both {L1 L2 L3 I1 I2 I3} {A B} (x : both L3 I3 (option A)) (fa : both L3 I3 A -> both L1 I1 B) (fb : both L2 I2 B) `{fsubset_loc1 : is_true (fsubset L3 L1)}  `{fsubset_loc2 : is_true (fsubset L3 L2)}  `{fsubset_opsig1 : is_true (fsubset I3 I1)}  `{fsubset_opsig2 : is_true (fsubset I3 I2)} : both (L1 :|: L2) (I1 :|: I2) B :=
-  bind_both (fsubset_loc := _) (fsubset_opsig := _) x (fun y => match y with
-         | Some a => lift_both  (fsubset_loc := _) (fsubset_opsig := _) (fa (ret_both a))
-         | None => lift_both  (fsubset_loc := _) (fsubset_opsig := _) fb
-                     end).
-Solve All Obligations with solve_ssprove_obligations.
-Fail Next Obligation.
-
-Notation "'matchb' x 'with' '|' 'Option_Some' a '=>' va '|' 'Option_None' '=>' vb 'end'" :=
-  (match_both x (fun a => va) vb (fsubset_loc1 := _) (fsubset_loc2 := _) (fsubset_opsig1 := _) (fsubset_opsig2 := _)).
-
-Notation "'matchb' x 'with' '|' 'Option_Some' a '=>' va '|' '_' '=>' vb 'end'" :=
-  (match_both x (fun a => va) vb (fsubset_loc1 := _) (fsubset_loc2 := _) (fsubset_opsig1 := _) (fsubset_opsig2 := _)).
 
 Notation "'ret_both' 'tt'" := (ret_both (tt : 'unit)).

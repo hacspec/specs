@@ -1,0 +1,31 @@
+DIGEST 41711fa53f537116d9fcaa389f96befd
+FExamples.Hacspec_ovn_Schnorr
+R126:136 Crypt.choice_type <> <> lib
+R138:144 Crypt.Package <> <> lib
+R146:152 Crypt.Prelude <> <> lib
+R162:176 Crypt.package.pkg_notation PackageNotation <> mod
+R211:213 extructures.ord <> <> lib
+R215:218 extructures.fset <> <> lib
+R250:253 mathcomp.zify.ssrZ <> <> lib
+R255:258 mathcomp.word.word <> <> lib
+R288:291 Jasmin.word <> <> lib
+R319:324 Coq.ZArith.ZArith <> <> lib
+R351:364 Coq.Strings.String <> <> lib
+R377:394 Coq.Lists.List ListNotations <> mod
+R492:505 Hacspec.ChoiceEquality <> <> lib
+R536:550 Hacspec.LocationUtility <> <> lib
+R581:602 Hacspec.Hacspec_Lib_Comparable <> <> lib
+R633:647 Hacspec.Hacspec_Lib_Pre <> <> lib
+R678:688 Hacspec.Hacspec_Lib <> <> lib
+R725:745 mathcomp.ssreflect.choice Choice.Exports <> mod
+R833:843 Examples.Hacspec_lib <> <> lib
+R862:864 Examples.Std <> <> lib
+R937:969 Examples.Hacspec_ovn_Schnorr_Random_oracle <> <> lib
+syndef 982:993 <> t_Transcript
+R1017:1020 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R1010:1013 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R1003:1006 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R1000:1002 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R1007:1009 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R1014:1016 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R1021:1023 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def

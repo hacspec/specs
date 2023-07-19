@@ -1,0 +1,113 @@
+DIGEST da4b43ceb41a55c830a2111ff36e5a15
+FExamples.Std
+R74:84 Hacspec.Hacspec_Lib <> <> lib
+R112:117 Coq.ZArith.ZArith <> <> lib
+R127:144 Coq.Lists.List ListNotations <> mod
+R206:208 Coq.micromega.Lia <> <> lib
+R226:259 Coq.Logic.FunctionalExtensionality <> <> lib
+R277:283 Coq.Bool.Sumbool <> <> lib
+R316:322 mathcomp.ssreflect.fintype <> <> lib
+R352:362 Crypt.choice_type <> <> lib
+R364:370 Crypt.Package <> <> lib
+R372:378 Crypt.Prelude <> <> lib
+R388:402 Crypt.package.pkg_notation PackageNotation <> mod
+R437:439 extructures.ord <> <> lib
+R441:444 extructures.fset <> <> lib
+R446:449 extructures.fmap <> <> lib
+R482:485 mathcomp.zify.ssrZ <> <> lib
+R487:490 mathcomp.word.word <> <> lib
+R520:523 Jasmin.word <> <> lib
+R551:556 Coq.ZArith.ZArith <> <> lib
+R558:561 Coq.Lists.List <> <> lib
+R571:583 Coq.Lists.List ListNotations <> mod
+R615:628 Hacspec.ChoiceEquality <> <> lib
+R659:673 Hacspec.LocationUtility <> <> lib
+R704:725 Hacspec.Hacspec_Lib_Comparable <> <> lib
+R756:770 Hacspec.Hacspec_Lib_Pre <> <> lib
+R801:811 Hacspec.Hacspec_Lib <> <> lib
+R970:990 mathcomp.ssreflect.choice Choice.Exports <> mod
+R1009:1012 Examples.Core <> <> lib
+R1022:1025 Examples.Core <> <> mod
+ind 1039:1050 <> random_state
+constr 1057:1069 <> t_RandomState
+def 1083:1091 <> t_HashMap
+binder 1093:1093 <> A:3
+binder 1095:1095 <> B:4
+R1102:1113 Examples.Std <> random_state ind
+R1119:1123 Crypt.choice_type <> chMap constr
+R1125:1125 Examples.Std <> A:3 var
+R1127:1127 Examples.Std <> B:4 var
+ax 1137:1142 <> insert
+binder 1154:1155 <> L1:5
+binder 1157:1158 <> L2:6
+binder 1160:1161 <> L3:7
+binder 1163:1164 <> I1:8
+binder 1166:1167 <> I2:9
+binder 1169:1170 <> I3:10
+binder 1172:1172 <> A:11
+binder 1174:1174 <> B:12
+R1218:1221 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1178:1181 Hacspec.ChoiceEquality <> both rec
+R1190:1198 Examples.Std <> t_HashMap def
+R1200:1200 Examples.Std <> A:11 var
+R1202:1202 Examples.Std <> B:12 var
+R1204:1216 Examples.Std <> t_RandomState constr
+R1186:1187 Examples.Std <> I1:8 var
+R1183:1184 Examples.Std <> L1:5 var
+R1234:1237 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1222:1225 Hacspec.ChoiceEquality <> both rec
+R1233:1233 Examples.Std <> A:11 var
+R1230:1231 Examples.Std <> I2:9 var
+R1227:1228 Examples.Std <> L2:6 var
+R1250:1253 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1238:1241 Hacspec.ChoiceEquality <> both rec
+R1249:1249 Examples.Std <> B:12 var
+R1246:1247 Examples.Std <> I3:10 var
+R1243:1244 Examples.Std <> L3:7 var
+R1254:1257 Hacspec.ChoiceEquality <> both rec
+R1308:1311 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R1298:1305 Examples.Core <> t_Option def
+R1307:1307 Examples.Std <> B:12 var
+R1312:1320 Examples.Std <> t_HashMap def
+R1322:1322 Examples.Std <> A:11 var
+R1324:1324 Examples.Std <> B:12 var
+R1326:1338 Examples.Std <> t_RandomState constr
+R1288:1292 extructures.fset <> ::fset_scope:x_':|:'_x not
+R1281:1285 extructures.fset <> ::fset_scope:x_':|:'_x not
+R1279:1280 Examples.Std <> I1:8 var
+R1286:1287 Examples.Std <> I2:9 var
+R1293:1294 Examples.Std <> I3:10 var
+R1269:1273 extructures.fset <> ::fset_scope:x_':|:'_x not
+R1262:1266 extructures.fset <> ::fset_scope:x_':|:'_x not
+R1260:1261 Examples.Std <> L1:5 var
+R1267:1268 Examples.Std <> L2:6 var
+R1274:1275 Examples.Std <> L3:7 var
+ax 1348:1350 <> get
+binder 1363:1364 <> L1:14
+binder 1366:1367 <> L2:15
+binder 1369:1370 <> I1:16
+binder 1372:1373 <> I2:17
+binder 1375:1375 <> A:18
+binder 1377:1377 <> B:19
+R1421:1424 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1381:1384 Hacspec.ChoiceEquality <> both rec
+R1393:1401 Examples.Std <> t_HashMap def
+R1403:1403 Examples.Std <> A:18 var
+R1405:1405 Examples.Std <> B:19 var
+R1407:1419 Examples.Std <> t_RandomState constr
+R1389:1390 Examples.Std <> I1:16 var
+R1386:1387 Examples.Std <> L1:14 var
+R1437:1440 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1425:1428 Hacspec.ChoiceEquality <> both rec
+R1436:1436 Examples.Std <> A:18 var
+R1433:1434 Examples.Std <> I2:17 var
+R1430:1431 Examples.Std <> L2:15 var
+R1441:1444 Hacspec.ChoiceEquality <> both rec
+R1471:1478 Examples.Core <> t_Option def
+R1480:1480 Examples.Std <> B:19 var
+R1461:1465 extructures.fset <> ::fset_scope:x_':|:'_x not
+R1459:1460 Examples.Std <> I1:16 var
+R1466:1467 Examples.Std <> I2:17 var
+R1449:1453 extructures.fset <> ::fset_scope:x_':|:'_x not
+R1447:1448 Examples.Std <> L1:14 var
+R1454:1455 Examples.Std <> L2:15 var

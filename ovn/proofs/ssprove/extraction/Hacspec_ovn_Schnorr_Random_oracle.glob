@@ -1,0 +1,247 @@
+DIGEST ebf35470edb32d87446cf29c011d7916
+FExamples.Hacspec_ovn_Schnorr_Random_oracle
+R126:136 Crypt.choice_type <> <> lib
+R138:144 Crypt.Package <> <> lib
+R146:152 Crypt.Prelude <> <> lib
+R162:176 Crypt.package.pkg_notation PackageNotation <> mod
+R211:213 extructures.ord <> <> lib
+R215:218 extructures.fset <> <> lib
+R250:253 mathcomp.zify.ssrZ <> <> lib
+R255:258 mathcomp.word.word <> <> lib
+R288:291 Jasmin.word <> <> lib
+R319:324 Coq.ZArith.ZArith <> <> lib
+R351:364 Coq.Strings.String <> <> lib
+R377:394 Coq.Lists.List ListNotations <> mod
+R492:505 Hacspec.ChoiceEquality <> <> lib
+R536:550 Hacspec.LocationUtility <> <> lib
+R581:602 Hacspec.Hacspec_Lib_Comparable <> <> lib
+R633:647 Hacspec.Hacspec_Lib_Pre <> <> lib
+R678:688 Hacspec.Hacspec_Lib <> <> lib
+R725:745 mathcomp.ssreflect.choice Choice.Exports <> mod
+R833:843 Examples.Hacspec_lib <> <> lib
+def 866:883 <> random_oracle_init
+R891:896 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R905:905 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R897:904 Crypt.package.pkg_core_definition <> Location def
+binder 886:887 <> L1:1
+R914:922 Crypt.package.pkg_core_definition <> Interface def
+binder 909:910 <> I1:2
+R930:933 Hacspec.ChoiceEquality <> both rec
+R942:946 Crypt.package.pkg_notation PackageNotation ::package_scope:'''unit' not
+R938:939 Examples.Hacspec_ovn_Schnorr_Random_oracle <> I1:2 var
+R935:936 Examples.Hacspec_ovn_Schnorr_Random_oracle <> L1:1 var
+R952:955 Hacspec.ChoiceEquality <> both rec
+R968:972 Crypt.package.pkg_notation PackageNotation ::package_scope:'''unit' not
+R963:964 Examples.Hacspec_ovn_Schnorr_Random_oracle <> I1:2 var
+R958:959 Examples.Hacspec_ovn_Schnorr_Random_oracle <> L1:1 var
+R980:987 Hacspec.ChoiceEquality <> ret_both def
+R995:999 Crypt.package.pkg_notation PackageNotation ::package_scope:'''unit' not
+R990:991 Coq.Init.Datatypes <> tt constr
+def 1037:1039 <> t_G
+R1043:1053 Crypt.choice_type <> choice_type ind
+R1061:1065 Hacspec.Hacspec_Lib_Pre <> int32 syndef
+def 1079:1087 <> Build_t_G
+R1094:1099 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R1108:1108 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R1100:1107 Crypt.package.pkg_core_definition <> Location def
+binder 1090:1090 <> L:3
+R1116:1124 Crypt.package.pkg_core_definition <> Interface def
+binder 1112:1112 <> I:4
+R1134:1137 Hacspec.ChoiceEquality <> both rec
+R1144:1148 Hacspec.Hacspec_Lib_Pre <> int32 syndef
+R1141:1141 Examples.Hacspec_ovn_Schnorr_Random_oracle <> I:4 var
+R1139:1139 Examples.Hacspec_ovn_Schnorr_Random_oracle <> L:3 var
+binder 1128:1130 <> f_v:5
+R1154:1157 Hacspec.ChoiceEquality <> both rec
+R1164:1166 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R1174:1182 Examples.Hacspec_ovn_Schnorr_Random_oracle <> Build_t_G:8 def
+R1184:1186 Examples.Hacspec_ovn_Schnorr_Random_oracle <> f_v:7 var
+R1256:1259 Hacspec.ChoiceEquality <> both rec
+R1266:1268 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R1196:1204 Hacspec.ChoiceEquality <> bind_both def
+binder 1215:1217 <> f_v:9
+R1228:1235 Hacspec.ChoiceEquality <> ret_both def
+R1247:1249 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R1239:1241 Examples.Hacspec_ovn_Schnorr_Random_oracle <> f_v:9 var
+def 1306:1308 <> t_Q
+R1312:1322 Crypt.choice_type <> choice_type ind
+R1330:1334 Hacspec.Hacspec_Lib_Pre <> int32 syndef
+def 1348:1356 <> Build_t_Q
+R1363:1368 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R1377:1377 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R1369:1376 Crypt.package.pkg_core_definition <> Location def
+binder 1359:1359 <> L:10
+R1385:1393 Crypt.package.pkg_core_definition <> Interface def
+binder 1381:1381 <> I:11
+R1403:1406 Hacspec.ChoiceEquality <> both rec
+R1413:1417 Hacspec.Hacspec_Lib_Pre <> int32 syndef
+R1410:1410 Examples.Hacspec_ovn_Schnorr_Random_oracle <> I:11 var
+R1408:1408 Examples.Hacspec_ovn_Schnorr_Random_oracle <> L:10 var
+binder 1397:1399 <> f_v:12
+R1423:1426 Hacspec.ChoiceEquality <> both rec
+R1433:1435 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R1443:1451 Examples.Hacspec_ovn_Schnorr_Random_oracle <> Build_t_Q:15 def
+R1453:1455 Examples.Hacspec_ovn_Schnorr_Random_oracle <> f_v:14 var
+R1525:1528 Hacspec.ChoiceEquality <> both rec
+R1535:1537 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R1465:1473 Hacspec.ChoiceEquality <> bind_both def
+binder 1484:1486 <> f_v:16
+R1497:1504 Hacspec.ChoiceEquality <> ret_both def
+R1516:1518 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R1508:1510 Examples.Hacspec_ovn_Schnorr_Random_oracle <> f_v:16 var
+syndef 1573:1581 <> t_Witness
+R1587:1589 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+syndef 1603:1613 <> t_Statement
+R1619:1621 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+syndef 1635:1643 <> t_Message
+R1649:1651 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+syndef 1665:1675 <> t_Challenge
+R1681:1683 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+syndef 1697:1706 <> t_Response
+R1712:1714 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+syndef 1728:1735 <> t_Random
+R1745:1748 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R1742:1744 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R1749:1751 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+syndef 1766:1772 <> t_Query
+R1778:1780 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+def 1804:1817 <> sample_uniform
+R1821:1824 Hacspec.ChoiceEquality <> both rec
+R1856:1859 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R1853:1855 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R1860:1862 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R1837:1848 Crypt.package.pkg_notation PackageNotation ::package_scope:'['_'interface'_']' not
+R1827:1830 extructures.fset <> fset def
+R1832:1833 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R1871:1878 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R1895:1895 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R1912:1912 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R1879:1887 Examples.Hacspec_ovn_Schnorr_Random_oracle <> Build_t_G def
+R1889:1892 Examples.Hacspec_lib <> :::'i32('_x_')' not
+R1894:1894 Examples.Hacspec_lib <> :::'i32('_x_')' not
+R1896:1904 Examples.Hacspec_ovn_Schnorr_Random_oracle <> Build_t_G def
+R1906:1909 Examples.Hacspec_lib <> :::'i32('_x_')' not
+R1911:1911 Examples.Hacspec_lib <> :::'i32('_x_')' not
+R1953:1955 Examples.Std <> <> lib
+def 1995:2013 <> random_oracle_query
+R2021:2026 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R2035:2035 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R2027:2034 Crypt.package.pkg_core_definition <> Location def
+binder 2016:2017 <> L1:17
+R2044:2049 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R2058:2058 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R2050:2057 Crypt.package.pkg_core_definition <> Location def
+binder 2039:2040 <> L2:18
+R2067:2075 Crypt.package.pkg_core_definition <> Interface def
+binder 2062:2063 <> I1:19
+R2084:2092 Crypt.package.pkg_core_definition <> Interface def
+binder 2079:2080 <> I2:20
+R2106:2109 Hacspec.ChoiceEquality <> both rec
+R2118:2126 Examples.Std <> t_HashMap def
+R2129:2131 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R2139:2142 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2136:2138 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2143:2145 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2150:2162 Examples.Std <> t_RandomState constr
+R2114:2115 Examples.Hacspec_ovn_Schnorr_Random_oracle <> I1:19 var
+R2111:2112 Examples.Hacspec_ovn_Schnorr_Random_oracle <> L1:17 var
+binder 2096:2102 <> QUERIES:21
+R2172:2175 Hacspec.ChoiceEquality <> both rec
+R2184:2186 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R2180:2181 Examples.Hacspec_ovn_Schnorr_Random_oracle <> I2:20 var
+R2177:2178 Examples.Hacspec_ovn_Schnorr_Random_oracle <> L2:18 var
+binder 2168:2168 <> q:22
+R2192:2195 Hacspec.ChoiceEquality <> both rec
+R2265:2269 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2280:2280 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2219:2227 Examples.Std <> t_HashMap def
+R2230:2232 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R2240:2243 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2237:2239 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2244:2246 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2251:2263 Examples.Std <> t_RandomState constr
+R2273:2276 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2270:2272 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2277:2279 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2210:2212 extructures.fset <> ::fset_scope:x_':|:'_x not
+R2208:2209 Examples.Hacspec_ovn_Schnorr_Random_oracle <> I1:19 var
+R2213:2214 Examples.Hacspec_ovn_Schnorr_Random_oracle <> I2:20 var
+R2200:2202 extructures.fset <> ::fset_scope:x_':|:'_x not
+R2198:2199 Examples.Hacspec_ovn_Schnorr_Random_oracle <> L1:17 var
+R2203:2204 Examples.Hacspec_ovn_Schnorr_Random_oracle <> L2:18 var
+R2289:2295 Hacspec.Hacspec_Lib <> :::'matchb'_x_'with'_'|'_'Option_Some'_x_'=>'_x_'|'_'Option_None'_'=>'_x_'end' not
+R2309:2330 Hacspec.Hacspec_Lib <> :::'matchb'_x_'with'_'|'_'Option_Some'_x_'=>'_x_'|'_'Option_None'_'=>'_x_'end' not
+R2332:2335 Hacspec.Hacspec_Lib <> :::'matchb'_x_'with'_'|'_'Option_Some'_x_'=>'_x_'|'_'Option_None'_'=>'_x_'end' not
+R2366:2386 Hacspec.Hacspec_Lib <> :::'matchb'_x_'with'_'|'_'Option_Some'_x_'=>'_x_'|'_'Option_None'_'=>'_x_'end' not
+R2790:2793 Hacspec.Hacspec_Lib <> :::'matchb'_x_'with'_'|'_'Option_Some'_x_'=>'_x_'|'_'Option_None'_'=>'_x_'end' not
+R2296:2298 Examples.Std <> get prfax
+R2308:2308 Examples.Hacspec_ovn_Schnorr_Random_oracle <> q:22 var
+R2300:2306 Examples.Hacspec_ovn_Schnorr_Random_oracle <> QUERIES:21 var
+binder 2331:2331 <> r:23
+R2336:2343 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R2357:2357 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R2365:2365 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R2344:2348 Examples.Core <> clone syndef
+R2350:2356 Examples.Hacspec_ovn_Schnorr_Random_oracle <> QUERIES:21 var
+R2358:2362 Examples.Core <> clone syndef
+R2364:2364 Examples.Hacspec_ovn_Schnorr_Random_oracle <> r:23 var
+R2387:2391 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2393:2396 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2439:2446 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2416:2419 Hacspec.ChoiceEquality <> both rec
+R2430:2433 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2427:2429 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2434:2436 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2398:2411 Examples.Hacspec_ovn_Schnorr_Random_oracle <> sample_uniform def
+binder 2392:2392 <> r:24
+binder 2392:2392 <> r:25
+R2447:2453 Hacspec.ChoiceEquality <> :::'letb'_''''_'('_x_','_x_')'_':='_x_'in'_x not
+R2468:2468 Hacspec.ChoiceEquality <> :::'letb'_''''_'('_x_','_x_')'_':='_x_'in'_x not
+R2481:2485 Hacspec.ChoiceEquality <> :::'letb'_''''_'('_x_','_x_')'_':='_x_'in'_x not
+R2595:2602 Hacspec.ChoiceEquality <> :::'letb'_''''_'('_x_','_x_')'_':='_x_'in'_x not
+R2509:2512 Hacspec.ChoiceEquality <> both rec
+R2543:2546 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2520:2527 Examples.Core <> t_Option def
+R2534:2537 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2531:2533 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2538:2540 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2547:2555 Examples.Std <> t_HashMap def
+R2558:2560 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R2568:2571 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2565:2567 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2572:2574 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2579:2591 Examples.Std <> t_RandomState constr
+R2487:2492 Examples.Std <> insert prfax
+R2504:2504 Examples.Hacspec_ovn_Schnorr_Random_oracle <> r:24 var
+R2502:2502 Examples.Hacspec_ovn_Schnorr_Random_oracle <> q:22 var
+R2494:2500 Examples.Hacspec_ovn_Schnorr_Random_oracle <> QUERIES:21 var
+binder 2454:2467 <> todo_fresh_var:26
+binder 2469:2480 <> QUERIES_temp:27
+R2603:2607 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2615:2618 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2693:2700 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2636:2639 Hacspec.ChoiceEquality <> both rec
+R2646:2654 Examples.Std <> t_HashMap def
+R2657:2659 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_Q def
+R2667:2670 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2664:2666 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2671:2673 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2678:2690 Examples.Std <> t_RandomState constr
+R2620:2631 Examples.Hacspec_ovn_Schnorr_Random_oracle <> QUERIES_temp:27 var
+binder 2608:2614 <> QUERIES:28
+binder 2608:2614 <> QUERIES:29
+R2701:2705 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2707:2710 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2764:2771 Hacspec.ChoiceEquality <> :::'letb'_x_':='_x_'in'_x not
+R2730:2733 Hacspec.ChoiceEquality <> both rec
+R2740:2747 Examples.Core <> t_Option def
+R2754:2757 Crypt.package.pkg_notation PackageNotation ::package_scope:x_'×'_x not
+R2751:2753 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2758:2760 Examples.Hacspec_ovn_Schnorr_Random_oracle <> t_G def
+R2712:2725 Examples.Hacspec_ovn_Schnorr_Random_oracle <> todo_fresh_var:26 var
+binder 2706:2706 <> pat:30
+R2772:2779 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R2787:2787 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R2789:2789 Hacspec.ChoiceEquality <> ::hacspec_scope:'prod_b'_'('_x_','_x_','_'..'_','_x_')' not
+R2780:2786 Examples.Hacspec_ovn_Schnorr_Random_oracle <> QUERIES:28 var
+R2788:2788 Examples.Hacspec_ovn_Schnorr_Random_oracle <> r:24 var

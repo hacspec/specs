@@ -2,13 +2,7 @@ use hacspec_lib::*;
 use std::collections::HashMap;
 
 pub mod random_oracle;
-// use random_oracle::*;
-
-pub type Witness = random_oracle::Q;
-pub type Statement = random_oracle::G;
-pub type Message = random_oracle::G;
-pub type Challenge = random_oracle::Q;
-pub type Response =  random_oracle::G;
+use random_oracle::*;
 // type Transcript = (Message, Challenge, Response);
 
 // Sigma1.Sigma.RUN and Sigma1.Sigma.VERIFY: (Schnorr, RO (RandomOracle) OracleParams)
@@ -47,13 +41,14 @@ pub type Response =  random_oracle::G;
 
 pub type Transcript = (Statement , Message , Challenge , Response);
 
-fn prod_assoc ((statement, message) : (Statement, Message)) -> random_oracle::Query {
+fn prod_assoc (sm : (Statement, Message)) -> random_oracle::Query {
+    let (statement, message) = sm;
     // Proof.
     //   cbn. intros [statement message].
     //   rewrite !card_prod.
     //   apply mxvec_index. all: assumption.
     // Qed.
-    random_oracle::Query::ONE()
+    random_oracle::Q{v: 1} // random_oracle::Query::ONE()
 }
 
 // Verify_schamir
@@ -80,14 +75,14 @@ fn Commit (h : Statement, w : Witness) -> Message {
     // #put commit_loc := r ;;
     let mut commit = r;
     // ret (fto (g ^+ (otf r)))
-    Message::ONE()
+    G{v: 1} // Message::ONE()
 }
 
 
 fn Response (h : Statement, w : Witness, a : Message, e : Challenge) -> Response {
     // r ← get commit_loc ;;
     // ret (fto (otf r + otf e * otf w))
-    Response::ONE()
+    Q{v: 1} // Response::ONE()
 }
 
 pub fn fiat_shamir_run(hw : Relation) -> Transcript {
@@ -97,13 +92,9 @@ pub fn fiat_shamir_run(hw : Relation) -> Transcript {
     let (h,w) = hw;
     // #assert (R (otf h) (otf w)) ;;
     let a = Commit(h, w);
-    // RO_init Datatypes.tt ;;
     random_oracle::random_oracle_init(());
-    // e ← RO_query (prod_assoc (h, a)) ;;
     let (QUERIES, eu) = random_oracle::random_oracle_query(QUERIES, prod_assoc((h, a)));
-    let e = Challenge::ONE(); // Should be e <- eu
-    // z ← Response h w a e ;;
+    let e = Q{v: 1}; // Challenge::ONE(); // Should be e <- eu
     let z = Response (h, w, a, e);
-    // @ret choiceTranscript (h,a,e,z)
     (h,a,e,z)
 }

@@ -1,8 +1,7 @@
 use hacspec_lib::*;
 
 mod schnorr;
-
-use schnorr::{random_oracle::sample_uniform, *};
+use schnorr::*;
 
 // (Exec_i i j m) ∘ (par ((P_i i b) ∘ (Sigma1.Sigma.Fiat_Shamir ∘ RO1.RO)) (Sigma1.Sigma.Fiat_Shamir ∘ RO1.RO))
 
@@ -46,19 +45,23 @@ use schnorr::{random_oracle::sample_uniform, *};
 //         }
 //     ].
 
-type public = schnorr::random_oracle::Q;
-type public_key = (public, schnorr::Transcript);
+type Secret = schnorr::random_oracle::Q; // Zp_finComRingType (Zp_trunc #[g]);
+pub fn sample_uniform () -> Secret {
+    schnorr::random_oracle::Q{v: 1} // Secret::ONE()
+}
+
+type public = schnorr::random_oracle::G;
+type public_key = (public, schnorr::Transcript); // (public, (schnorr::random_oracle::Message , schnorr::random_oracle::Challenge , schnorr::random_oracle::Response))
 fn p_i_init(_: ()) -> public_key {
     // #import {sig #[ Sigma1.Sigma.RUN ] : chRelation1 → chTranscript1} as ZKP ;;
     // #import {sig #[ Sigma1.Sigma.VERIFY ] : chTranscript1 → 'bool} as VER ;;
     // x ← sample uniform i_secret ;;
-    let x = schnorr::random_oracle::sample_uniform();
+    let x = sample_uniform();
     // #put (skey_loc i) := x ;;
     // let y := (fto (g ^+ (otf x))) : public in
-    let y = public::ONE();
+    let y = schnorr::random_oracle::G{v: 1}; // public::ONE();
     // zkp ← ZKP (y, x) ;;
-    let zkp = schnorr::fiat_shamir_run((x, y)); // should be (y, x)
-                                                // ret (y, zkp)
+    let zkp = schnorr::fiat_shamir_run((y, x));
     (y, zkp)
 }
 
@@ -98,7 +101,7 @@ fn p_i_vote(v: bool) -> public {
     // else
     //     let vote := (otf ckey ^+ skey * g ^+ (negb v)) in
     //     @ret 'public (fto vote)
-    public::ONE()
+    schnorr::random_oracle::G{v: 1} // public::ONE()
 }
 
 // Exec_i
@@ -127,11 +130,11 @@ fn exec(v : bool) -> public {
     // #import {sig #[ Sigma1.Sigma.RUN ] : chRelation1 → chTranscript1} as ZKP ;;
     // pk ← Init Datatypes.tt ;;
     // x ← sample uniform i_secret ;;
-    let x = random_oracle::sample_uniform();
+    let x = sample_uniform();
     // let y := (fto (g ^+ (otf x))) : public in
-    let y = public::ONE();
+    let y = schnorr::random_oracle::G{v: 1}; // public::ONE();
     //     zkp ← ZKP (y, x) ;;
-    let zkp = schnorr::fiat_shamir_run((x, y));
+    let zkp = schnorr::fiat_shamir_run((y, x));
     // let m' := setm (setm m j (y, zkp)) i pk in
     //     Construct m' ;;
     // vote ← Vote v ;;
