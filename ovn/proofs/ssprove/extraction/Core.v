@@ -65,19 +65,19 @@ Equations swap_both_list {A L I} (x : list (both L I A)) : both L I (chList A) :
   (List.fold_left (fun (x : both L I (chList A)) y =>
    bind_both x (fun x' =>
    bind_both y (fun y' =>
-                  ret_both ((y' :: x') : chList A)))) x (ret_both ([] : chList A))).
+   solve_lift (ret_both ((y' :: x') : chList A))))) x (solve_lift (ret_both ([] : chList A)))).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
 
 Equations match_list {A B : choice_type} {L I} (x : both L I (chList A)) (f : list A -> B) : both L I B :=
   match_list x f :=
-  bind_both x (fun x' => ret_both (f x')).
+  bind_both x (fun x' => solve_lift (ret_both (f x'))).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
 
 Equations map {A B} {L I} (x : both L I (chList A))  (f : both L I A -> both L I B) : both L I (chList B) :=
   map x f :=
-  bind_both x (fun x' => swap_both_list (List.map (fun y => f (ret_both y)) x')).
+  bind_both x (fun x' => swap_both_list (List.map (fun y => f (solve_lift (ret_both y))) x')).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
 
@@ -85,14 +85,16 @@ Definition cloned {A} {L I} (x : both L I (chList A)) : both L I (chList A) := x
 
 Equations iter {A L I} (x : both L I (seq A)) : both L I (chList A) :=
   iter x :=
-  bind_both x (fun x' => ret_both (seq_to_list _ x' : chList A)).
+  bind_both x (fun x' => solve_lift (ret_both (seq_to_list _ x' : chList A))).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
 
 Definition dedup {A} {L I} (x : both L I (t_Vec A t_Global)) : both L I (t_Vec A t_Global) := x.
 
 Definition t_String := Coq.Strings.String.string.
-Definition new {A L I} : both L I (t_Vec A t_Global) := ret_both ([] : chList A).
+Program Definition new {A L I} : both L I (t_Vec A t_Global) := solve_lift (ret_both ([] : chList A)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
 
 Definition enumerate {A} {L I} (x : both L I (t_Vec A t_Global)) : both L I (t_Vec A t_Global) := x.
 
@@ -126,11 +128,25 @@ Definition run {A B : choice_type} {L I} (x : ControlFlow A B) : both L I (t_Res
 (* | ErrorKind_LeavesIndicesCountMismatcht_ErrorKind. *)
 
 Definition t_ErrorKind : choice_type := chFin (mkpos 5).
-Definition ErrorKind_SerializedProofSizeIsIncorrect {L I} : both L I t_ErrorKind := ret_both (fintype.Ordinal (n:=5) (m:=0) eq_refl : t_ErrorKind).
-Definition ErrorKind_NotEnoughHelperNodes {L I} : both L I t_ErrorKind := ret_both (fintype.Ordinal (n:=5) (m:=1) eq_refl : t_ErrorKind).
-Definition ErrorKind_HashConversionError {L I} : both L I t_ErrorKind := ret_both (fintype.Ordinal (n:=5) (m:=2) eq_refl : t_ErrorKind).
-Definition ErrorKind_NotEnoughHashesToCalculateRoot {L I} : both L I t_ErrorKind := ret_both (fintype.Ordinal (n:=5) (m:=3) eq_refl : t_ErrorKind).
-Definition ErrorKind_LeavesIndicesCountMismatch {L I} : both L I t_ErrorKind := ret_both (fintype.Ordinal (n:=5) (m:=4) eq_refl : t_ErrorKind).
+Program Definition ErrorKind_SerializedProofSizeIsIncorrect {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=0) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Program Definition ErrorKind_NotEnoughHelperNodes {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=1) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Program Definition ErrorKind_HashConversionError {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=2) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Program Definition ErrorKind_NotEnoughHashesToCalculateRoot {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=3) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Program Definition ErrorKind_LeavesIndicesCountMismatch {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=4) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
 
 (** How to handle records: **)
 (* TODO: Remove them as a phase? *)
@@ -146,7 +162,7 @@ Equations Build_Error {L I} {f_kind1 : both L I t_ErrorKind} {f_kind2 : both L I
   Build_Error (f_kind1 := x) (f_kind2 := y) :=
   bind_both x (fun x' =>
   bind_both y (fun y' =>
-                 ret_both ((x', y') : t_Error))).
+  solve_lift (ret_both ((x', y') : t_Error)))).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
 Definition f_kind1 (v : t_Error) := fst v.
@@ -158,11 +174,11 @@ Definition t_Drain : choice_type -> vec_typ -> choice_type := t_Vec.
 Inductive t_Range := RangeFull.
 Equations drain : forall {L I A}, both L I (t_Vec A t_Global) -> t_Range -> both L I (t_Drain A t_Global × t_Vec A t_Global) :=
   drain x _ :=
-    bind_both x (fun x' => ret_both ((x', []) : (t_Drain A t_Global × t_Vec A t_Global))).
+    bind_both x (fun x' => solve_lift (ret_both ((x', []) : (t_Drain A t_Global × t_Vec A t_Global)))).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
 Notation t_Rev := id.
-Equations rev {L I A} (x : both L I (chList A)) : both L I (chList A) := rev x := bind_both x (fun x => ret_both (List.rev x : chList _)).
+Equations rev {L I A} (x : both L I (chList A)) : both L I (chList A) := rev x := bind_both x (fun x => solve_lift (ret_both (List.rev x : chList _))).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
 
@@ -180,7 +196,7 @@ Notation clone := id.
 Definition seq_unzip {A B} (s : chList (A × B)) : chList A × chList B := (seq.unzip1 s, seq.unzip2 s).
 Definition unzip {L I} {A B} : both L I (chList (A × B)) -> both L I (chList A × chList B) := lift1_both seq_unzip.
 Equations deref {L I A} : both L I (t_Vec A t_Global) -> both L I (seq A) :=
-  deref X := bind_both X (fun x : t_Vec A t_Global => ret_both (seq_from_list A x)).
+  deref X := bind_both X (fun x : t_Vec A t_Global => solve_lift (ret_both (seq_from_list A x))).
 Solve All Obligations with solve_ssprove_obligations.
 Fail Next Obligation.
 Definition t_Never := False.

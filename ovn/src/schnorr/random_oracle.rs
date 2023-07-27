@@ -71,10 +71,11 @@ use std::collections::HashMap;
 //     }
 // }
 
+pub type QueriesType = HashMap<Query, Random>;
 // static ref QUERIES : HashMap<Query, Random> = HashMap::new();
 // chQuery  := 'fin #|Query|
 // chRandom := 'fin #|Random|
-pub fn random_oracle_query(mut QUERIES : HashMap<Query, Random>, q : Query) -> (HashMap<Query, Random>, Random) {
+pub fn random_oracle_query(mut QUERIES : QueriesType, q : Query) -> (QueriesType, Random) {
     match QUERIES.get(&q) {
         Some (r) => (QUERIES.clone(), r.clone()),
         None => {

@@ -24,10 +24,12 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Require Import Hacspec_lib.
+Require Import (* Hacspec_ovn_ *)Hacspec_lib.
+Export (* Hacspec_ovn_ *)Hacspec_lib.
 
-Program Definition random_oracle_init {L1 : {fset Location}} {I1 : Interface} (_ : both L1 I1 ('unit)) : both (L1) (I1) ('unit) :=
-  ret_both (tt : 'unit).
+Equations random_oracle_init {L1 : {fset Location}} {I1 : Interface} (_ : both L1 I1 ('unit)) : both (L1) (I1) ('unit) :=
+  random_oracle_init _  :=
+    solve_lift (ret_both (tt : 'unit)) : both (L1) (I1) ('unit).
 Fail Next Obligation.
 
 Definition t_G : choice_type :=
@@ -35,7 +37,7 @@ Definition t_G : choice_type :=
 Equations Build_t_G {L : {fset Location}} {I : Interface} (f_v : both L I (int32)) : both L I (t_G) :=
   Build_t_G f_v  :=
     bind_both f_v (fun f_v =>
-      ret_both ((f_v) : (t_G))) : both L I (t_G).
+      solve_lift (ret_both ((f_v) : (t_G)))) : both L I (t_G).
 Fail Next Obligation.
 
 Definition t_Q : choice_type :=
@@ -43,7 +45,7 @@ Definition t_Q : choice_type :=
 Equations Build_t_Q {L : {fset Location}} {I : Interface} (f_v : both L I (int32)) : both L I (t_Q) :=
   Build_t_Q f_v  :=
     bind_both f_v (fun f_v =>
-      ret_both ((f_v) : (t_Q))) : both L I (t_Q).
+      solve_lift (ret_both ((f_v) : (t_Q)))) : both L I (t_Q).
 Fail Next Obligation.
 
 Notation t_Witness := (t_Q).
@@ -60,19 +62,25 @@ Notation t_Random := ((t_G × t_G)).
 
 Notation t_Query := (t_Q).
 
-Program Definition sample_uniform : both (fset []) ([interface ]) ((t_G × t_G)) :=
-  prod_b (Build_t_G i32(1),Build_t_G i32(1)).
+Equations sample_uniform : both (fset []) ([interface ]) ((t_G × t_G)) :=
+  sample_uniform  :=
+    solve_lift (prod_b (Build_t_G (ret_both (1 : int32)),Build_t_G (ret_both (1 : int32)))) : both (fset []) ([interface ]) ((t_G × t_G)).
 Fail Next Obligation.
 
-Require Import Std. (* as HashMap *)
+Require Import HashMap.
 
-Program Definition random_oracle_query {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (QUERIES : both L1 I1 (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState))) (q : both L2 I2 (t_Q)) : both (L1:|:L2) (I1:|:I2) ((t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState) × (t_G × t_G))) :=
-  match get_under_impl_2 QUERIES q with
-  | Option_Some r => prod_b (clone QUERIES,clone r)
-  | Option_None  => letb r := (sample_uniform) : both _ _ ((t_G × t_G)) in
-    letb '(todo_fresh_var,QUERIES_temp) := (insert_under_impl_2 QUERIES q r) : both _ _ ((t_Option ((t_G × t_G)) × t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState))) in
-    letb QUERIES := (QUERIES_temp) : both _ _ (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)) in
-    letb _ := (todo_fresh_var) : both _ _ (t_Option ((t_G × t_G))) in
-    prod_b (QUERIES,r)
-  end.
+Notation t_QueriesType := (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)).
+
+Equations random_oracle_query {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (QUERIES : both L1 I1 (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState))) (q : both L2 I2 (t_Q)) : both (L1:|:L2) (I1:|:I2) ((t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState) × (t_G × t_G))) :=
+  random_oracle_query QUERIES q  :=
+    solve_lift matchb get QUERIES q with
+    | Option_Some r =>
+      prod_b (clone QUERIES,clone r)
+    | Option_None  =>
+      letb r := (sample_uniform) : both _ _ ((t_G × t_G)) in
+      letb '(todo_fresh_var,QUERIES_temp) := (insert QUERIES q r) : both _ _ ((t_Option ((t_G × t_G)) × t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState))) in
+      letb QUERIES := (QUERIES_temp) : both _ _ (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)) in
+      letb _ := (todo_fresh_var) : both _ _ (t_Option ((t_G × t_G))) in
+      prod_b (QUERIES,r)
+    end : both (L1:|:L2) (I1:|:I2) ((t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState) × (t_G × t_G))).
 Fail Next Obligation.

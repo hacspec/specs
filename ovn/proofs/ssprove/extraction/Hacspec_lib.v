@@ -50,19 +50,13 @@ Program Definition int_xO {WS : wsize} (a : int WS) : int WS :=
 (* Next Obligation. intros ; now rewrite fsetU0. Defined. *)
 (* Next Obligation. intros ; rewrite <- fset0E ; now rewrite fsetU0. Defined. *)
 
-Definition both_int_one {WS : wsize} : both (fset []) ([interface]) (@int WS) := ret_both (L := fset []) (one).
-
-Compute (Hacspec_Lib_Pre.int_add (repr U32 3%Z) (repr U32 8%Z)).
+Definition both_int_one {WS : wsize} : both (fset []) ([interface]) (@int WS) := ret_both (one).
 
 Open Scope hacspec_scope.
 Definition int_num {WS : wsize} := int WS.
 Number Notation int_num Pos.of_num_int Pos.to_num_int (via positive mapping [[int_xI] => xI, [int_xO] => xO , [one] => xH]) : hacspec_scope.
 
 Notation "0" := (repr _ 0%Z) : hacspec_scope.
-
-Check 5 : int8.
-Check 3 : int8.
-Check 8 : int8.
 
 (* Notation U8_t := int8. *)
 (* Notation U8 := id. *)

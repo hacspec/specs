@@ -48,3 +48,5 @@ Definition t_HashMap A B (_ : random_state) := chMap A B.
 Axiom insert : forall {L1 L2 L3 I1 I2 I3 A B}, both L1 I1 (t_HashMap A B t_RandomState) -> both L2 I2 A -> both L3 I3 B -> both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (t_Option B × t_HashMap A B t_RandomState).
 Axiom get :  forall {L1 L2 I1 I2 A B}, both L1 I1 (t_HashMap A B t_RandomState) -> both L2 I2 A -> both (L1 :|: L2) (I1 :|: I2) (t_Option B).
 
+Axiom new :  forall {L I A B}, both L I (t_HashMap A B t_RandomState).
+

@@ -26,46 +26,57 @@ Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
 (*Not implemented yet? todo(item)*)
 
-Require Import Hacspec_lib.
+Require Import (* Hacspec_ovn_ *)Hacspec_lib.
+Export Hacspec_lib.
 
 (*Not implemented yet? todo(item)*)
 
-Require Import Schnorr.
+Require Import Hacspec_ovn_Schnorr.
+Export Hacspec_ovn_Schnorr.
 
 Notation t_Secret := (t_Q).
 
-Program Definition sample_uniform : both (fset []) ([interface ]) (t_Q) :=
-  Build_t_Q i32(1).
+Equations sample_uniform : both (fset []) ([interface ]) (t_Q) :=
+  sample_uniform  :=
+    solve_lift (Build_t_Q (ret_both (1 : int32))) : both (fset []) ([interface ]) (t_Q).
 Fail Next Obligation.
 
 Notation t_public := (t_G).
 
 Notation t_public_key := ((t_G × (t_G × t_G × t_Q × t_Q))).
 
-Program Definition p_i_init {L1 : {fset Location}} {I1 : Interface} (_ : both L1 I1 ('unit)) : both (L1 :|: fset [commit_loc]) (I1) ((t_G × (t_G × t_G × t_Q × t_Q))) :=
-  letb x := (sample_uniform) : both _ _ (t_Q) in
-  letb y := (Build_t_G i32(1)) : both _ _ (t_G) in
-  letb zkp := (fiat_shamir_run (prod_b (y,x))) : both _ _ ((t_G × t_G × t_Q × t_Q)) in
-  prod_b (y,zkp).
+Equations p_i_init {L1 : {fset Location}} {I1 : Interface} (_ : both L1 I1 ('unit)) : both (L1 :|: fset [commit_loc]) (I1) ((t_G × (t_G × t_G × t_Q × t_Q))) :=
+  p_i_init _  :=
+    letb x := (sample_uniform) : both _ _ (t_Q) in
+    letb y := (Build_t_G (ret_both (1 : int32))) : both _ _ (t_G) in
+    letb zkp := (fiat_shamir_run (prod_b (y,x))) : both _ _ ((t_G × t_G × t_Q × t_Q)) in
+    solve_lift (prod_b (y,zkp)) : both (L1 :|: fset [commit_loc]) (I1) ((t_G × (t_G × t_G × t_Q × t_Q))).
 Fail Next Obligation.
 
+Definition t_N := nat_mod 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab.
 Notation t_pid := (t_N).
 
-Require Import Std. (* as HashMap *)
+Require Import HashMap.
 
 Notation t_public_keys := (t_HashMap (t_N) ((t_G × (t_G × t_G × t_Q × t_Q))) (t_RandomState)).
 
-Program Definition p_i_construct {L1 : {fset Location}} {I1 : Interface} (m : both L1 I1 (t_HashMap (t_N) ((t_G × (t_G × t_G × t_Q × t_Q))) (t_RandomState))) : both (L1) (I1) ('unit) :=
-  ret_both (tt : 'unit).
+Equations p_i_construct {L1 : {fset Location}} {I1 : Interface} (m : both L1 I1 (t_HashMap (t_N) ((t_G × (t_G × t_G × t_Q × t_Q))) (t_RandomState))) : both (L1) (I1) ('unit) :=
+  p_i_construct m  :=
+    solve_lift (ret_both (tt : 'unit)) : both (L1) (I1) ('unit).
 Fail Next Obligation.
 
-Program Definition p_i_vote {L1 : {fset Location}} {I1 : Interface} (v : both L1 I1 ('bool)) : both (L1) (I1) (t_G) :=
-  Build_t_G i32(1).
+Require Import (* Hacspec_ovn_ *)Hacspec_lib.
+
+
+Equations p_i_vote {L1 : {fset Location}} {I1 : Interface} (v : both L1 I1 ('bool)) : both (L1) (I1) (t_G) :=
+  p_i_vote v  :=
+    solve_lift (Build_t_G (ret_both (1 : int32))) : both (L1) (I1) (t_G).
 Fail Next Obligation.
 
-Program Definition exec {L1 : {fset Location}} {I1 : Interface} (v : both L1 I1 ('bool)) : both (L1 :|: fset [commit_loc]) (I1) (t_G) :=
-  letb x := (sample_uniform) : both _ _ (t_Q) in
-  letb y := (Build_t_G i32(1)) : both _ _ (t_G) in
-  letb zkp := (fiat_shamir_run (prod_b (y,x))) : both _ _ ((t_G × t_G × t_Q × t_Q)) in
-  p_i_vote v.
+Equations exec {L1 : {fset Location}} {I1 : Interface} (v : both L1 I1 ('bool)) : both (L1 :|: fset [commit_loc]) (I1) (t_G) :=
+  exec v  :=
+    letb x := (sample_uniform) : both _ _ (t_Q) in
+    letb y := (Build_t_G (ret_both (1 : int32))) : both _ _ (t_G) in
+    letb zkp := (fiat_shamir_run (prod_b (y,x))) : both _ _ ((t_G × t_G × t_Q × t_Q)) in
+    solve_lift (p_i_vote v) : both (L1 :|: fset [commit_loc]) (I1) (t_G).
 Fail Next Obligation.
