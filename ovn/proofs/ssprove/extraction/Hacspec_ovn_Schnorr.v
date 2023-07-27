@@ -24,10 +24,11 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Require Import (* Hacspec_ovn_ *)Hacspec_lib.
+Require Import Hacspec_lib.
 Export Hacspec_lib.
 
 Require Import HashMap.
+Export HashMap.
 
 (*Not implemented yet? todo(item)*)
 
@@ -49,7 +50,7 @@ Fail Next Obligation.
 
 Equations fiat_shamir_verify {L1 : {fset Location}} {I1 : Interface} (t : both L1 I1 ((t_G × t_G × t_Q × t_Q))) : both (L1) (I1) ('bool) :=
   fiat_shamir_verify t  :=
-    letb QUERIES := (new(* _under_impl *)) : both _ _ (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)) in
+    letb QUERIES := (new) : both _ _ (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)) in
     letb '(h,a,e,z) := (t) : both _ _ ((t_G × t_G × t_Q × t_Q)) in
     letb '(QUERIES,eu) := (random_oracle_query QUERIES (prod_assoc (prod_b (h,a)))) : both _ _ ((t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState) × (t_G × t_G))) in
     solve_lift (verify h a e z) : both (L1) (I1) ('bool).
@@ -76,7 +77,7 @@ Equations fiat_shamir_run {L1 : {fset Location}} {I1 : Interface} (hw : both L1 
     letb QUERIES := (new) : both _ _ (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)) in
     letb '(h,w) := (hw) : both _ _ ((t_G × t_Q)) in
     letb a := (v_Commit h w) : both _ _ (t_G) in
-    letb '{| both_prog := {| is_pure := tt |} |} := (random_oracle_init (ret_both (tt : 'unit))) : both _ _ ('unit) in
+    letb _ := (random_oracle_init (ret_both (tt : 'unit))) : both _ _ ('unit) in
     letb _ := (ret_both (tt : 'unit)) : both _ _ ('unit) in
     letb '(QUERIES,eu) := (random_oracle_query QUERIES (prod_assoc (prod_b (h,a)))) : both _ _ ((t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState) × (t_G × t_G))) in
     letb e := (Build_t_Q (ret_both (1 : int32))) : both _ _ (t_Q) in

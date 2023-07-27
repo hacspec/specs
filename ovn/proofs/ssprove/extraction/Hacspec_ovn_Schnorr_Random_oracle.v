@@ -24,8 +24,8 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Require Import (* Hacspec_ovn_ *)Hacspec_lib.
-Export (* Hacspec_ovn_ *)Hacspec_lib.
+Require Import Hacspec_lib.
+Export Hacspec_lib.
 
 Equations random_oracle_init {L1 : {fset Location}} {I1 : Interface} (_ : both L1 I1 ('unit)) : both (L1) (I1) ('unit) :=
   random_oracle_init _  :=
@@ -68,6 +68,7 @@ Equations sample_uniform : both (fset []) ([interface ]) ((t_G × t_G)) :=
 Fail Next Obligation.
 
 Require Import HashMap.
+Export HashMap.
 
 Notation t_QueriesType := (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)).
 

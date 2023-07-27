@@ -41,6 +41,9 @@ Import choice.Choice.Exports.
 Require Import Core.
 Export Core.
 
+Require Import Hacspec_lib.
+Export Hacspec_lib.
+
 Inductive random_state :=
   t_RandomState.
 Definition t_HashMap A B (_ : random_state) := chMap A B.

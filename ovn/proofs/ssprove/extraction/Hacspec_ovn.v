@@ -26,7 +26,7 @@ Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
 (*Not implemented yet? todo(item)*)
 
-Require Import (* Hacspec_ovn_ *)Hacspec_lib.
+Require Import Hacspec_lib.
 Export Hacspec_lib.
 
 (*Not implemented yet? todo(item)*)
@@ -53,10 +53,14 @@ Equations p_i_init {L1 : {fset Location}} {I1 : Interface} (_ : both L1 I1 ('uni
     solve_lift (prod_b (y,zkp)) : both (L1 :|: fset [commit_loc]) (I1) ((t_G × (t_G × t_G × t_Q × t_Q))).
 Fail Next Obligation.
 
-Definition t_N := nat_mod 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab.
+Notation t_N := (nat_mod 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab).
+Definition N {L : {fset Location}} {I : Interface} : both L I (t_N) -> both L I (t_N) :=
+  id.
+
 Notation t_pid := (t_N).
 
 Require Import HashMap.
+Export HashMap.
 
 Notation t_public_keys := (t_HashMap (t_N) ((t_G × (t_G × t_G × t_Q × t_Q))) (t_RandomState)).
 
@@ -64,9 +68,6 @@ Equations p_i_construct {L1 : {fset Location}} {I1 : Interface} (m : both L1 I1 
   p_i_construct m  :=
     solve_lift (ret_both (tt : 'unit)) : both (L1) (I1) ('unit).
 Fail Next Obligation.
-
-Require Import (* Hacspec_ovn_ *)Hacspec_lib.
-
 
 Equations p_i_vote {L1 : {fset Location}} {I1 : Interface} (v : both L1 I1 ('bool)) : both (L1) (I1) (t_G) :=
   p_i_vote v  :=
