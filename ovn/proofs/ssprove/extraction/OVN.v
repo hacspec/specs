@@ -11,6 +11,7 @@ From Crypt Require Import Axioms ChoiceAsOrd SubDistr Couplings
   UniformDistrLemmas FreeProbProg Theta_dens RulesStateProb UniformStateProb
   pkg_composition Package Prelude (* Schnorr *) (* DDH *).
 
+Require Import pkg_advantage.
 Require Import SigmaProtocol.
 Require Import Schnorr.
 Require Import DDH.
@@ -885,8 +886,6 @@ Module OVN (π2 : CDSParams) (Alg2 : SigmaProtocolAlgorithms π2).
 
   Definition combined_locations :=
     (Sigma1.MyAlg.Sigma_locs :|: RO1.RO_locs).
-
-  From Hacspec Require Import Hacspec_Lib.
 
   Equations? Exec_i_realised b m (i j : pid) : package (P_i_locs i :|: combined_locations) [interface] (Exec_i_E i) :=
     Exec_i_realised b m i j :=
@@ -1778,6 +1777,7 @@ Module OVN (π2 : CDSParams) (Alg2 : SigmaProtocolAlgorithms π2).
         case b; apply r_ret ; done.
   Qed.
 
+  Check secret.
   Lemma Hord (x : secret): (nat_of_ord x) = (nat_of_ord (otf x)).
   Proof.
       unfold otf.
@@ -1934,6 +1934,7 @@ Module OVN (π2 : CDSParams) (Alg2 : SigmaProtocolAlgorithms π2).
       have -> : (par DDH.DDH_ideal (Sigma1.Sigma.Fiat_Shamir ∘ RO1.RO)) =
                (par (Sigma1.Sigma.Fiat_Shamir ∘ RO1.RO) DDH.DDH_ideal).
       { apply par_commut. ssprove_valid. }
+      Locate Advantage_par.
       erewrite Advantage_par.
       3: apply DDH.DDH_real.
       3: apply DDH.DDH_ideal.

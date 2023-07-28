@@ -262,12 +262,12 @@ Proof.
         exact {| as_seq := array_to_seq x ; as_nseq := x |}.
 Defined.
 
-Notation " x .[ a ]" := (array_index (n_seq_array_or_seq x _) a) (at level 40).
+Notation " x '.a[' a ']'" := (array_index (n_seq_array_or_seq x _) a) (at level 40).
 
 Program Definition (* Equations *) array_upd {A: choice_type} {len : uint_size} {L I} (s: both L I (nseq A len)) {WS} (i: both L I (@int WS)) (new_v: both L I A) : both L I (nseq A len) :=
   (* array_upd s i new_v := *) Hacspec_Lib.array_upd s i new_v.
 Fail Next Obligation.
-Notation " x .[ i ]<- a" := (array_upd x i a) (at level 40).
+Notation " x '.a[' i ']<-' a" := (array_upd x i a) (at level 40).
 
 (* Definition update {A : Type}  `{Default A} {len slen} (s : nseq A len) {WS} (start : @int WS) (start_a : array_or_seq A slen) : nseq A len := *)
 (* array_update (a := A) (len := len) s (unsigned start) (as_seq start_a). *)

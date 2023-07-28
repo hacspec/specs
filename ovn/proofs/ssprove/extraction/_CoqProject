@@ -3,6 +3,7 @@
 -arg all
 
 # Taken from Crypt (as branches are not merged!)
+pkg_advantage.v
 SigmaProtocol.v
 Schnorr.v
 DDH.v
