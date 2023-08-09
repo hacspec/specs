@@ -4,7 +4,8 @@
 
 use hacspec_lib::*;
 
-pub struct Polynomial<T: Numeric + NumericCopy> {
+/// A generic representation of polynomial
+pub struct Polynomial<T: Numeric + NumericCopy + Clone> {
     coefficients: Seq<T>,
 }
 
@@ -79,6 +80,9 @@ impl<T: Numeric + NumericCopy + PartialEq> Polynomial<T> {
         }
     }
 }
+
+
+/// We wil now define the ring operations on polynomials.
 
 impl<T: Numeric + NumericCopy + PartialEq> Add<Polynomial<T>> for Polynomial<T> {
     type Output = Self;
