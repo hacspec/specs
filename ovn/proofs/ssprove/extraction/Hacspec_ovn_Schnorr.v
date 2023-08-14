@@ -24,8 +24,8 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Require Import Hacspec_lib.
-Export Hacspec_lib.
+Require Import Hacspec_ovn_Schnorr_Hacspec_lib.
+Export Hacspec_ovn_Schnorr_Hacspec_lib.
 
 Require Import HashMap.
 Export HashMap.
@@ -48,23 +48,23 @@ Equations verify {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Locat
     solve_lift (ret_both (false : 'bool)) : both (L1:|:L2:|:L3:|:L4) (I1:|:I2:|:I3:|:I4) ('bool).
 Fail Next Obligation.
 
-Equations fiat_shamir_verify {L1 : {fset Location}} {I1 : Interface} (t : both L1 I1 ((t_G × t_G × t_Q × t_Q))) : both (L1) (I1) ('bool) :=
-  fiat_shamir_verify t  :=
-    letb QUERIES := (new) : both _ _ (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)) in
+Equations fiat_shamir_verify {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (t : both L1 I1 ((t_G × t_G × t_Q × t_Q))) (uniform_sample : both L2 I2 (t_Q)) : both (L1:|:L2) (I1:|:I2) ('bool) :=
+  fiat_shamir_verify t uniform_sample  :=
+    letb QUERIES := (new_under_impl) : both _ _ (t_HashMap (t_Q) (t_Q) (t_RandomState)) in
     letb '(h,a,e,z) := (t) : both _ _ ((t_G × t_G × t_Q × t_Q)) in
-    letb '(QUERIES,eu) := (random_oracle_query QUERIES (prod_assoc (prod_b (h,a)))) : both _ _ ((t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState) × (t_G × t_G))) in
-    solve_lift (verify h a e z) : both (L1) (I1) ('bool).
+    letb '(QUERIES,eu) := (random_oracle_query QUERIES (prod_assoc (prod_b (h,a))) uniform_sample) : both _ _ ((t_HashMap (t_Q) (t_Q) (t_RandomState) × t_Q)) in
+    solve_lift (verify h a e z) : both (L1:|:L2) (I1:|:I2) ('bool).
 Fail Next Obligation.
 
 Notation t_Relation := ((t_G × t_Q)).
 
 Definition commit_loc : Location :=
-  ((t_G × t_G) ; 0%nat).
-Equations v_Commit {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (h : both L1 I1 (t_G)) (w : both L2 I2 (t_Q)) : both (L1:|:L2 :|: fset [commit_loc]) (I1:|:I2) (t_G) :=
-  v_Commit h w  :=
-    letb r := (sample_uniform) : both _ _ ((t_G × t_G)) in
-    letbm commit loc(commit_loc) := (r) : both _ _ ((t_G × t_G)) in
-    solve_lift (Build_t_G (ret_both (1 : int32))) : both (L1:|:L2 :|: fset [commit_loc]) (I1:|:I2) (t_G).
+  (t_Q ; 5%nat).
+Equations v_Commit {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} (h : both L1 I1 (t_G)) (w : both L2 I2 (t_Q)) (uniform_sample : both L3 I3 (t_Q)) : both (L1:|:L2:|:L3 :|: fset [commit_loc]) (I1:|:I2:|:I3) (t_G) :=
+  v_Commit h w uniform_sample  :=
+    letb r := (uniform_sample) : both _ _ (t_Q) in
+    letbm commit loc(commit_loc) := (r) : both _ _ (t_Q) in
+    solve_lift v_ONE : both (L1:|:L2:|:L3 :|: fset [commit_loc]) (I1:|:I2:|:I3) (t_G).
 Fail Next Obligation.
 
 Equations v_Response {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} (h : both L1 I1 (t_G)) (w : both L2 I2 (t_Q)) (a : both L3 I3 (t_G)) (e : both L4 I4 (t_Q)) : both (L1:|:L2:|:L3:|:L4) (I1:|:I2:|:I3:|:I4) (t_Q) :=
@@ -72,15 +72,15 @@ Equations v_Response {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset L
     solve_lift (Build_t_Q (ret_both (1 : int32))) : both (L1:|:L2:|:L3:|:L4) (I1:|:I2:|:I3:|:I4) (t_Q).
 Fail Next Obligation.
 
-Equations fiat_shamir_run {L1 : {fset Location}} {I1 : Interface} (hw : both L1 I1 ((t_G × t_Q))) : both (L1 :|: fset [commit_loc]) (I1) ((t_G × t_G × t_Q × t_Q)) :=
-  fiat_shamir_run hw  :=
-    letb QUERIES := (new) : both _ _ (t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState)) in
+Equations fiat_shamir_run {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} (hw : both L1 I1 ((t_G × t_Q))) (uniform_sample_1 : both L2 I2 (t_Q)) (uniform_sample_2 : both L3 I3 (t_Q)) : both (L1:|:L2:|:L3 :|: fset [commit_loc]) (I1:|:I2:|:I3) ((t_G × t_G × t_Q × t_Q)) :=
+  fiat_shamir_run hw uniform_sample_1 uniform_sample_2  :=
+    letb QUERIES := (new_under_impl) : both _ _ (t_HashMap (t_Q) (t_Q) (t_RandomState)) in
     letb '(h,w) := (hw) : both _ _ ((t_G × t_Q)) in
-    letb a := (v_Commit h w) : both _ _ (t_G) in
+    letb a := (v_Commit h w uniform_sample_1) : both _ _ (t_G) in
     letb _ := (random_oracle_init (ret_both (tt : 'unit))) : both _ _ ('unit) in
     letb _ := (ret_both (tt : 'unit)) : both _ _ ('unit) in
-    letb '(QUERIES,eu) := (random_oracle_query QUERIES (prod_assoc (prod_b (h,a)))) : both _ _ ((t_HashMap (t_Q) ((t_G × t_G)) (t_RandomState) × (t_G × t_G))) in
+    letb '(QUERIES,eu) := (random_oracle_query QUERIES (prod_assoc (prod_b (h,a))) uniform_sample_2) : both _ _ ((t_HashMap (t_Q) (t_Q) (t_RandomState) × t_Q)) in
     letb e := (Build_t_Q (ret_both (1 : int32))) : both _ _ (t_Q) in
     letb z := (v_Response h w a e) : both _ _ (t_Q) in
-    solve_lift (prod_b (h,a,e,z)) : both (L1 :|: fset [commit_loc]) (I1) ((t_G × t_G × t_Q × t_Q)).
+    solve_lift (prod_b (h,a,e,z)) : both (L1:|:L2:|:L3 :|: fset [commit_loc]) (I1:|:I2:|:I3) ((t_G × t_G × t_Q × t_Q)).
 Fail Next Obligation.
