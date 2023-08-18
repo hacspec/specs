@@ -38,19 +38,19 @@ Class t_Group (Self : choice_type) := {
   t_group_type_t_Clone :> t_Clone (t_group_type) ;
   t_group_type_t_PartialEq :> t_PartialEq (t_group_type) ;
   t_group_type_t_Sized :> t_Sized (t_group_type) ;
-  q : forall {L0 I0}, both L0 I0 (uint_size) ;
-  g : forall {L0 I0}, both L0 I0 (t_group_type) ;
-  g_pow : forall {L0 L1 I0 I1}, both L0 I0 (uint_size) -> both L1 I1 (t_group_type) ;
-  one : forall {L0 I0}, both L0 I0 (t_group_type) ;
-  prod : forall {L0 L1 L2 I0 I1 I2}, both L0 I0 (t_group_type) -> both L1 I1 (t_group_type) -> both L2 I2 (t_group_type) ;
-  div : forall {L0 L1 L2 I0 I1 I2}, both L0 I0 (t_group_type) -> both L1 I1 (t_group_type) -> both L2 I2 (t_group_type) ;
-  random_element : forall {L0 I0}, both L0 I0 (t_group_type) ;
+  q : forall {L I}, both L I uint_size ;
+  g : forall {L I}, both L I t_group_type ;
+  g_pow : forall {L I}, both L I uint_size -> both L I t_group_type ;
+  one : forall {L I}, both L I t_group_type ;
+  prod_tt : forall {L1 L2 I1 I2}, both L1 I1 t_group_type -> both L2 I2 t_group_type -> both (L1 :|: L2) (I1 :|: I2) t_group_type ;
+  div : forall {L1 L2 I1 I2}, both L1 I1 t_group_type -> both L2 I2 t_group_type -> both (L1 :|: L2) (I1 :|: I2) t_group_type ;
+  random_element : forall {L I}, both L I t_group_type ;
 }.
 
 Definition t_eligible_votes : choice_type :=
   (uint_size).
-Equations Build_t_C_eligible_votes {L : {fset Location}} {I : Interface} (f_v_id : both L I (uint_size)) : both L I (t_eligible_votes) :=
-  Build_t_C_eligible_votes f_v_id  :=
+Equations Build_t_eligible_votes {L : {fset Location}} {I : Interface} (f_v_id : both L I (uint_size)) : both L I (t_eligible_votes) :=
+  Build_t_eligible_votes f_v_id  :=
     bind_both f_v_id (fun f_v_id =>
       solve_lift (ret_both ((f_v_id) : (t_eligible_votes)))) : both L I (t_eligible_votes).
 Fail Next Obligation.
@@ -62,9 +62,9 @@ Fail Next Obligation.
 
 Equations v_P : both (fset []) ([interface ]) (nseq t_eligible_votes 3) :=
   v_P  :=
-    array_from_list [solve_lift (Build_t_C_eligible_votes (ret_both (0 : uint_size)));
-      solve_lift (Build_t_C_eligible_votes (ret_both (1 : uint_size)));
-      solve_lift (Build_t_C_eligible_votes (ret_both (2 : uint_size)))] : both (fset []) ([interface ]) (nseq t_eligible_votes 3).
+    array_from_list [solve_lift (Build_t_eligible_votes (* Build_t_C_eligible_votes *) (ret_both (0 : uint_size)));
+      solve_lift (Build_t_eligible_votes (* Build_t_C_eligible_votes *) (ret_both (1 : uint_size)));
+      solve_lift (Build_t_eligible_votes (* Build_t_C_eligible_votes *) (ret_both (2 : uint_size)))] : both (fset []) ([interface ]) (nseq t_eligible_votes 3).
 Fail Next Obligation.
 
 Equations select_private_voting_key (G : _) `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (uint_size)) : both (L1) (I1) (uint_size) :=
@@ -100,17 +100,15 @@ Equations register_vote (G : _) `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Loca
     letb _ := (broadcast1 G (g_pow xi) (v_ZKP G xi) i) : both _ _ ('unit) in
     letb _ := (ret_both (tt : 'unit)) : both _ _ ('unit) in
     letb '(gs,zkps) := (get_broadcast1) : both _ _ ((t_Vec (uint_size) (t_Global) × t_Vec (uint_size) (t_Global))) in
-    letb _ := (foldi_both_list (into_iter zkps) (fun {L I _ _} =>fun zkp =>
-        (ssp (fun _ =>
-          letb _ := (check_valid zkp) in solve_lift ret_both (tt : 'unit)) )) (ret_both (tt : 'unit))) : both _ _ ('unit) in
+    (* letb _ := (other loop todo(term)) : both _ _ ('unit) in *)
     letbm prod1 loc(prod1_loc) := (one) : both _ _ (t_group_type) in
-    letb prod1 := (foldi_both (into_iter (Build_t_Range (ret_both (0 : uint_size))(i .- (ret_both (1 : uint_size))))) (fun {L I _ _} =>fun j =>
+    letb prod1 := (foldi_both (into_iter (Build_t_Range (ret_both (1 : uint_size))(i .- (ret_both (1 : uint_size))))) (fun {L I _ _} =>fun j =>
         (ssp (fun prod1 =>
-          solve_lift (prod prod1 (g_pow (gs.a[j])))) )) prod1) : both _ _ (t_group_type) in
+          solve_lift (prod_tt prod1 (g_pow (gs.a[j])))) )) prod1) : both _ _ (t_group_type) in
     letb prod2 := (one) : both _ _ (t_group_type) in
     letb prod1 := (foldi_both (into_iter (Build_t_Range (i .+ (ret_both (1 : uint_size)))n)) (fun {L I _ _} =>fun j =>
         (ssp (fun prod1 =>
-          solve_lift (prod prod1 (g_pow (gs.a[j])))) )) prod1) : both _ _ (t_group_type) in
+          solve_lift (prod_tt prod1 (g_pow (gs.a[j])))) )) prod1) : both _ _ (t_group_type) in
     letb Yi := (div prod1 prod2) : both _ _ (t_group_type) in
     solve_lift (ret_both (tt : 'unit)) : both (L1:|:L2 :|: fset [prod1_loc]) (I1:|:I2) ('unit).
 Fail Next Obligation.
@@ -127,7 +125,7 @@ Fail Next Obligation.
 
 Equations get_broadcast2 (G : _) `{ t_Sized (G)} `{ t_Group (G)} : both (fset []) ([interface ]) ((t_Vec (t_group_type) (t_Global) × t_Vec (t_group_type) (t_Global) × t_Vec (uint_size) (t_Global))) :=
   get_broadcast2 G  :=
-    solve_lift (prod_b (new(* _under_impl *) : both fset0 fset0 _,new(* _under_impl *) : both fset0 fset0 _,new(* _under_impl *) : both fset0 fset0 _)) : both (fset []) ([interface ]) ((t_Vec (t_group_type) (t_Global) × t_Vec (t_group_type) (t_Global) × t_Vec (uint_size) (t_Global))).
+    solve_lift (prod_b (new(* _under_impl *) : both fset0 fset0 _,new(* _under_impl *): both fset0 fset0 _,new(* _under_impl *): both fset0 fset0 _)) : both (fset []) ([interface ]) ((t_Vec (t_group_type) (t_Global) × t_Vec (t_group_type) (t_Global) × t_Vec (uint_size) (t_Global))).
 Fail Next Obligation.
 
 Equations cast_vote (G : _) `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} (xi : both L1 I1 (uint_size)) (yi : both L2 I2 (uint_size)) (vi : both L3 I3 ('bool)) : both (L1:|:L2:|:L3) (I1:|:I2:|:I3) ('unit) :=
@@ -140,34 +138,28 @@ Equations cast_vote (G : _) `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location
 Fail Next Obligation.
 
 Definition vote_result_loc {G : _} `{ t_Sized (G)} `{ t_Group (G)} : Location :=
-  (t_group_type ; 3%nat).
+  (t_group_type ; 2%nat).
 Definition tally_loc {G : _} `{ t_Sized (G)} `{ t_Group (G)} : Location :=
-  (uint_size ; 2%nat).
-Definition done_loc {G : _} `{ t_Sized (G)} `{ t_Group (G)} : Location :=
-  ('bool ; 1%nat).
+  (uint_size ; 1%nat).
 
-Definition andb {L1 L2 I1 I2} (x : both L1 I1 'bool) (y : both L2 I2 'bool) : both (L1 :|: L2) (I1 :|: I2) 'bool := lift2_both (fun (x y : 'bool) => Datatypes.andb x y : 'bool) x y.
-Definition negb {L1 I1} (x : both L1 I1 'bool) : both (L1) (I1) 'bool := lift1_both (fun (x : 'bool) => Datatypes.negb x : 'bool) x.
-Notation "a <> b" := (negb (eqb a b)).
-Notation "'not'" := (negb).
-Equations tally_votes (G : _) `{ t_Sized (G)} `{ t_Group (G)} : both (fset [done_loc; tally_loc; vote_result_loc]) ([interface ]) (uint_size) :=
+Definition len {A L I} := lift1_both (L := L) (I := I) (fun (x : chList A) => repr _ (@List.length A x) : uint32).
+
+Equations tally_votes (G : _) `{ t_Sized (G)} `{ t_Group (G)} : both (fset [tally_loc; vote_result_loc]) ([interface ]) (uint_size) :=
   tally_votes G  :=
     letb '(g_pow_xi_yi,g_pow_vi,zkps) := (get_broadcast2 G) : both _ _ ((t_Vec (t_group_type) (t_Global) × t_Vec (t_group_type) (t_Global) × t_Vec (uint_size) (t_Global))) in
-    letb _ := (foldi_both_list (into_iter zkps) (fun {L I _ _} =>fun zkp =>
-        (ssp (fun _ =>
-          letb _ := (check_valid zkp) in solve_lift ret_both (tt : 'unit)) )) (ret_both (tt : 'unit))) : both _ _ ('unit) in
-    letbm vote_result loc(vote_result_loc) := (one) : both _ _ (t_group_type) in
-      letb vote_result := (foldi_both (into_iter (Build_t_Range (ret_both (0 : uint_size))(vec_len (* len_under_impl_1 *) g_pow_vi))) (fun {L I _ _} =>fun i =>
-        (ssp (fun vote_result =>
-          solve_lift (prod vote_result (prod (clone (g_pow_xi_yi.a[i])) (clone (g_pow_vi.a[i]))))) )) vote_result) : both _ _ (t_group_type) in
+    (* letb _ := (other loop todo(term)) : both _ _ ('unit) in *)
+    (* letbm vote_result loc(vote_result_loc) := (one) : both _ _ (t_group_type) in *)
+    (* letb vote_result := (foldi_both (into_iter (Build_t_Range (ret_both (0 : uint_size))(len(* _under_impl_1 *) g_pow_vi))) (fun {L I _ _} =>fun i => *)
+    (*     (ssp (fun vote_result => *)
+    (*       solve_lift (prod_tt vote_result (prod_tt (clone (g_pow_xi_yi.a[i])) (clone (g_pow_vi.a[i]))))) )) vote_result) : both _ _ (t_group_type) in *)
     letbm tally loc(tally_loc) := (ret_both (0 : uint_size)) : both _ _ (uint_size) in
-    letbm done loc(done_loc) := (ret_both (false : 'bool)) : both _ _ ('bool) in
-    letb '(done,tally) := (foldi_both (into_iter (Build_t_Range (ret_both (1 : uint_size))n)) (fun {L I _ _} =>fun _ =>
-        (ssp (fun '(done,tally) =>
-          ifb solve_lift (andb ((g_pow tally) <> vote_result) (not done))
-          then letb _ := (tally .+ (ret_both (1 : uint_size))) : both _ _ ('unit) in
-            solve_lift (prod_b (done,ret_both (tt : 'unit)))
-          else letb done := (ret_both (true : 'bool)) : both _ _ ('bool) in
-            solve_lift (prod_b (done,tally))) )) (prod_b (done,tally))) : both _ _ (('bool × 'unit)) in
-    tally : both (fset [done_loc; tally_loc; vote_result_loc]) ([interface ]) (uint_size).
+    (* letb tally := (foldi_both (into_iter (Build_t_Range (ret_both (1 : uint_size))n)) (fun {L I _ _} =>fun i => *)
+    (*     (ssp (fun tally => *)
+    (*       (* ifb solve_lift ((g_pow tally) <> vote_result) *) *)
+    (*       (* then ControlFlow_Continue (letb _ := (tally .+ (ret_both (1 : uint_size))) : both _ _ ('unit) in *) *)
+    (*         solve_lift (ret_both (tt : 'unit)) (* ) *) *)
+    (*       (* else letb hoist1 := (v_Break tally) : both _ _ (t_Never) in *) *)
+    (*       (*   ControlFlow_Continue (letb _ := (never_to_any hoist1) : both _ _ ('unit) in *) *)
+    (*       (*   tally) *)) )) tally) : both _ _ ('unit) in *)
+      solve_lift tally : both (fset [tally_loc; vote_result_loc]) ([interface ]) (uint_size).
 Fail Next Obligation.

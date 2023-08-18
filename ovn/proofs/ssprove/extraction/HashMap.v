@@ -64,4 +64,4 @@ Equations get {L1 L2 I1 I2} {A B} (m : both L1 I1 (t_HashMap A B t_RandomState))
     solve_lift ret_both (getm m' (chElement_ordType_ce_to_ce A i') : chOption B))).
 
 Equations new {L I A B} : both L I (t_HashMap A B t_RandomState) :=
-  new := (solve_lift ret_both emptym). (* (fmap (s:=[]) _ : chMap _ _) *)
+  new := solve_lift ret_both (emptym : t_HashMap A B t_RandomState). (* (fmap (s:=[]) _ : chMap _ _) *)

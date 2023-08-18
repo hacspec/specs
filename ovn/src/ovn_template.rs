@@ -1,7 +1,8 @@
+use core::*;
 use hacspec_lib::*;
 
 pub trait Group {
-    type group_type : PartialEq;
+    type group_type : PartialEq + Clone + Copy;
 
     const q : usize; // Prime order
     const g : Self::group_type; // Generator (elemnent of group)
@@ -55,7 +56,7 @@ pub fn register_vote<G : Group>(i : usize, random : usize) {
     }
 
     let mut prod1 = G::one();
-    for j in 1..i-1 {
+    for j in 0..i-1 {
         prod1 = G::prod(prod1, G::g_pow(gs[j]));
     }
     let prod2 = G::one();
@@ -106,18 +107,23 @@ pub fn tally_votes<G : Group>() -> usize {
     }
 
     let mut vote_result = G::one();
-    for (gxiyi, gvi) in g_pow_xi_yi.into_iter().zip(g_pow_vi) {
-        vote_result = G::prod(vote_result, G::prod(gxiyi, gvi));
+    for i in 0..g_pow_vi.len() {
+        vote_result = G::prod(vote_result, G::prod(g_pow_xi_yi[i].clone(), g_pow_vi[i].clone()));
     }
 
     let mut tally = 0;
-    for i in 1..n { // Should be while, but is bounded by n anyways!
-        if G::g_pow(tally) != vote_result {
+    let mut done = false;
+    for _ in 1..n { // Should be while, but is bounded by n anyways!
+        if G::g_pow(tally) != vote_result && !done {
             tally += 1
         }
         else {
-            return tally
+            done = true;
         }
     }
     tally
 }
+
+// Meta Round:
+
+// Tally

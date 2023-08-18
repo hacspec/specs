@@ -117,7 +117,8 @@ Fail Next Obligation.
 
 Structure array_or_seq A L I (len : nat) :=
   { as_nseq :> both L I (nseq_ A len) ;
-    as_seq :> both L I (seq A)
+    as_seq :> both L I (seq A) ;
+    as_list :> both L I (chList A)
   }.
 Print as_seq.
 Print as_nseq.
@@ -129,6 +130,7 @@ Print Graph.
 
 Arguments as_seq {_} {_} {_} {_}. (* array_or_seq. *)
 Arguments as_nseq {_} {_} {_} {_}. (* array_or_seq. *)
+Arguments as_list {_} {_} {_} {_}. (* array_or_seq. *)
 (* Coercion as_seq : array_or_seq >-> both. *)
 (* Coercion as_nseq : array_or_seq >-> both. *)
 
@@ -140,8 +142,16 @@ Arguments as_nseq {_} {_} {_} {_}. (* array_or_seq. *)
 (*   Build_array_or_seq A L I len (array_to_seq a) a. *)
 (* Canonical (* Structure *) nseq_array_or_seq. *)
 
+Definition array_to_list {L I A n} := lift1_both (L := L) (I := I) (fun x => (@array_to_list A n x) : chList _).
+
+Definition seq_to_list {L I A} := lift1_both (L := L) (I := I) (fun x => (@seq_to_list A x) : chList _).
+
+Definition seq_from_list {L I A} := lift1_both (L := L) (I := I) (fun (x : chList _) => seq_from_list A (x : list _)).
+
+Definition array_from_list' {L I A} {n : nat} := lift1_both (L := L) (I := I) (fun (x : chList A) => @array_from_list' A x n : nseq_ _ _).
+
 Equations nseq_array_or_seq {A L I len} (val : both L I (nseq_ A len)) : array_or_seq A L I len :=
-  nseq_array_or_seq val := {| as_seq := array_to_seq val ; as_nseq := val |}.
+  nseq_array_or_seq val := {| as_seq := array_to_seq val ; as_nseq := val ; as_list := array_to_list val |}.
 Fail Next Obligation.
 
 Arguments nseq_array_or_seq {A} {L} {I} {len}.
@@ -211,6 +221,7 @@ Definition n_seq_array_or_seq {L I A} {B} (x : both L I B)
                       | chUnit => True
                       | chMap (chFin (@mkpos (S n) _)) (C) => C = A
                       | chMap 'nat (C) => C = A
+                      | chList C => C = A
                       | _ => False
                       end) :
   let len := (match B as K return
@@ -218,6 +229,7 @@ Definition n_seq_array_or_seq {L I A} {B} (x : both L I B)
                     | chUnit => True
                     | chMap (chFin (@mkpos (S n) _)) (C) => C = A
                     | chMap 'nat (C) => C = A
+                    | chList C => C = A
                     | _ => False
                     end -> nat
               with
@@ -234,6 +246,7 @@ Definition n_seq_array_or_seq {L I A} {B} (x : both L I B)
                   end m_contra
               | chMap 'nat C =>
                   fun m_contra => 3%nat
+              | chList C => fun m_contra => 4%nat
               | _ => fun m_contra => False_rect nat m_contra
               end contra) in
   array_or_seq A L I len.
@@ -241,11 +254,11 @@ Proof.
   intros.
   destruct B ; try contradiction contra.
   - change 'unit with (nseq_ A len) in x.
-    exact {| as_seq := array_to_seq x ; as_nseq := x |}.
+    exact {| as_seq := array_to_seq x ; as_nseq := x; as_list := array_to_list x |}.
   - destruct B1 ; try contradiction contra ; simpl in *.
     + subst.
       change (chMap 'nat A) with (seq A) in x.
-      exact ({| as_seq := x ; as_nseq := array_from_seq _ x ; |}).
+      exact ({| as_seq := x ; as_nseq := array_from_seq _ x ; as_list := seq_to_list x |}).
     + destruct n.
       destruct pos.
       * contradiction.
@@ -259,7 +272,9 @@ Proof.
           unfold positive_eq.
           apply eqtype.eq_refl.
         }
-        exact {| as_seq := array_to_seq x ; as_nseq := x |}.
+        exact {| as_seq := array_to_seq x ; as_nseq := x; as_list := array_to_list x |}.
+  - subst.
+    exact {| as_seq := seq_from_list x ; as_nseq := array_from_list' x ; as_list := x |}.
 Defined.
 
 Notation " x '.a[' a ']'" := (array_index (n_seq_array_or_seq x _) a) (at level 40).
@@ -353,4 +368,12 @@ Notation "'i64(' v ')'" := (ret_both (v : int64) : both (fset []) ([interface]) 
 Notation "'i128(' v ')'" := (ret_both (v : int128) : both (fset []) ([interface]) _).
 
 Notation into_iter := (fun x => x).
+
+Definition vec_len {L I A ws} := lift1_both (L := L) (I := I)  (fun (x : chList A) => repr ws (List.length x)).
+
+Definition andb {L1 L2 I1 I2} (x : both L1 I1 'bool) (y : both L2 I2 'bool) : both (L1 :|: L2) (I1 :|: I2) 'bool := lift2_both (fun (x y : 'bool) => Datatypes.andb x y : 'bool) x y.
+Definition negb {L1 I1} (x : both L1 I1 'bool) : both (L1) (I1) 'bool := lift1_both (fun (x : 'bool) => Datatypes.negb x : 'bool) x.
+Notation "a <> b" := (negb (eqb a b)).
+Notation "'not'" := (negb).
+
 (** end of: Should be moved to Hacspec_Lib.v **)
