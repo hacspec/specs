@@ -26,16 +26,16 @@ pub fn random_oracle_init(_ : ()) -> () {
     ()
 }
 
-#[derive(PartialEq, Eq, Clone, Copy)]
-pub struct G{
-    pub v : u32
-}
-// public_nat_mod!( //Custom Macro - defining a newtype with some functions - well defined macro's have library functions built in
-//     type_name: G,
-//     type_of_canvas: GCanvas,
-//     bit_size_of_field: 384, //381 with 3 extra bits
-//     modulo_value: "1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab" //0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
-// );
+// #[derive(PartialEq, Eq, Clone, Copy)]
+// pub struct G{
+//     pub v : u32
+// }
+public_nat_mod!( //Custom Macro - defining a newtype with some functions - well defined macro's have library functions built in
+    type_name: G,
+    type_of_canvas: GCanvas,
+    bit_size_of_field: 384, //381 with 3 extra bits
+    modulo_value: "1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab" //0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
+);
 
 #[derive(PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Q {
@@ -55,12 +55,13 @@ pub type Message = G;
 pub type Challenge = Q;
 pub type Response =  Q;
 
-pub type Random = (Statement, Message);
+pub type Random = Challenge; // (Statement, Message);
 pub type Query = Challenge;
 
-pub fn sample_uniform () -> Random {
-    (G{v: 1}, G{v: 1})// (Statement::ONE(), Message::ONE())
-}
+// pub fn sample_uniform () -> Random {
+//     uniform_sample
+//     // (G{v: 1}, G{v: 1})// (Statement::ONE(), Message::ONE())
+// }
 
 use std::collections::HashMap;
 
@@ -75,11 +76,11 @@ pub type QueriesType = HashMap<Query, Random>;
 // static ref QUERIES : HashMap<Query, Random> = HashMap::new();
 // chQuery  := 'fin #|Query|
 // chRandom := 'fin #|Random|
-pub fn random_oracle_query(mut QUERIES : QueriesType, q : Query) -> (QueriesType, Random) {
+pub fn random_oracle_query(mut QUERIES : QueriesType, q : Query, uniform_sample : Random) -> (QueriesType, Random) {
     match QUERIES.get(&q) {
         Some (r) => (QUERIES.clone(), r.clone()),
         None => {
-            let r = sample_uniform();
+            let r = uniform_sample;
             QUERIES.insert(q, r);
             (QUERIES, r)
         }

@@ -57,10 +57,10 @@ fn verify (h : Statement, a : Message, e : Challenge, z : Response) -> bool {
     false
 }
 
-pub fn fiat_shamir_verify(t : Transcript) -> bool {
+pub fn fiat_shamir_verify(t : Transcript, uniform_sample : Random) -> bool {
     let QUERIES = HashMap::new();
     let (h,a,e,z) = t;
-    let (QUERIES, eu) = random_oracle::random_oracle_query (QUERIES, prod_assoc ((h, a)));
+    let (QUERIES, eu) = random_oracle::random_oracle_query (QUERIES, prod_assoc ((h, a)), uniform_sample);
     // e <- eu;
     // otf (
     verify (h, a, e, z)
@@ -69,13 +69,15 @@ pub fn fiat_shamir_verify(t : Transcript) -> bool {
 
 pub type Relation = (Statement, Witness);
 
-fn Commit (h : Statement, w : Witness) -> Message {
+fn Commit (h : Statement, w : Witness, uniform_sample : Random) -> Message {
     // r ← sample uniform i_witness ;;
-    let r = random_oracle::sample_uniform();
+    let r = uniform_sample;
     // #put commit_loc := r ;;
     let mut commit = r;
     // ret (fto (g ^+ (otf r)))
-    G{v: 1} // Message::ONE()
+    // G{v: 1}
+    G::ONE()
+    // Message::ONE()
 }
 
 
@@ -85,15 +87,15 @@ fn Response (h : Statement, w : Witness, a : Message, e : Challenge) -> Response
     Q{v: 1} // Response::ONE()
 }
 
-pub fn fiat_shamir_run(hw : Relation) -> Transcript {
+pub fn fiat_shamir_run(hw : Relation, uniform_sample_1 : Random, uniform_sample_2 : Random) -> Transcript {
     let QUERIES = HashMap::new();
     // #import {sig #[ INIT ] : 'unit → 'unit } as RO_init ;;
     // #import {sig #[ QUERY ] : 'query → 'random } as RO_query ;;
     let (h,w) = hw;
     // #assert (R (otf h) (otf w)) ;;
-    let a = Commit(h, w);
+    let a = Commit(h, w, uniform_sample_1);
     random_oracle::random_oracle_init(());
-    let (QUERIES, eu) = random_oracle::random_oracle_query(QUERIES, prod_assoc((h, a)));
+    let (QUERIES, eu) = random_oracle::random_oracle_query(QUERIES, prod_assoc((h, a)), uniform_sample_2);
     let e = Q{v: 1}; // Challenge::ONE(); // Should be e <- eu
     let z = Response (h, w, a, e);
     (h,a,e,z)

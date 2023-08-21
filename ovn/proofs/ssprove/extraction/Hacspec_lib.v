@@ -369,11 +369,12 @@ Notation "'i128(' v ')'" := (ret_both (v : int128) : both (fset []) ([interface]
 
 Notation into_iter := (fun x => x).
 
-Definition vec_len {L I A ws} := lift1_both (L := L) (I := I)  (fun (x : chList A) => repr ws (List.length x)).
+Definition (* vec_ *)len {L I A ws} := lift1_both (L := L) (I := I)  (fun (x : chList A) => repr ws (List.length x)).
 
 Definition andb {L1 L2 I1 I2} (x : both L1 I1 'bool) (y : both L2 I2 'bool) : both (L1 :|: L2) (I1 :|: I2) 'bool := lift2_both (fun (x y : 'bool) => Datatypes.andb x y : 'bool) x y.
 Definition negb {L1 I1} (x : both L1 I1 'bool) : both (L1) (I1) 'bool := lift1_both (fun (x : 'bool) => Datatypes.negb x : 'bool) x.
 Notation "a <> b" := (negb (eqb a b)).
 Notation "'not'" := (negb).
-
+Notation "x ':of:' y" := (x : both _ _ y) (at level 100).
+Notation "x ':of0:' y" := (x : both (fset []) (fset []) y) (at level 100).
 (** end of: Should be moved to Hacspec_Lib.v **)

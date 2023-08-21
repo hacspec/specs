@@ -2,7 +2,7 @@ use core::*;
 use hacspec_lib::*;
 
 pub trait Group {
-    type group_type : PartialEq + Clone + Copy;
+    type group_type : PartialEq + Eq + Clone + Copy;
 
     const q : usize; // Prime order
     const g : Self::group_type; // Generator (elemnent of group)
@@ -14,15 +14,15 @@ pub trait Group {
     fn random_element() -> Self::group_type;
 }
 
-struct eligible_votes {
-    v_id : usize,
-}
+// struct eligible_votes {
+//     v_id : usize,
+// }
 
 const n : usize = 3;
-const P : [eligible_votes; 3] = // n = 3
-    [eligible_votes {v_id: 0},
-     eligible_votes {v_id: 1},
-     eligible_votes {v_id: 2}];
+// const P : [eligible_votes; 3] = // n = 3
+//     [eligible_votes {v_id: 0},
+//      eligible_votes {v_id: 1},
+//      eligible_votes {v_id: 2}];
 
 pub fn select_private_voting_key<G : Group> (random : usize) -> usize {
     random % G::q // x_i \in_R Z_q;
@@ -43,7 +43,7 @@ pub fn check_valid(zkp : usize) -> bool {
 }
 
 pub fn broadcast1<G : Group>(xi : G::group_type, zkp : usize, i : usize) {
-
+    ()
 }
 
 pub fn register_vote<G : Group>(i : usize, random : usize) {
@@ -53,18 +53,22 @@ pub fn register_vote<G : Group>(i : usize, random : usize) {
 
     for zkp in zkps {
         check_valid(zkp);
+        ()
     }
 
     let mut prod1 = G::one();
     for j in 0..i-1 {
         prod1 = G::prod(prod1, G::g_pow(gs[j]));
+        ()
     }
     let prod2 = G::one();
     for j in i+1..n {
         prod1 = G::prod(prod1, G::g_pow(gs[j]));
+        ()
     }
     let Yi = G::div(prod1, prod2);
     // implicityly: Y_i = g^y_i
+    ()
 }
 
 // Meta Round:
@@ -81,7 +85,7 @@ pub fn ZKP_one_out_of_two(vi : bool) -> usize {
 }
 
 pub fn broadcast2<G : Group> (g_pow_xiyi : G::group_type, g_pow_vi : G::group_type, g_pow_vi_zkp : usize) {
-
+    ()
 }
 
 pub fn get_broadcast2<G : Group> () -> (Vec<G::group_type>,Vec<G::group_type>,Vec<usize>) {
@@ -90,6 +94,7 @@ pub fn get_broadcast2<G : Group> () -> (Vec<G::group_type>,Vec<G::group_type>,Ve
 
 pub fn cast_vote<G : Group>(xi : usize, yi : usize, vi : bool) {
     broadcast2::<G>(G::g_pow(xi * yi), G::g_pow(if vi { 1 } else { 0 }), ZKP_one_out_of_two(vi));
+    ()
 }
 
 // Meta Round:
@@ -104,21 +109,19 @@ pub fn tally_votes<G : Group>() -> usize {
     let (g_pow_xi_yi, g_pow_vi, zkps) = get_broadcast2::<G>();
     for zkp in zkps {
         check_valid(zkp);
+        ()
     }
 
     let mut vote_result = G::one();
     for i in 0..g_pow_vi.len() {
         vote_result = G::prod(vote_result, G::prod(g_pow_xi_yi[i].clone(), g_pow_vi[i].clone()));
+        ()
     }
 
     let mut tally = 0;
-    let mut done = false;
-    for _ in 1..n { // Should be while, but is bounded by n anyways!
-        if G::g_pow(tally) != vote_result && !done {
-            tally += 1
-        }
-        else {
-            done = true;
+    for i in 1..n { // Should be while, but is bounded by n anyways!
+        if G::g_pow(i) == vote_result {
+            tally = i;
         }
     }
     tally
