@@ -9,6 +9,10 @@ path = "src/ovn_template.rs"
 
 [dependencies]
 hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+creusot-contracts = { git = "https://github.com/xldenis/creusot", rev = "1cca2320e262b2ec9d28b3c84cba759c96829898" } # branch = master
+
+quickcheck = "1"
+quickcheck_macros = "1"
 
 [dev-dependencies]
 criterion = "0.4"
