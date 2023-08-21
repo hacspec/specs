@@ -89,13 +89,11 @@ Equations register_vote {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Loca
     letbm prod1 loc(prod1_loc) := (one) : both _ _ (t_group_type) in
     letb prod1 := foldi_both(* _list *) (into_iter (Build_t_Range  (ret_both (0 : uint_size)) (i .- (ret_both (1 : uint_size))))) (fun {L I _ _} =>fun j =>
         ssp (fun prod1 =>
-          letb prod1 := prod prod1 (g_pow (gs.a[j])) :of: t_group_type in
-          solve_lift prod1)) prod1 :of: t_group_type in
+          solve_lift (prod prod1 (g_pow (gs.a[j]))))) prod1 :of: t_group_type in
     letb prod2 := one :of: t_group_type in
     letb prod1 := foldi_both(* _list *) (into_iter (Build_t_Range  (i .+ (ret_both (1 : uint_size))) n)) (fun {L I _ _} =>fun j =>
         ssp (fun prod1 =>
-          letb prod1 := prod prod1 (g_pow (gs.a[j])) :of: t_group_type in
-          solve_lift prod1)) prod1 :of: t_group_type in
+          solve_lift (prod prod1 (g_pow (gs.a[j]))))) prod1 :of: t_group_type in
     letb Yi := div prod1 prod2 :of: t_group_type in
     solve_lift (ret_both (tt : 'unit)) : both (L1:|:L2 :|: fset [prod1_loc]) (I1:|:I2) ('unit).
 Fail Next Obligation.
@@ -135,22 +133,23 @@ Equations tally_votes {G : _} `{ t_Sized (G)} `{ t_Group (G)} : both (fset [tall
         ssp (fun _ =>
           letb _ := check_valid zkp :of: 'bool in
           solve_lift (ret_both (tt : 'unit)))) (ret_both (tt : 'unit)) :of: 'unit in
-    letbm vote_result loc(vote_result_loc) := (one) : both (fset []) (fset []) (t_group_type) in
+    letbm vote_result loc(vote_result_loc) := (one) :of0: (t_group_type) in
     letb vote_result := foldi_both(* _list *) (into_iter (Build_t_Range  (ret_both (0 : uint_size)) (len(* _under_impl_1 *) g_pow_vi))) (fun {L I _ _} =>fun i =>
         ssp (fun vote_result =>
-          letb vote_result := prod vote_result (prod (clone (g_pow_xi_yi.a[i])) (clone (g_pow_vi.a[i]))) :of: t_group_type in
-          solve_lift vote_result)) vote_result :of: t_group_type in
+          solve_lift (prod vote_result (prod (clone (g_pow_xi_yi.a[i])) (clone (g_pow_vi.a[i])))))) vote_result :of: t_group_type in
     letbm tally loc(tally_loc) := (ret_both (0 : uint_size)) : both _ _ (uint_size) in
     letb tally := foldi_both(* _list *) (into_iter (Build_t_Range  (ret_both (1 : uint_size)) n)) (fun {L I _ _} =>fun i =>
         ssp (fun tally =>
-          solve_lift ifb solve_lift ((g_pow i) =.? vote_result)
+          solve_lift (ifb (g_pow i) =.? vote_result
           then letb tally := i :of: uint_size in
             tally
-          else tally
-        )) (solve_lift tally : both (fset [tally_loc; vote_result_loc]) [interface] _) :of: uint_size in
+          else tally))) (solve_lift tally : both (fset [tally_loc; vote_result_loc]) ([interface ]) (uint_size)) :of: uint_size in
       solve_lift tally : both (fset [tally_loc; vote_result_loc]) ([interface ]) (uint_size).
 Next Obligation.
-  unfold tally_votes_obligations_obligation_15.
+  noramlize_fset ;
+  repeat (rewrite is_true_split_and || rewrite fsubUset) ;
+  repeat (try rewrite andb_true_intro ; split) ;
+    repeat (solve_match || apply fsubsetU ; rewrite is_true_split_or ; (left ; solve_match) || right).
   refine (fsubset_trans _ i1).
   solve_ssprove_obligations.
 Defined.
