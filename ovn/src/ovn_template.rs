@@ -159,7 +159,7 @@ pub fn cast_vote<A: HasActions>(
     for j in 0..(params.i - 1) as usize {
         prod1 = G::prod(prod1, state.broadcast1_a[j]);
     }
-    let prod2 = G::one();
+    let mut prod2 = G::one();
     for j in (params.i + 1) as usize..n {
         prod2 = G::prod(prod2, state.broadcast1_a[j]);
     }
