@@ -24,162 +24,681 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-(** Tool: prelude_import _  **)
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+Tool: prelude_import _  **)
 
-(** Tool: macro_use _  **)
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+Tool: macro_use _  **)
 (*Not implemented yet? todo(item)*)
 
-Require Import Core.
-Export Core.
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+Tool: macro_use _  **)
+(*Not implemented yet? todo(item)*)
 
-Require Import Hacspec_lib.
-Export Hacspec_lib.
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Require Import Concordium_std.
+Export Concordium_std.
 
-Require Import Creusot_contracts.
-Export Creusot_contracts.
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Require Import Concordium_std_derive.
+Export Concordium_std_derive.
 
-(** DocComment:  Interface for group implementation  **)
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+DocComment:  Interface for group implementation  **)
 Class t_Group (Self : choice_type) := {
   t_group_type : choice_type ;
   t_group_type_t_Group :> t_Group (t_group_type) ;
-  q : forall {L0 I0}, both L0 I0 (uint_size) ;
+  q : forall {L0 I0}, both L0 I0 (int32) ;
   g : forall {L0 I0}, both L0 I0 (t_group_type) ;
-  g_pow : forall {L0 I0}, both L0 I0 (uint_size) -> both L0 I0 (t_group_type) ;
-  pow : forall {L0 L1 I0 I1}, both L0 I0 (t_group_type) -> both L1 I1 (uint_size) -> both (L0 :|: L1) (I0 :|: I1) (t_group_type) ;
+  g_pow : forall {L0 I0}, both L0 I0 (int32) -> both L0 I0 (t_group_type) ;
+  pow : forall {L0 L1 I0 I1}, both L0 I0 (t_group_type) -> both L1 I1 (int32) -> both (L0 :|: L1) (I0 :|: I1) (t_group_type) ;
   one : forall {L0 I0}, both L0 I0 (t_group_type) ;
   prod : forall {L0 L1 I0 I1}, both L0 I0 (t_group_type) -> both L1 I1 (t_group_type) -> both (L0 :|: L1) (I0 :|: I1) (t_group_type) ;
+  inv : forall {L0 I0}, both L0 I0 (t_group_type) -> both L0 I0 (t_group_type) ;
   div : forall {L0 L1 I0 I1}, both L0 I0 (t_group_type) -> both L1 I1 (t_group_type) -> both (L0 :|: L1) (I0 :|: I1) (t_group_type) ;
-  random_element : forall {L0 I0}, both L0 I0 (t_group_type) ;
 }.
 
-(** DocComment:  number of parties  **)
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Definition t_z_17_ : choice_type :=
+  'unit.
+Equations Build_t_z_17_ {L : {fset Location}} {I : Interface} : both L I (t_z_17_) :=
+  Build_t_z_17_  :=
+    solve_lift (ret_both ((!TODO empty tuple!) : (t_z_17_))) : both L I (t_z_17_).
+Fail Next Obligation.
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+#[global] Instance t_z_17__t_Group : t_Group t_z_17_ := {
+  t_group_type := int32;
+  q := solve_lift (ret_both (17 : int32));
+  g := solve_lift (ret_both (3 : int32));
+  g_pow (x : int32) := solve_lift ((g .^ x) .% q);
+  pow (g : int32) (x : int32) := solve_lift ((g .^ x) .% q);
+  one := solve_lift (ret_both (1 : int32));
+  prod (x : int32) (y : int32) := solve_lift ((x .* y) .% q);
+  inv (x : int32) := letbm res loc(res_loc) := ret_both (0 : int32) :of: int32 in
+  letb res := foldi_both_list (into_iter (Build_t_Range  (ret_both (1 : int32)) q)) (fun {L I _ _} =>fun i =>
+      ssp (fun res =>
+        solve_lift (ifb (pow g i) =.? x
+        then i
+        else res))) res :of: int32 in
+  solve_lift (q .- res);
+  div (x : int32) (y : int32) := solve_lift (prod x (inv y));
+}.
+
+(*item error backend*)
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+Tool: export_name _  **)
+Definition state_bytes_loc : Location :=
+  (t_ContractState ; 0%nat).
+Equations export_init_ovn_contract {L1 : {fset Location}} {I1 : Interface} (amount : both L1 I1 (t_Amount)) : both (L1 :|: fset [state_bytes_loc]) (I1) (int32) :=
+  export_init_ovn_contract amount  :=
+    solve_lift (run (letb _ := ifb (f_micro_ccd amount) <> (ret_both (0 : int64))
+      then letb hoist1 := v_Break (get_under_impl_56 (f_error_code (from NotPayableError))) :of: t_Never in
+        ControlFlow_Continue (never_to_any hoist1)
+      else ControlFlow_Continue (ret_both (tt : 'unit)) :of: 'unit in
+    ControlFlow_Continue (letb ctx := open (ret_both (tt : 'unit)) :of: t_ExternContext (t_InitContextExtern) in
+    matchb init_ovn_contract ctx with
+    | Result_Ok state =>
+      letbm state_bytes loc(state_bytes_loc) := open (ret_both (tt : 'unit)) :of: t_ContractState in
+      letb '(tmp0,out) := serial state state_bytes :of: (t_ContractState × t_Result ('unit) (t_Err)) in
+      letb state_bytes := tmp0 :of: t_ContractState in
+      letb hoist2 := out :of: (t_ContractState × t_Result ('unit) (t_Err)) in
+      letb hoist3 := is_err_under_impl hoist2 :of: 'bool in
+      letb _ := ifb hoist3
+        then never_to_any trap
+        else ret_both (tt : 'unit) :of: 'unit in
+      ret_both (0 : int32)
+    | Result_Err reject =>
+      letb code := get_under_impl_56 (f_error_code (from reject)) :of: int32 in
+      ifb code <.? (ret_both (0 : int32))
+      then code
+      else never_to_any trap
+    end))) : both (L1 :|: fset [state_bytes_loc]) (I1) (int32).
+Fail Next Obligation.
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Equations init_ovn_contract {impl HasInitContext : _} `{ t_Sized (impl HasInitContext)} `{ t_HasInitContext (impl HasInitContext) ('unit)} {L1 : {fset Location}} {I1 : Interface} (ctx : both L1 I1 (impl HasInitContext)) : both (L1) (I1) (t_Result ('bool) ('unit)) :=
+  init_ovn_contract ctx  :=
+    Result_Ok (solve_lift (ret_both (true : 'bool))) : both (L1) (I1) (t_Result ('bool) ('unit)).
+Fail Next Obligation.
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+DocComment:  Currently randomness needs to be injected  **)
+Equations select_private_voting_key {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (int32)) : both (L1) (I1) (int32) :=
+  select_private_voting_key random  :=
+    solve_lift (random .% q) : both (L1) (I1) (int32).
+Fail Next Obligation.
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+DocComment:  TODO: Non-interactive Schnorr proof using Fiat-Shamir heuristics  **)
+Equations v_ZKP {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {I1 : Interface} (xi : both L1 I1 (int32)) : both (L1) (I1) (int32) :=
+  v_ZKP xi  :=
+    solve_lift (ret_both (0 : int32)) : both (L1) (I1) (int32).
+Fail Next Obligation.
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Definition t_RegisterParam : choice_type :=
+  (int32 × int32).
+Equations Build_t_RegisterParam {L : {fset Location}} {I : Interface} (f_i : both L I (int32)) (f_xi : both L I (int32)) : both L I (t_RegisterParam) :=
+  Build_t_RegisterParam f_i f_xi  :=
+    bind_both f_xi (fun f_xi =>
+      bind_both f_i (fun f_i =>
+        solve_lift (ret_both ((f_i,f_xi) : (t_RegisterParam))))) : both L I (t_RegisterParam).
+Fail Next Obligation.
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Notation t_G := (t_z_17_).
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
 Equations n : both (fset []) ([interface ]) (uint_size) :=
   n  :=
-    solve_lift (ret_both (3 : uint_size)) : both (fset []) ([interface ]) (uint_size).
+    solve_lift (ret_both (20 : uint_size)) : both (fset []) ([interface ]) (uint_size).
 Fail Next Obligation.
 
-(** Tool: cfg _ not(simple_test)
-DocComment:  Currently randomness needs to be injected  **)
-Equations select_private_voting_key {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (uint_size)) : both (L1) (I1) (uint_size) :=
-  select_private_voting_key random  :=
-    solve_lift (random .% q) : both (L1) (I1) (uint_size).
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+Tool: export_name _  **)
+Equations export_register_vote_pre {L1 : {fset Location}} {I1 : Interface} (amount : both L1 I1 (t_Amount)) : both (L1) (I1) (int32) :=
+  export_register_vote_pre amount  :=
+    solve_lift (failure (ret_both ((LocalMutation) The bindings ["state_bytes"] cannot be mutated here: they don't belong to the closure scope, and this is not allowed.
+ : chString)) (ret_both ({
+        let _: tuple0 = {
+            (if core::cmp::PartialEq::ne(
+                proj_concordium_contracts_common::types::Amount::f_micro_ccd(amount),
+                0,
+            ) {
+                {
+                    let hoist4: rust_primitives::hax::t_Never = {
+                        (return core::num::nonzero::get_under_impl_56(
+                            proj_concordium_std::types::Reject::f_error_code(
+                                core::convert::From::from(concordium_std::types::NotPayableError()),
+                            ),
+                        ))
+                    };
+                    rust_primitives::hax::never_to_any(hoist4)
+                }
+            })
+        };
+        {
+            let ctx: concordium_std::types::t_ExternContext<
+                concordium_std::types::t_ReceiveContextExtern,
+            > = { concordium_std::traits::HasReceiveContext::open(Tuple0()) };
+            {
+                let mut state_bytes: concordium_std::types::t_ContractState =
+                    { concordium_std::traits::HasContractState::open(Tuple0()) };
+                {
+                    let Tuple2(tmp0, out): tuple2<
+                        concordium_std::types::t_ContractState,
+                        core::result::t_Result<
+                            hacspec_ovn::t_OvnContractState<
+                                hacspec_ovn::t_z_17_,
+                                generic_value!(todo),
+                            >,
+                            concordium_contracts_common::types::t_ParseError,
+                        >,
+                    > = { concordium_contracts_common::traits::Get::get(state_bytes) };
+                    {
+                        let _: tuple0 = { (state_bytes = tmp0) };
+                        {
+                            let hoist7: tuple2<
+                                concordium_std::types::t_ContractState,
+                                core::result::t_Result<
+                                    hacspec_ovn::t_OvnContractState<
+                                        hacspec_ovn::t_z_17_,
+                                        generic_value!(todo),
+                                    >,
+                                    concordium_contracts_common::types::t_ParseError,
+                                >,
+                            > = { out };
+                            (match hoist7 {
+                                core::result::Result_Ok(mut state) => {
+                                    {
+                                        let Tuple2(tmp0, out): tuple2<
+                                            hacspec_ovn::t_OvnContractState<
+                                                hacspec_ovn::t_z_17_,
+                                                generic_value!(todo),
+                                            >,
+                                            core::result::t_Result<
+                                                concordium_std::types::t_Action,
+                                                concordium_contracts_common::types::t_ParseError,
+                                            >,
+                                        > = { hacspec_ovn::register_vote_pre(ctx, state) };
+                                        {
+                                            let _: tuple0 = { (state = tmp0) };
+                                            {
+                                                // Note: rhs.typ=tuple2<hacspec_ovn::t_OvnContractState<hacspec_ovn::t_z_17_, generic_value!(todo)>, core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError>>
+                                                let pat_ascription!(res as core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError>): core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError> = {out};
+                                                (match res {
+                                                    core::result::Result_Ok(act) => {
+                                                        let Tuple2(tmp0, out): tuple2<concordium_std::types::t_ContractState, core::result::t_Result<int, concordium_contracts_common::traits::Seek::t_Err>> = {concordium_contracts_common::traits::Seek::seek(state_bytes,concordium_contracts_common::traits::SeekFrom_Start(0))};
+                                                        {
+                                                            let _: tuple0 =
+                                                                { (state_bytes = tmp0) };
+                                                            {
+                                                                let hoist6: tuple2<concordium_std::types::t_ContractState, core::result::t_Result<int, concordium_contracts_common::traits::Seek::t_Err>> = {out};
+                                                                {
+                                                                    let hoist5: arrow!(int -> core::result::t_Result<tuple0, tuple0>) = {
+                                                                        (|_| {
+                                                                            let Tuple2(tmp0, out): tuple2<concordium_std::types::t_ContractState, core::result::t_Result<tuple0, concordium_contracts_common::traits::Write::t_Err>> = {concordium_contracts_common::traits::Serial::serial(state,state_bytes)};
+                                                                            {
+                                                                                let _: tuple0 = {
+                                                                                    (state_bytes =
+                                                                                        tmp0)
+                                                                                };
+                                                                                out
+                                                                            }
+                                                                        })
+                                                                    };
+                                                                    {
+                                                                        let res: core::result::t_Result<tuple0, tuple0> = {core::result::and_then_under_impl(hoist6,hoist5)};
+                                                                        (if core::result::is_err_under_impl(res){rust_primitives::hax::never_to_any(concordium_std::trap())} else {cast(concordium_std::types::tag_under_impl(act))})
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    core::result::Result_Err(reject) => {
+                                                        let code: int = {
+                                                            core::num::nonzero::get_under_impl_56(proj_concordium_std::types::Reject::f_error_code(core::convert::From::from(reject)))
+                                                        };
+                                                        (if core::cmp::PartialOrd::lt(code, 0) {
+                                                            code
+                                                        } else {
+                                                            rust_primitives::hax::never_to_any(
+                                                                concordium_std::trap(),
+                                                            )
+                                                        })
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    }
+                                }
+                                _ => rust_primitives::hax::never_to_any(concordium_std::trap()),
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    } : chString))) : both (L1) (I1) (int32).
 Fail Next Obligation.
 
-(** DocComment:  TODO: Non-interactive Schnorr proof using Fiat-Shamir heuristics  **)
-Equations v_ZKP {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {I1 : Interface} (xi : both L1 I1 (uint_size)) : both (L1) (I1) (uint_size) :=
-  v_ZKP xi  :=
-    solve_lift (ret_both (0 : uint_size)) : both (L1) (I1) (uint_size).
-Fail Next Obligation.
+(*(RefMut) The mutation of this &mut is not allowed here.
 
-(** DocComment:  State of bulletin board  **)
-Equations get_broadcast1 : both (fset []) ([interface ]) ((t_Vec (uint_size) (t_Global) × t_Vec (uint_size) (t_Global))) :=
-  get_broadcast1  :=
-    solve_lift (prod_b (new_under_impl,new_under_impl)) : both (fset []) ([interface ]) ((t_Vec (uint_size) (t_Global) × t_Vec (uint_size) (t_Global))).
-Fail Next Obligation.
+Last available AST for this item:
 
-Equations check_valid {L1 : {fset Location}} {I1 : Interface} (zkp : both L1 I1 (uint_size)) : both (L1) (I1) ('bool) :=
+/*
+
+
+#######################################################
+########### WARNING: Failed running rustfmt ###########
+#### STDOUT:
+
+#### STDERR:
+error: expected identifier, found keyword `impl`
+ --> <stdin>:1:125
+  |
+1 | ..._vote_pre<A, Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(ctx: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnCont...
+  |                                                   ^^^^ expected identifier, found keyword
+
+error: expected one of `,`, `:`, `=`, or `>`, found `HasReceiveContext`
+ --> <stdin>:1:130
+  |
+1 | ...Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(ctx: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnContractState<hac...
+  |                                           ^^^^^^^^^^^^^^^^^ expected one of `,`, `:`, `=`, or `>`
+#######################################################
+
+*/
+
+#[no_std()]#[feature(register_tool)]#[register_tool(_hax)]#[doc()]fn register_vote_pre<A, Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(ctx: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnContractState<hacspec_ovn::t_z_17_, generic_value!(todo)>) -> core::result::t_Result<A, concordium_contracts_common::types::t_ParseError> where A:core::marker::t_Sized<A>,A:core::marker::t_Sized<impl HasReceiveContext>,A:concordium_std::traits::t_HasActions<A>,A:concordium_std::traits::t_HasReceiveContext<impl HasReceiveContext, tuple0>,impl HasReceiveContext:core::marker::t_Sized<A>,impl HasReceiveContext:core::marker::t_Sized<impl HasReceiveContext>,impl HasReceiveContext:concordium_std::traits::t_HasActions<A>,impl HasReceiveContext:concordium_std::traits::t_HasReceiveContext<impl HasReceiveContext, tuple0>{{let pat_ascription!(params as hacspec_ovn::t_RegisterParam): hacspec_ovn::t_RegisterParam = {(match core::ops::try_trait::Try::branch(concordium_contracts_common::traits::Get::get(&mut (concordium_std::traits::HasCommonData::parameter_cursor(&(deref(ctx)))))) {core::ops::control_flow::ControlFlow_Break(residual) => {rust_primitives::hax::never_to_any((return core::ops::try_trait::FromResidual::from_residual(residual)))},core::ops::control_flow::ControlFlow_Continue(val) => {val}})};{let _: tuple0 = {(deref(state).f_broadcast1_a[cast(proj_hacspec_ovn::RegisterParam::f_i(params))] = hacspec_ovn::Group::g_pow(proj_hacspec_ovn::RegisterParam::f_xi(params)))};{let _: tuple0 = {(deref(state).f_broadcast1_b[cast(proj_hacspec_ovn::RegisterParam::f_i(params))] = hacspec_ovn::v_ZKP(proj_hacspec_ovn::RegisterParam::f_xi(params)))};{core::result::Result_Ok(concordium_std::traits::HasActions::accept())}}}}} todo(item)*)
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Equations check_valid {L1 : {fset Location}} {I1 : Interface} (zkp : both L1 I1 (int32)) : both (L1) (I1) ('bool) :=
   check_valid zkp  :=
     solve_lift (ret_both (true : 'bool)) : both (L1) (I1) ('bool).
 Fail Next Obligation.
 
-Equations broadcast1 {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} (xi : both L1 I1 (t_group_type)) (zkp : both L2 I2 (uint_size)) (i : both L3 I3 (uint_size)) : both (L1:|:L2:|:L3) (I1:|:I2:|:I3) ('unit) :=
-  broadcast1 xi zkp i  :=
-    solve_lift (ret_both (tt : 'unit)) : both (L1:|:L2:|:L3) (I1:|:I2:|:I3) ('unit).
-Fail Next Obligation.
-
-(** DocComment:  Primary function in round 1  **)
-Equations register_vote_pre {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (i : both L1 I1 (uint_size)) (random : both L2 I2 (uint_size)) : both (L1:|:L2) (I1:|:I2) (uint_size) :=
-  register_vote_pre i random  :=
-    letb xi := select_private_voting_key random :of: uint_size in
-    letb _ := broadcast1 (g_pow xi) (v_ZKP xi) i :of: 'unit in
-    letb _ := ret_both (tt : 'unit) :of: 'unit in
-    solve_lift xi : both (L1:|:L2) (I1:|:I2) (uint_size).
-Fail Next Obligation.
-
-(** DocComment:  Primary function in round 1  **)
-Definition prod1_loc {G : _} `{ t_Sized (G)} `{ t_Group (G)} : Location :=
-  (t_group_type ; 0%nat).
-Equations register_vote_post {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} (i : both L1 I1 (uint_size)) (gs : both L2 I2 (t_Vec (uint_size) (t_Global))) (zkps : both L3 I3 (t_Vec (uint_size) (t_Global))) : both (L1:|:L2:|:L3 :|: fset [prod1_loc]) (I1:|:I2:|:I3) (t_group_type) :=
-  register_vote_post i gs zkps  :=
-    letb _ := foldi_both_list (into_iter zkps) (fun {L I _ _} =>fun zkp =>
-        ssp (fun _ =>
-          letb _ := check_valid zkp :of: 'bool in
-          solve_lift (ret_both (tt : 'unit)))) (ret_both (tt : 'unit)) :of: 'unit in
-    letbm prod1 loc(prod1_loc) := (one) : both _ _ (t_group_type) in
-    letb prod1 := foldi_both_list (into_iter (Build_t_Range  (ret_both (0 : uint_size)) (i .- (ret_both (1 : uint_size))))) (fun {L I _ _} =>fun j =>
-        ssp (fun prod1 =>
-          solve_lift (prod prod1 (g_pow (gs.a[j]))))) prod1 :of: t_group_type in
-    letb prod2 := one :of: t_group_type in
-    letb prod1 := foldi_both_list (into_iter (Build_t_Range  (i .+ (ret_both (1 : uint_size))) n)) (fun {L I _ _} =>fun j =>
-        ssp (fun prod1 =>
-          solve_lift (prod prod1 (g_pow (gs.a[j]))))) prod1 :of: t_group_type in
-    solve_lift (div prod1 prod2) : both (L1:|:L2:|:L3 :|: fset [prod1_loc]) (I1:|:I2:|:I3) (t_group_type).
-Fail Next Obligation.
-
-(** DocComment:  Cramer, Damgård and Schoenmakers (CDS) technique  **)
-Equations v_ZKP_one_out_of_two {L1 : {fset Location}} {I1 : Interface} (vi : both L1 I1 ('bool)) : both (L1) (I1) (uint_size) :=
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+DocComment:  Cramer, Damgård and Schoenmakers (CDS) technique  **)
+Equations v_ZKP_one_out_of_two {L1 : {fset Location}} {I1 : Interface} (vi : both L1 I1 ('bool)) : both (L1) (I1) (int32) :=
   v_ZKP_one_out_of_two vi  :=
-    solve_lift (ret_both (32 : uint_size)) : both (L1) (I1) (uint_size).
+    solve_lift (ret_both (32 : int32)) : both (L1) (I1) (int32).
 Fail Next Obligation.
 
-Equations broadcast2 {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} (g_pow_xiyi : both L1 I1 (t_group_type)) (g_pow_vi : both L2 I2 (t_group_type)) (g_pow_vi_zkp : both L3 I3 (uint_size)) : both (L1:|:L2:|:L3) (I1:|:I2:|:I3) ('unit) :=
-  broadcast2 g_pow_xiyi g_pow_vi g_pow_vi_zkp  :=
-    solve_lift (ret_both (tt : 'unit)) : both (L1:|:L2:|:L3) (I1:|:I2:|:I3) ('unit).
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Definition t_CastVoteParam : choice_type :=
+  (int32 × int32 × 'bool).
+Equations Build_t_CastVoteParam {L : {fset Location}} {I : Interface} (f_i : both L I (int32)) (f_xi : both L I (int32)) (f_vote : both L I ('bool)) : both L I (t_CastVoteParam) :=
+  Build_t_CastVoteParam f_i f_xi f_vote  :=
+    bind_both f_vote (fun f_vote =>
+      bind_both f_xi (fun f_xi =>
+        bind_both f_i (fun f_i =>
+          solve_lift (ret_both ((f_i,f_xi,f_vote) : (t_CastVoteParam)))))) : both L I (t_CastVoteParam).
 Fail Next Obligation.
 
-Equations get_broadcast2 {G : _} `{ t_Sized (G)} `{ t_Group (G)} : both (fset []) ([interface ]) ((t_Vec (t_group_type) (t_Global) × t_Vec (t_group_type) (t_Global) × t_Vec (uint_size) (t_Global))) :=
-  get_broadcast2  :=
-    solve_lift (prod_b (new_under_impl,new_under_impl,new_under_impl)) : both (fset []) ([interface ]) ((t_Vec (t_group_type) (t_Global) × t_Vec (t_group_type) (t_Global) × t_Vec (uint_size) (t_Global))).
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+Tool: export_name _  **)
+Equations export_cast_vote {L1 : {fset Location}} {I1 : Interface} (amount : both L1 I1 (t_Amount)) : both (L1) (I1) (int32) :=
+  export_cast_vote amount  :=
+    solve_lift (failure (ret_both ((LocalMutation) The bindings ["state_bytes"] cannot be mutated here: they don't belong to the closure scope, and this is not allowed.
+ : chString)) (ret_both ({
+        let _: tuple0 = {
+            (if core::cmp::PartialEq::ne(
+                proj_concordium_contracts_common::types::Amount::f_micro_ccd(amount),
+                0,
+            ) {
+                {
+                    let hoist8: rust_primitives::hax::t_Never = {
+                        (return core::num::nonzero::get_under_impl_56(
+                            proj_concordium_std::types::Reject::f_error_code(
+                                core::convert::From::from(concordium_std::types::NotPayableError()),
+                            ),
+                        ))
+                    };
+                    rust_primitives::hax::never_to_any(hoist8)
+                }
+            })
+        };
+        {
+            let ctx: concordium_std::types::t_ExternContext<
+                concordium_std::types::t_ReceiveContextExtern,
+            > = { concordium_std::traits::HasReceiveContext::open(Tuple0()) };
+            {
+                let mut state_bytes: concordium_std::types::t_ContractState =
+                    { concordium_std::traits::HasContractState::open(Tuple0()) };
+                {
+                    let Tuple2(tmp0, out): tuple2<
+                        concordium_std::types::t_ContractState,
+                        core::result::t_Result<
+                            hacspec_ovn::t_OvnContractState<
+                                hacspec_ovn::t_z_17_,
+                                generic_value!(todo),
+                            >,
+                            concordium_contracts_common::types::t_ParseError,
+                        >,
+                    > = { concordium_contracts_common::traits::Get::get(state_bytes) };
+                    {
+                        let _: tuple0 = { (state_bytes = tmp0) };
+                        {
+                            let hoist11: tuple2<
+                                concordium_std::types::t_ContractState,
+                                core::result::t_Result<
+                                    hacspec_ovn::t_OvnContractState<
+                                        hacspec_ovn::t_z_17_,
+                                        generic_value!(todo),
+                                    >,
+                                    concordium_contracts_common::types::t_ParseError,
+                                >,
+                            > = { out };
+                            (match hoist11 {
+                                core::result::Result_Ok(mut state) => {
+                                    {
+                                        let Tuple2(tmp0, out): tuple2<
+                                            hacspec_ovn::t_OvnContractState<
+                                                hacspec_ovn::t_z_17_,
+                                                generic_value!(todo),
+                                            >,
+                                            core::result::t_Result<
+                                                concordium_std::types::t_Action,
+                                                concordium_contracts_common::types::t_ParseError,
+                                            >,
+                                        > = { hacspec_ovn::cast_vote(ctx, state) };
+                                        {
+                                            let _: tuple0 = { (state = tmp0) };
+                                            {
+                                                // Note: rhs.typ=tuple2<hacspec_ovn::t_OvnContractState<hacspec_ovn::t_z_17_, generic_value!(todo)>, core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError>>
+                                                let pat_ascription!(res as core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError>): core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError> = {out};
+                                                (match res {
+                                                    core::result::Result_Ok(act) => {
+                                                        let Tuple2(tmp0, out): tuple2<concordium_std::types::t_ContractState, core::result::t_Result<int, concordium_contracts_common::traits::Seek::t_Err>> = {concordium_contracts_common::traits::Seek::seek(state_bytes,concordium_contracts_common::traits::SeekFrom_Start(0))};
+                                                        {
+                                                            let _: tuple0 =
+                                                                { (state_bytes = tmp0) };
+                                                            {
+                                                                let hoist10: tuple2<concordium_std::types::t_ContractState, core::result::t_Result<int, concordium_contracts_common::traits::Seek::t_Err>> = {out};
+                                                                {
+                                                                    let hoist9: arrow!(int -> core::result::t_Result<tuple0, tuple0>) = {
+                                                                        (|_| {
+                                                                            let Tuple2(tmp0, out): tuple2<concordium_std::types::t_ContractState, core::result::t_Result<tuple0, concordium_contracts_common::traits::Write::t_Err>> = {concordium_contracts_common::traits::Serial::serial(state,state_bytes)};
+                                                                            {
+                                                                                let _: tuple0 = {
+                                                                                    (state_bytes =
+                                                                                        tmp0)
+                                                                                };
+                                                                                out
+                                                                            }
+                                                                        })
+                                                                    };
+                                                                    {
+                                                                        let res: core::result::t_Result<tuple0, tuple0> = {core::result::and_then_under_impl(hoist10,hoist9)};
+                                                                        (if core::result::is_err_under_impl(res){rust_primitives::hax::never_to_any(concordium_std::trap())} else {cast(concordium_std::types::tag_under_impl(act))})
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    core::result::Result_Err(reject) => {
+                                                        let code: int = {
+                                                            core::num::nonzero::get_under_impl_56(proj_concordium_std::types::Reject::f_error_code(core::convert::From::from(reject)))
+                                                        };
+                                                        (if core::cmp::PartialOrd::lt(code, 0) {
+                                                            code
+                                                        } else {
+                                                            rust_primitives::hax::never_to_any(
+                                                                concordium_std::trap(),
+                                                            )
+                                                        })
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    }
+                                }
+                                _ => rust_primitives::hax::never_to_any(concordium_std::trap()),
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    } : chString))) : both (L1) (I1) (int32).
 Fail Next Obligation.
 
-(** DocComment:  Primary function in round 2  **)
-Equations cast_vote {G : _} `{ t_Sized (G)} `{ t_Group (G)} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} (xi : both L1 I1 (uint_size)) (Yi : both L2 I2 (t_group_type)) (vi : both L3 I3 ('bool)) : both (L1:|:L2:|:L3) (I1:|:I2:|:I3) ('unit) :=
-  cast_vote xi Yi vi  :=
-    letb _ := broadcast2 (pow Yi xi) (g_pow (ifb vi
-      then ret_both (1 : uint_size)
-      else ret_both (0 : uint_size))) (v_ZKP_one_out_of_two vi) :of: 'unit in
-    letb _ := ret_both (tt : 'unit) :of: 'unit in
-    solve_lift (ret_both (tt : 'unit)) : both (L1:|:L2:|:L3) (I1:|:I2:|:I3) ('unit).
+(*(RefMut) The mutation of this &mut is not allowed here.
+
+Last available AST for this item:
+
+/*
+
+
+#######################################################
+########### WARNING: Failed running rustfmt ###########
+#### STDOUT:
+
+#### STDERR:
+error: expected identifier, found keyword `impl`
+ --> <stdin>:1:117
+  |
+1 | ...cast_vote<A, Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(ctx: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnCont...
+  |                                                   ^^^^ expected identifier, found keyword
+
+error: expected one of `,`, `:`, `=`, or `>`, found `HasReceiveContext`
+ --> <stdin>:1:122
+  |
+1 | ...Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(ctx: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnContractState<hac...
+  |                                           ^^^^^^^^^^^^^^^^^ expected one of `,`, `:`, `=`, or `>`
+#######################################################
+
+*/
+
+#[no_std()]#[feature(register_tool)]#[register_tool(_hax)]#[doc()]fn cast_vote<A, Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(ctx: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnContractState<hacspec_ovn::t_z_17_, generic_value!(todo)>) -> core::result::t_Result<A, concordium_contracts_common::types::t_ParseError> where A:core::marker::t_Sized<A>,A:core::marker::t_Sized<impl HasReceiveContext>,A:concordium_std::traits::t_HasActions<A>,A:concordium_std::traits::t_HasReceiveContext<impl HasReceiveContext, tuple0>,impl HasReceiveContext:core::marker::t_Sized<A>,impl HasReceiveContext:core::marker::t_Sized<impl HasReceiveContext>,impl HasReceiveContext:concordium_std::traits::t_HasActions<A>,impl HasReceiveContext:concordium_std::traits::t_HasReceiveContext<impl HasReceiveContext, tuple0>{{let pat_ascription!(params as hacspec_ovn::t_CastVoteParam): hacspec_ovn::t_CastVoteParam = {(match core::ops::try_trait::Try::branch(concordium_contracts_common::traits::Get::get(&mut (concordium_std::traits::HasCommonData::parameter_cursor(&(deref(ctx)))))) {core::ops::control_flow::ControlFlow_Break(residual) => {rust_primitives::hax::never_to_any((return core::ops::try_trait::FromResidual::from_residual(residual)))},core::ops::control_flow::ControlFlow_Continue(val) => {val}})};{let _: tuple0 = {{for zkp in (core::iter::traits::collect::IntoIterator::into_iter(proj_hacspec_ovn::OvnContractState::f_broadcast1_b(deref(state)))) { {let _: bool = {hacspec_ovn::check_valid(zkp)};{Tuple0()}} }}};{let mut prod1: int = {hacspec_ovn::Group::one()};{let _: tuple0 = {{for j in (core::iter::traits::collect::IntoIterator::into_iter(core::ops::range::Range{f_start:0,f_end:cast(core::ops::arith::Sub::sub(proj_hacspec_ovn::CastVoteParam::f_i(params),1)),})) { (prod1 = hacspec_ovn::Group::prod(prod1,core::ops::index::Index::index(proj_hacspec_ovn::OvnContractState::f_broadcast1_a(deref(state)),j))) }}};{let prod2: int = {hacspec_ovn::Group::one()};{let _: tuple0 = {{for j in (core::iter::traits::collect::IntoIterator::into_iter(core::ops::range::Range{f_start:cast(core::ops::arith::Add::add(proj_hacspec_ovn::CastVoteParam::f_i(params),1)),f_end:hacspec_ovn::n,})) { (prod2 = hacspec_ovn::Group::prod(prod2,core::ops::index::Index::index(proj_hacspec_ovn::OvnContractState::f_broadcast1_a(deref(state)),j))) }}};{let Yi: int = {hacspec_ovn::Group::div(prod1,prod2)};{let _: tuple0 = {(deref(state).f_broadcast2_a[cast(proj_hacspec_ovn::CastVoteParam::f_i(params))] = hacspec_ovn::Group::pow(Yi,proj_hacspec_ovn::CastVoteParam::f_xi(params)))};{let _: tuple0 = {(deref(state).f_broadcast2_b[cast(proj_hacspec_ovn::CastVoteParam::f_i(params))] = hacspec_ovn::Group::g_pow((if proj_hacspec_ovn::CastVoteParam::f_vote(params){{1}} else {{0}})))};{let _: tuple0 = {(deref(state).f_broadcast2_c[cast(proj_hacspec_ovn::CastVoteParam::f_i(params))] = hacspec_ovn::v_ZKP_one_out_of_two(proj_hacspec_ovn::CastVoteParam::f_vote(params)))};{core::result::Result_Ok(concordium_std::traits::HasActions::accept())}}}}}}}}}}}} todo(item)*)
+
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Definition t_TallyParameter : choice_type :=
+  'unit.
+Equations Build_t_TallyParameter {L : {fset Location}} {I : Interface} : both L I (t_TallyParameter) :=
+  Build_t_TallyParameter  :=
+    solve_lift (ret_both ((!TODO empty tuple!) : (t_TallyParameter))) : both L I (t_TallyParameter).
 Fail Next Obligation.
 
-(** DocComment:  Anyone can tally the votes  **)
-Definition vote_result_loc {G : _} `{ t_Sized (G)} `{ t_Group (G)} : Location :=
-  (t_group_type ; 2%nat).
-Definition tally_loc {G : _} `{ t_Sized (G)} `{ t_Group (G)} : Location :=
-  (uint_size ; 1%nat).
-Equations tally_votes {G : _} `{ t_Sized (G)} `{ t_Group (G)} : both (fset [tally_loc; vote_result_loc]) ([interface ]) (uint_size) :=
-  tally_votes  :=
-    letb '(g_pow_xi_yi,g_pow_vi,zkps) := get_broadcast2 :of: (t_Vec (t_group_type) (t_Global) × t_Vec (t_group_type) (t_Global) × t_Vec (uint_size) (t_Global)) in
-    letb _ := foldi_both_list (into_iter zkps) (fun {L I _ _} =>fun zkp =>
-        ssp (fun _ =>
-          letb _ := check_valid zkp :of: 'bool in
-          solve_lift (ret_both (tt : 'unit)))) (ret_both (tt : 'unit)) :of: 'unit in
-    letbm vote_result loc(vote_result_loc) := (one) : both _ _ (t_group_type) in
-    letb vote_result := foldi_both_list (into_iter (Build_t_Range  (ret_both (0 : uint_size)) (len_under_impl_1 g_pow_vi))) (fun {L I _ _} =>fun i =>
-        ssp (fun vote_result =>
-          solve_lift (prod vote_result (prod (clone (g_pow_xi_yi.a[i])) (clone (g_pow_vi.a[i])))))) vote_result :of: t_group_type in
-    letbm tally loc(tally_loc) := (ret_both (0 : uint_size)) : both _ _ (uint_size) in
-    letb tally := foldi_both_list (into_iter (Build_t_Range  (ret_both (1 : uint_size)) n)) (fun {L I _ _} =>fun i =>
-        ssp (fun tally =>
-          solve_lift (ifb (g_pow i) =.? vote_result
-          then letb tally := i :of: uint_size in
-            tally
-          else tally))) tally :of: uint_size in
-    solve_lift tally : both (fset [tally_loc; vote_result_loc]) ([interface ]) (uint_size).
+(** Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax
+Tool: export_name _  **)
+Equations export_tally_votes {L1 : {fset Location}} {I1 : Interface} (amount : both L1 I1 (t_Amount)) : both (L1) (I1) (int32) :=
+  export_tally_votes amount  :=
+    solve_lift (failure (ret_both ((LocalMutation) The bindings ["state_bytes"] cannot be mutated here: they don't belong to the closure scope, and this is not allowed.
+ : chString)) (ret_both ({
+        let _: tuple0 = {
+            (if core::cmp::PartialEq::ne(
+                proj_concordium_contracts_common::types::Amount::f_micro_ccd(amount),
+                0,
+            ) {
+                {
+                    let hoist12: rust_primitives::hax::t_Never = {
+                        (return core::num::nonzero::get_under_impl_56(
+                            proj_concordium_std::types::Reject::f_error_code(
+                                core::convert::From::from(concordium_std::types::NotPayableError()),
+                            ),
+                        ))
+                    };
+                    rust_primitives::hax::never_to_any(hoist12)
+                }
+            })
+        };
+        {
+            let ctx: concordium_std::types::t_ExternContext<
+                concordium_std::types::t_ReceiveContextExtern,
+            > = { concordium_std::traits::HasReceiveContext::open(Tuple0()) };
+            {
+                let mut state_bytes: concordium_std::types::t_ContractState =
+                    { concordium_std::traits::HasContractState::open(Tuple0()) };
+                {
+                    let Tuple2(tmp0, out): tuple2<
+                        concordium_std::types::t_ContractState,
+                        core::result::t_Result<
+                            hacspec_ovn::t_OvnContractState<
+                                hacspec_ovn::t_z_17_,
+                                generic_value!(todo),
+                            >,
+                            concordium_contracts_common::types::t_ParseError,
+                        >,
+                    > = { concordium_contracts_common::traits::Get::get(state_bytes) };
+                    {
+                        let _: tuple0 = { (state_bytes = tmp0) };
+                        {
+                            let hoist15: tuple2<
+                                concordium_std::types::t_ContractState,
+                                core::result::t_Result<
+                                    hacspec_ovn::t_OvnContractState<
+                                        hacspec_ovn::t_z_17_,
+                                        generic_value!(todo),
+                                    >,
+                                    concordium_contracts_common::types::t_ParseError,
+                                >,
+                            > = { out };
+                            (match hoist15 {
+                                core::result::Result_Ok(mut state) => {
+                                    {
+                                        let Tuple2(tmp0, out): tuple2<
+                                            hacspec_ovn::t_OvnContractState<
+                                                hacspec_ovn::t_z_17_,
+                                                generic_value!(todo),
+                                            >,
+                                            core::result::t_Result<
+                                                concordium_std::types::t_Action,
+                                                concordium_contracts_common::types::t_ParseError,
+                                            >,
+                                        > = { hacspec_ovn::tally_votes(ctx, state) };
+                                        {
+                                            let _: tuple0 = { (state = tmp0) };
+                                            {
+                                                // Note: rhs.typ=tuple2<hacspec_ovn::t_OvnContractState<hacspec_ovn::t_z_17_, generic_value!(todo)>, core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError>>
+                                                let pat_ascription!(res as core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError>): core::result::t_Result<concordium_std::types::t_Action, concordium_contracts_common::types::t_ParseError> = {out};
+                                                (match res {
+                                                    core::result::Result_Ok(act) => {
+                                                        let Tuple2(tmp0, out): tuple2<concordium_std::types::t_ContractState, core::result::t_Result<int, concordium_contracts_common::traits::Seek::t_Err>> = {concordium_contracts_common::traits::Seek::seek(state_bytes,concordium_contracts_common::traits::SeekFrom_Start(0))};
+                                                        {
+                                                            let _: tuple0 =
+                                                                { (state_bytes = tmp0) };
+                                                            {
+                                                                let hoist14: tuple2<concordium_std::types::t_ContractState, core::result::t_Result<int, concordium_contracts_common::traits::Seek::t_Err>> = {out};
+                                                                {
+                                                                    let hoist13: arrow!(int -> core::result::t_Result<tuple0, tuple0>) = {
+                                                                        (|_| {
+                                                                            let Tuple2(tmp0, out): tuple2<concordium_std::types::t_ContractState, core::result::t_Result<tuple0, concordium_contracts_common::traits::Write::t_Err>> = {concordium_contracts_common::traits::Serial::serial(state,state_bytes)};
+                                                                            {
+                                                                                let _: tuple0 = {
+                                                                                    (state_bytes =
+                                                                                        tmp0)
+                                                                                };
+                                                                                out
+                                                                            }
+                                                                        })
+                                                                    };
+                                                                    {
+                                                                        let res: core::result::t_Result<tuple0, tuple0> = {core::result::and_then_under_impl(hoist14,hoist13)};
+                                                                        (if core::result::is_err_under_impl(res){rust_primitives::hax::never_to_any(concordium_std::trap())} else {cast(concordium_std::types::tag_under_impl(act))})
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    core::result::Result_Err(reject) => {
+                                                        let code: int = {
+                                                            core::num::nonzero::get_under_impl_56(proj_concordium_std::types::Reject::f_error_code(core::convert::From::from(reject)))
+                                                        };
+                                                        (if core::cmp::PartialOrd::lt(code, 0) {
+                                                            code
+                                                        } else {
+                                                            rust_primitives::hax::never_to_any(
+                                                                concordium_std::trap(),
+                                                            )
+                                                        })
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    }
+                                }
+                                _ => rust_primitives::hax::never_to_any(concordium_std::trap()),
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    } : chString))) : both (L1) (I1) (int32).
 Fail Next Obligation.
 
-Definition t_votes : choice_type :=
-  (nseq 'bool 3).
-Equations Build_t_votes {L : {fset Location}} {I : Interface} (f_elems : both L I (nseq 'bool 3)) : both L I (t_votes) :=
-  Build_t_votes f_elems  :=
-    bind_both f_elems (fun f_elems =>
-      solve_lift (ret_both ((f_elems) : (t_votes)))) : both L I (t_votes).
-Fail Next Obligation.
+(*(RefMut) The mutation of this &mut is not allowed here.
 
-Definition t_randomness : choice_type :=
-  (nseq uint_size 3).
-Equations Build_t_randomness {L : {fset Location}} {I : Interface} (f_elems : both L I (nseq uint_size 3)) : both L I (t_randomness) :=
-  Build_t_randomness f_elems  :=
-    bind_both f_elems (fun f_elems =>
-      solve_lift (ret_both ((f_elems) : (t_randomness)))) : both L I (t_randomness).
-Fail Next Obligation.
+Last available AST for this item:
+
+/*
+
+
+#######################################################
+########### WARNING: Failed running rustfmt ###########
+#### STDOUT:
+
+#### STDERR:
+error: expected identifier, found keyword `impl`
+ --> <stdin>:1:119
+  |
+1 | ...lly_votes<A, Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(_: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnContra...
+  |                                                   ^^^^ expected identifier, found keyword
+
+error: expected one of `,`, `:`, `=`, or `>`, found `HasReceiveContext`
+ --> <stdin>:1:124
+  |
+1 | ...Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(_: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnContractState<hacsp...
+  |                                           ^^^^^^^^^^^^^^^^^ expected one of `,`, `:`, `=`, or `>`
+#######################################################
+
+*/
+
+#[no_std()]#[feature(register_tool)]#[register_tool(_hax)]#[doc()]fn tally_votes<A, Anonymous: 'unk, Anonymous: 'unk, impl HasReceiveContext>(_: &impl HasReceiveContext,state: &mut hacspec_ovn::t_OvnContractState<hacspec_ovn::t_z_17_, generic_value!(todo)>) -> core::result::t_Result<A, concordium_contracts_common::types::t_ParseError> where A:core::marker::t_Sized<A>,A:core::marker::t_Sized<impl HasReceiveContext>,A:concordium_std::traits::t_HasActions<A>,A:concordium_std::traits::t_HasReceiveContext<impl HasReceiveContext, tuple0>,impl HasReceiveContext:core::marker::t_Sized<A>,impl HasReceiveContext:core::marker::t_Sized<impl HasReceiveContext>,impl HasReceiveContext:concordium_std::traits::t_HasActions<A>,impl HasReceiveContext:concordium_std::traits::t_HasReceiveContext<impl HasReceiveContext, tuple0>{{let Tuple3(g_pow_xi_yi, g_pow_vi, zkps): tuple3<[int;20], [int;20], [int;20]> = {Tuple3(proj_hacspec_ovn::OvnContractState::f_broadcast2_a(deref(state)),proj_hacspec_ovn::OvnContractState::f_broadcast2_b(deref(state)),proj_hacspec_ovn::OvnContractState::f_broadcast2_c(deref(state)))};{let _: tuple0 = {{for zkp in (core::iter::traits::collect::IntoIterator::into_iter(zkps)) { {let _: bool = {hacspec_ovn::check_valid(zkp)};{Tuple0()}} }}};{let mut vote_result: int = {hacspec_ovn::Group::one()};{let _: tuple0 = {{for i in (core::iter::traits::collect::IntoIterator::into_iter(core::ops::range::Range{f_start:0,f_end:core::slice::len_under_impl(rust_primitives::unsize(&(g_pow_vi))),})) { (vote_result = hacspec_ovn::Group::prod(vote_result,hacspec_ovn::Group::prod(core::clone::Clone::clone(&(core::ops::index::Index::index(g_pow_xi_yi,i))),core::clone::Clone::clone(&(core::ops::index::Index::index(g_pow_vi,i)))))) }}};{let mut tally: int = {0};{let _: tuple0 = {{for i in (core::iter::traits::collect::IntoIterator::into_iter(core::ops::range::Range{f_start:1,f_end:cast(hacspec_ovn::n),})) { {(if core::cmp::PartialEq::eq(hacspec_ovn::Group::g_pow(i),vote_result){{let _: tuple0 = {(tally = i)};Tuple0}})} }}};{let _: tuple0 = {(deref(state).f_tally = tally)};{core::result::Result_Ok(concordium_std::traits::HasActions::accept())}}}}}}}}} todo(item)*)

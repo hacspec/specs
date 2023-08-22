@@ -24,10 +24,37 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Require Import Hacspec_ovn_GroupParameter_Hacspec_lib.
-Export Hacspec_ovn_GroupParameter_Hacspec_lib.
+(** Tool: export_name _ 
+Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Require Import Concordium_std.
+Export Concordium_std.
 
-Equations modulo_value : both (fset []) ([interface ]) (t_String) :=
-  modulo_value  :=
-    solve_lift (from (ret_both (1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab : chString))) : both (fset []) ([interface ]) (t_String).
-Fail Next Obligation.
+(** Tool: export_name _ 
+Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Require Import trap.
+Export trap.
+
+(** Tool: export_name _ 
+Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Require Import ExternContext.
+Export ExternContext.
+
+(** Tool: export_name _ 
+Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Require Import InitContextExtern.
+Export InitContextExtern.
+
+(** Tool: export_name _ 
+Tool: no_std _ 
+Tool: feature _ register_tool
+Tool: register_tool _ _hax **)
+Require Import ContractState.
+Export ContractState.
