@@ -4,7 +4,7 @@
 // use hacspec_lib::*;
 // use creusot_contracts::*;
 
-use concordium_std::*; // {HasLogger, HasInitContext, Logger, HasContractState, Reject, Serial, Deserial, Read, ParseResult, Write};
+use concordium_std::*; // ::{HasLogger, HasInitContext, Logger, HasContractState, Reject, Serial, Deserial, Read, ParseResult, Write, Get, ParseError, HasReceiveContext, HasActions, Seek, Action, ReceiveContextExtern, ExternContext, Vec, to_bytes, test_infrastructure::InitContextTest};
 use concordium_std_derive::*;
 
 /** Interface for group implementation */
@@ -23,7 +23,7 @@ pub trait Group {
     // fn random_element() -> Self::group_type;
 }
 
-struct z_17 {}
+pub struct z_17 {}
 impl Group for z_17 {
     type group_type = u32;
 
@@ -80,7 +80,7 @@ impl Group for z_17 {
 
 #[contract_state(contract = "OVN")]
 #[derive(Serialize, SchemaType)]
-struct OvnContractState<G: Group, const n: usize> {
+pub struct OvnContractState<G: Group, const n: usize> {
     broadcast1_a: [G::group_type; n],
     broadcast1_b: [u32; n],
 
@@ -107,7 +107,7 @@ pub fn ZKP<G: Group>(xi: u32) -> u32 {
 }
 
 #[derive(Serialize, SchemaType)]
-struct RegisterParam {
+pub struct RegisterParam {
     i: u32,
     xi: u32,
 }
@@ -117,7 +117,7 @@ const n: usize = 20;
 
 /** Primary function in round 1 */
 #[receive(contract = "OVN", name = "register", parameter = "RegisterParam")]
-pub fn register_vote_pre<A: HasActions>(
+pub fn register_vote<A: HasActions>(
     ctx: &impl HasReceiveContext,
     state: &mut OvnContractState<G, n>,
 ) -> Result<A, ParseError> {
@@ -138,7 +138,7 @@ pub fn ZKP_one_out_of_two(vi: bool) -> u32 {
 }
 
 #[derive(Serialize, SchemaType)]
-struct CastVoteParam {
+pub struct CastVoteParam {
     i: u32,
     xi: u32,
     vote: bool,
@@ -159,7 +159,7 @@ pub fn cast_vote<A: HasActions>(
     for j in 0..(params.i - 1) as usize {
         prod1 = G::prod(prod1, state.broadcast1_a[j]);
     }
-    let prod2 = G::one();
+    let mut prod2 = G::one();
     for j in (params.i + 1) as usize..n {
         prod2 = G::prod(prod2, state.broadcast1_a[j]);
     }
@@ -173,8 +173,7 @@ pub fn cast_vote<A: HasActions>(
     Ok(A::accept())
 }
 
-struct TallyParameter {}
-
+pub struct TallyParameter {}
 #[receive(contract = "OVN", name = "tally", parameter = "TallyParameter")]
 /** Anyone can tally the votes */
 pub fn tally_votes<A: HasActions>(
@@ -208,39 +207,45 @@ pub fn tally_votes<A: HasActions>(
     Ok(A::accept())
 }
 
-// pub fn correctness<G : Group>(randomness : Vec<u32>, votes : Vec<bool>) -> bool {
-//     let mut xi = Vec::new();
+// #[cfg(test)]
+// #[concordium_test]
+// pub fn test_correctness<G : Group>() {
+//     let randomness : Vec<u32> = Vec::new();
+//     let votes : Vec<bool> = Vec::new();
+
+//     // Setup the context
+//     let mut ctx = InitContextTest::empty();
+//     // ctx.set_sender(ADDRESS_0);
+
+//     let mut state = init_ovn_contract();
+
+//     let xis = Vec::new();
 //     for i in 0..n {
-//         xi.push(register_vote_pre::<G>(i, randomness[i]))
+//         xis.push(select_private_voting_key::<G>(randomness[i]));
 //     }
-//     let (gs, zkps) = get_broadcast1();
-//     let mut Yi = Vec::new();
+
 //     for i in 0..n {
-//         Yi.push(register_vote_post::<G>(i, gs.clone(), zkps.clone()));
+//         let parameter = RegisterParam { i, xi: xis[i] };
+//         let parameter_bytes = to_bytes(&parameter);
+//         ctx.set_parameter(&parameter_bytes);
+
+//         register_vote(ctx, state);
 //     }
+
 //     for i in 0..n {
-//         cast_vote::<G>(xi[i], Yi[i], votes[i])
+//         let parameter = CastVoteParam { i, xi: xis[i], vote: votes[i] };
+//         let parameter_bytes = to_bytes(&parameter);
+//         ctx.set_parameter(&parameter_bytes);
+
+//         cast_vote(ctx, state);
 //     }
+
 //     let mut count = 0;
 //     for v in votes {
 //         if v {
 //             count = count + 1; // += 1 does not work correctly
 //         }
 //     }
-//     tally_votes::<G>() == count
-// }
 
-// extern crate quickcheck;
-// #[macro_use(quickcheck)]
-// extern crate quickcheck_macros;
-// use quickcheck::*;
-
-// #[ensures(result == true)]
-// pub fn temp () {
-
-// }
-
-// #[quickcheck]
-// pub fn check_correctness(randomness : Vec<u32>, votes : Vec<bool>) -> bool {
-//     correctness::<z_17>(randomness, votes);
+//     claim_eq!(state.tally, count, "The tally should equal the number of positive votes");
 // }
