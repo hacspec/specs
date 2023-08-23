@@ -1,0 +1,28 @@
+[package]
+name = "hacspec-concordium"
+version = "0.1.0"
+authors = [""]
+edition = "2018"
+
+[lib]
+path = "src/concordium.rs"
+
+[dependencies]
+hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+# hacspec-attributes = { path = "../../utils/attributes", version = "0.1.0-beta.1" , features = ["print_attributes", "hacspec_unsafe"] } # , features = ["hacspec_unsafe"] , , optional = true
+creusot-contracts = { git = "https://github.com/xldenis/creusot", rev = "7763b3ae77205fba83182b9a6c3e69ad0b12fec7" }
+concordium-contracts-common = { git = "https://github.com/Concordium/concordium-contracts-common", rev = "84ff7db509ca1fbf958b47e5e5903b7662295850", version = "=2.0.0", default-features = false }
+hacspec-concordium-derive = { path = "../concordium-derive" }
+
+# Reduce code size, at the cost of performance in allocation heavy-code.
+wee_alloc="0.4.5"
+
+# [features]
+# use_attributes = ["hacspec-attributes/print_attributes", "hacspec-attributes/hacspec_unsafe"]
+
+[dev-dependencies]
+# hacspec-dev = { path = "../../utils/dev" }
+criterion = "0.3"
+rand = "0.8"
+quickcheck = "1"
+quickcheck_macros = "1"

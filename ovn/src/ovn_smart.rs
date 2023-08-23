@@ -4,12 +4,12 @@
 // use hacspec_lib::*;
 // use creusot_contracts::*;
 
-use concordium_std::*; // ::{HasLogger, HasInitContext, Logger, HasContractState, Reject, Serial, Deserial, Read, ParseResult, Write, Get, ParseError, HasReceiveContext, HasActions, Seek, Action, ReceiveContextExtern, ExternContext, Vec, to_bytes, test_infrastructure::InitContextTest};
-use concordium_std_derive::*;
+use hacspec_concordium::*; // ::{HasLogger, HasInitContext, Logger, HasContractState, Reject, Serial, Deserial, Read, ParseResult, Write, Get, ParseError, HasReceiveContext, HasActions, Seek, Action, ReceiveContextExtern, ExternContext, Vec, to_bytes, test_infrastructure::InitContextTest};
+use hacspec_concordium_derive::*;
 
 /** Interface for group implementation */
 pub trait Group {
-    type group_type: PartialEq + Eq + Clone + Copy + concordium_std::Serialize;
+    type group_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
 
     const q: u32; // Prime order
     const g: Self::group_type; // Generator (elemnent of group)
