@@ -4,12 +4,12 @@
 // use hacspec_lib::*;
 // use creusot_contracts::*;
 
-use hacspec_concordium::*; // ::{HasLogger, HasInitContext, Logger, HasContractState, Reject, Serial, Deserial, Read, ParseResult, Write, Get, ParseError, HasReceiveContext, HasActions, Seek, Action, ReceiveContextExtern, ExternContext, Vec, to_bytes, test_infrastructure::InitContextTest};
-use hacspec_concordium_derive::*;
+use concordium_std::*; // ::{HasLogger, HasInitContext, Logger, HasContractState, Reject, Serial, Deserial, Read, ParseResult, Write, Get, ParseError, HasReceiveContext, HasActions, Seek, Action, ReceiveContextExtern, ExternContext, Vec, to_bytes, test_infrastructure::InitContextTest};
+use concordium_std_derive::*;
 
 /** Interface for group implementation */
 pub trait Group {
-    type group_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
+    type group_type: PartialEq + Eq + Clone + Copy + concordium_std::Serialize;
 
     const q: u32; // Prime order
     const g: Self::group_type; // Generator (elemnent of group)
@@ -23,7 +23,6 @@ pub trait Group {
     // fn random_element() -> Self::group_type;
 }
 
-#[derive(Clone, Copy)]
 pub struct z_17 {}
 impl Group for z_17 {
     type group_type = u32;
@@ -80,7 +79,7 @@ impl Group for z_17 {
 // extern crate concordium_std;
 
 #[contract_state(contract = "OVN")]
-#[derive(Serialize, SchemaType, Clone, Copy)]
+#[derive(Serialize, SchemaType)]
 pub struct OvnContractState<G: Group, const n: usize> {
     g_pow_xis: [G::group_type; n],
     zkp_xis: [u32; n],
@@ -121,19 +120,17 @@ const n: usize = 20;
 #[receive(contract = "OVN", name = "register", parameter = "RegisterParam")]
 pub fn register_vote<A: HasActions>(
     ctx: &impl HasReceiveContext,
-    state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> {
+    state: &mut OvnContractState<G, n>,
+) -> Result<A, ParseError> {
     let params: RegisterParam = ctx.parameter_cursor().get()?;
 
     // let xi = select_private_voting_key::<G>(params.random);
     let g_pow_xi = G::g_pow(params.xi);
     let zkp_xi = ZKP::<G>(g_pow_xi, params.xi);
 
-    let mut state_ret = state.clone();
-    state_ret.g_pow_xis[params.i as usize] = g_pow_xi;
-    state_ret.zkp_xis[params.i as usize] = zkp_xi;
-
-    Ok((A::accept(), state_ret))
+    state.g_pow_xis[params.i as usize] = g_pow_xi;
+    state.zkp_xis[params.i as usize] = zkp_xi;
+    Ok(A::accept())
 }
 
 #[derive(Serialize, SchemaType)]
@@ -174,8 +171,8 @@ pub fn commit_to<G: Group>(x: G::group_type) -> u32 {
 #[receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam")]
 pub fn commit_to_vote<A: HasActions>(
     ctx: &impl HasReceiveContext,
-    state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> {
+    state: &mut OvnContractState<G, n>,
+) -> Result<A, ParseError> {
     let params: CastVoteParam = ctx.parameter_cursor().get()?;
     for zkp in state.zkp_xis {
         check_valid(zkp);
@@ -186,9 +183,8 @@ pub fn commit_to_vote<A: HasActions>(
         compute_group_element_for_vote::<G>(params.i, params.xi, params.vote, state.g_pow_xis);
     let commit_vi = commit_to::<G>(g_pow_xi_yi_vi);
 
-    let mut state_ret = state.clone();
-    state_ret.commit_vis[params.i as usize] = commit_vi;
-    Ok((A::accept(), state_ret))
+    state.commit_vis[params.i as usize] = commit_vi;
+    Ok(A::accept())
 }
 
 /** Cramer, Damgård and Schoenmakers (CDS) technique */
@@ -200,19 +196,18 @@ pub fn ZKP_one_out_of_two<G: Group>(g_pow_vi: G::group_type, vi: bool) -> u32 {
 #[receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam")]
 pub fn cast_vote<A: HasActions>(
     ctx: &impl HasReceiveContext,
-    state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> {
+    state: &mut OvnContractState<G, n>,
+) -> Result<A, ParseError> {
     let params: CastVoteParam = ctx.parameter_cursor().get()?;
 
     let g_pow_xi_yi_vi =
         compute_group_element_for_vote::<G>(params.i, params.xi, params.vote, state.g_pow_xis);
     let zkp_vi = ZKP_one_out_of_two::<G>(g_pow_xi_yi_vi, params.vote);
 
-    let mut state_ret = state.clone();
-    state_ret.g_pow_xi_yi_vis[params.i as usize] = g_pow_xi_yi_vi;
-    state_ret.zkp_vis[params.i as usize] = zkp_vi;
+    state.g_pow_xi_yi_vis[params.i as usize] = g_pow_xi_yi_vi;
+    state.zkp_vis[params.i as usize] = zkp_vi;
 
-    Ok((A::accept(),state_ret))
+    Ok(A::accept())
 }
 
 pub fn check_valid2<G: Group>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
@@ -228,8 +223,8 @@ pub struct TallyParameter {}
 /** Anyone can tally the votes */
 pub fn tally_votes<A: HasActions>(
     _: &impl HasReceiveContext,
-    state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> {
+    state: &mut OvnContractState<G, n>,
+) -> Result<A, ParseError> {
     for i in 0..n {
         check_valid2::<G>(state.g_pow_xi_yi_vis[i], state.zkp_vis[i]);
         check_commitment::<G>(state.g_pow_xi_yi_vis[i], state.commit_vis[i]);
@@ -248,11 +243,9 @@ pub fn tally_votes<A: HasActions>(
             tally = i;
         }
     }
+    state.tally = tally;
 
-    let mut state_ret = state.clone();
-    state_ret.tally = tally;
-
-    Ok((A::accept(), state_ret))
+    Ok(A::accept())
 }
 
 // #[cfg(test)]

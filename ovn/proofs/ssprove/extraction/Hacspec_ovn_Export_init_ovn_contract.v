@@ -28,8 +28,8 @@ Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 Tool: no_std _ 
 Tool: feature _ register_tool
 Tool: register_tool _ _hax **)
-Require Import Concordium_std.
-Export Concordium_std.
+Require Import Hacspec_concordium.
+Export Hacspec_concordium.
 
 (** Tool: export_name _ 
 Tool: no_std _ 
