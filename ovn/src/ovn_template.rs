@@ -104,8 +104,8 @@ pub fn tally_votes() -> u32 {
     let commit_vis = get_broadcast_commit();
 
     for i in 0..n {
-        check_valid2(g_pow_xi_yi_vis[i], zkp_vis[i]);
-        check_commitment(g_pow_xi_yi_vis[i], commit_vis[i]);
+        check_valid2::<G>(g_pow_xi_yi_vis[i], zkp_vis[i]);
+        check_commitment::<G>(g_pow_xi_yi_vis[i], commit_vis[i]);
         ()
     }
 
