@@ -81,12 +81,13 @@ impl Group for z_17 {
 #[contract_state(contract = "OVN")]
 #[derive(Serialize, SchemaType)]
 pub struct OvnContractState<G: Group, const n: usize> {
-    broadcast1_a: [G::group_type; n],
-    broadcast1_b: [u32; n],
+    g_pow_xis: [G::group_type; n],
+    zkp_xis: [u32; n],
 
-    broadcast2_a: [G::group_type; n],
-    broadcast2_b: [G::group_type; n],
-    broadcast2_c: [u32; n],
+    commit_vis: [u32; n],
+
+    g_pow_xi_yi_vis: [G::group_type; n],
+    zkp_vis: [u32; n],
 
     tally: u32,
 }
@@ -102,7 +103,7 @@ pub fn select_private_voting_key<G: Group>(random: u32) -> u32 {
 }
 
 /** TODO: Non-interactive Schnorr proof using Fiat-Shamir heuristics */
-pub fn ZKP<G: Group>(xi: u32) -> u32 {
+pub fn ZKP<G: Group>(g_pow_xi: G::group_type, xi: u32) -> u32 {
     0
 }
 
@@ -122,19 +123,14 @@ pub fn register_vote<A: HasActions>(
     state: &mut OvnContractState<G, n>,
 ) -> Result<A, ParseError> {
     let params: RegisterParam = ctx.parameter_cursor().get()?;
+
     // let xi = select_private_voting_key::<G>(params.random);
-    state.broadcast1_a[params.i as usize] = G::g_pow(params.xi);
-    state.broadcast1_b[params.i as usize] = ZKP::<G>(params.xi);
+    let g_pow_xi = G::g_pow(params.xi);
+    let zkp_xi = ZKP::<G>(g_pow_xi, params.xi);
+
+    state.g_pow_xis[params.i as usize] = g_pow_xi;
+    state.zkp_xis[params.i as usize] = zkp_xi;
     Ok(A::accept())
-}
-
-pub fn check_valid(zkp: u32) -> bool {
-    true
-}
-
-/** Cramer, Damgård and Schoenmakers (CDS) technique */
-pub fn ZKP_one_out_of_two(vi: bool) -> u32 {
-    32 // TODO
 }
 
 #[derive(Serialize, SchemaType)]
@@ -143,34 +139,83 @@ pub struct CastVoteParam {
     xi: u32,
     vote: bool,
 }
-/** Primary function in round 2 */
+
+pub fn check_valid(zkp: u32) -> bool {
+    true
+}
+
+pub fn compute_group_element_for_vote<G: Group>(
+    i: u32,
+    xi: u32,
+    vote: bool,
+    xis: [G::group_type; n],
+) -> G::group_type {
+    let mut prod1 = G::one();
+    for j in 0..(i - 1) as usize {
+        prod1 = G::prod(prod1, xis[j]);
+    }
+    let mut prod2 = G::one();
+    for j in (i + 1) as usize..n {
+        prod2 = G::prod(prod2, xis[j]);
+    }
+    let Yi = G::div(prod1, prod2);
+    // implicityly: Y_i = g^y_i
+    G::prod(G::pow(Yi, xi), G::g_pow(if vote { 1 } else { 0 }))
+}
+
+pub fn commit_to<G: Group>(x: G::group_type) -> u32 {
+    0
+}
+
+/** Commitment before round 2 */
+#[receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam")]
+pub fn commit_to_vote<A: HasActions>(
+    ctx: &impl HasReceiveContext,
+    state: &mut OvnContractState<G, n>,
+) -> Result<A, ParseError> {
+    let params: CastVoteParam = ctx.parameter_cursor().get()?;
+    for zkp in state.zkp_xis {
+        check_valid(zkp);
+        ()
+    }
+
+    let g_pow_xi_yi_vi =
+        compute_group_element_for_vote::<G>(params.i, params.xi, params.vote, state.g_pow_xis);
+    let commit_vi = commit_to::<G>(g_pow_xi_yi_vi);
+
+    state.commit_vis[params.i as usize] = commit_vi;
+    Ok(A::accept())
+}
+
+/** Cramer, Damgård and Schoenmakers (CDS) technique */
+pub fn ZKP_one_out_of_two<G: Group>(g_pow_vi: G::group_type, vi: bool) -> u32 {
+    32 // TODO
+}
+
+/** Primary function in round 2, also opens commitment */
 #[receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam")]
 pub fn cast_vote<A: HasActions>(
     ctx: &impl HasReceiveContext,
     state: &mut OvnContractState<G, n>,
 ) -> Result<A, ParseError> {
     let params: CastVoteParam = ctx.parameter_cursor().get()?;
-    for zkp in state.broadcast1_b {
-        check_valid(zkp);
-        ()
-    }
 
-    let mut prod1 = G::one();
-    for j in 0..(params.i - 1) as usize {
-        prod1 = G::prod(prod1, state.broadcast1_a[j]);
-    }
-    let mut prod2 = G::one();
-    for j in (params.i + 1) as usize..n {
-        prod2 = G::prod(prod2, state.broadcast1_a[j]);
-    }
-    let Yi = G::div(prod1, prod2);
-    // implicityly: Y_i = g^y_i
+    let g_pow_xi_yi_vi =
+        compute_group_element_for_vote::<G>(params.i, params.xi, params.vote, state.g_pow_xis);
+    let zkp_vi = ZKP_one_out_of_two::<G>(g_pow_xi_yi_vi, params.vote);
 
-    state.broadcast2_a[params.i as usize] = G::pow(Yi, params.xi);
-    state.broadcast2_b[params.i as usize] = G::g_pow(if params.vote { 1 } else { 0 });
-    state.broadcast2_c[params.i as usize] = ZKP_one_out_of_two(params.vote);
+    state.g_pow_xi_yi_vis[params.i as usize] = g_pow_xi_yi_vi;
+    state.zkp_vis[params.i as usize] = zkp_vi;
 
     Ok(A::accept())
+}
+
+pub fn check_valid2<G: Group>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
+    true
+}
+
+pub fn check_commitment<G: Group>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
+    true
 }
 
 pub struct TallyParameter {}
@@ -180,23 +225,19 @@ pub fn tally_votes<A: HasActions>(
     _: &impl HasReceiveContext,
     state: &mut OvnContractState<G, n>,
 ) -> Result<A, ParseError> {
-    let (g_pow_xi_yi, g_pow_vi, zkps) =
-        (state.broadcast2_a, state.broadcast2_b, state.broadcast2_c);
-    for zkp in zkps {
-        check_valid(zkp);
+    for i in 0..n {
+        check_valid2::<G>(state.g_pow_xi_yi_vis[i], state.zkp_vis[i]);
+        check_commitment::<G>(state.g_pow_xi_yi_vis[i], state.commit_vis[i]);
         ()
     }
 
     let mut vote_result = G::one();
-    for i in 0..g_pow_vi.len() {
-        vote_result = G::prod(
-            vote_result,
-            G::prod(g_pow_xi_yi[i].clone(), g_pow_vi[i].clone()),
-        );
+    for g_pow_vote in state.g_pow_xi_yi_vis {
+        vote_result = G::prod(vote_result, g_pow_vote);
     }
 
     let mut tally = 0;
-    for i in 1..n as u32 {
+    for i in 0..n as u32 {
         // Should be while, but is bounded by n anyways!
         if G::g_pow(i) == vote_result {
             tally = i;
@@ -237,8 +278,22 @@ pub fn tally_votes<A: HasActions>(
 //         let parameter_bytes = to_bytes(&parameter);
 //         ctx.set_parameter(&parameter_bytes);
 
+//         commit_to_vote(ctx, state);
+//     }
+
+//     for i in 0..n {
+//         let parameter = CastVoteParam { i, xi: xis[i], vote: votes[i] };
+//         let parameter_bytes = to_bytes(&parameter);
+//         ctx.set_parameter(&parameter_bytes);
+
 //         cast_vote(ctx, state);
 //     }
+
+//     let parameter = TallyParameter {};
+//     let parameter_bytes = to_bytes(&parameter);
+//     ctx.set_parameter(&parameter_bytes);
+
+//     tally_votes(ctx, state);
 
 //     let mut count = 0;
 //     for v in votes {
