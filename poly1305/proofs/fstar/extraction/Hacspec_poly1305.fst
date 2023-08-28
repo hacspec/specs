@@ -30,7 +30,10 @@ let poly1305_encode_r (b: t_PolyBlock) : t_FieldElement =
         <:
         Hacspec_lib.Prelude.t_U128Word)
   in
-  let n = n &. Secret_integers.U128 (pub_u128 21267647620597763993911028882763415551sz) in
+  let n =
+    n &.
+    Secret_integers.U128 (Rust_primitives.Hax.u128_of_int 21267647620597763993911028882763415551)
+  in
   from_secret_literal_under_impl_105 n
 
 let poly1305_encode_block (b: t_PolyBlock) : _ =

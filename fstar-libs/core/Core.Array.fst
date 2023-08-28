@@ -22,3 +22,7 @@ let array_of_list = Seq.seq_of_list
 let array_create (x: 'a) (len: usize): array 'a len = 
   FStar.Seq.create (SizeT.v len) x
 
+instance update_at_vec t: update_at (Alloc.Vec.t_Vec t ()) usize =
+  magic ()
+
+

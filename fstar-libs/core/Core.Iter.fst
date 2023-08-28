@@ -12,10 +12,18 @@ class iterator self = {
 
 open Core.Ops.Range.Range
 
-instance iterator_array (t: eqtype) len: iterator (array t len) = {
+instance iterator_slice (t: eqtype): iterator (slice t) = {
   item = t;
   next = (fun s -> admit ());
   size_hint = (fun s -> Some (admit ()));
+  in_range = (fun (s: slice t) i -> Seq.mem i s);
+  fold = (fun #b s init f -> admit ())
+}
+
+instance iterator_array (t: eqtype) len: iterator (array t len) = {
+  item = t;
+  next = (fun s -> admit ());
+  size_hint = (fun s -> Some (admit()));
   in_range = (fun (arr: array t len) i -> Seq.mem i arr);
   fold = (fun #b s init f -> admit ())
 }

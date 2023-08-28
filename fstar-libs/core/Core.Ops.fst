@@ -26,13 +26,20 @@ instance _: add_tc SizeT.t SizeT.t = {
 let ( ^. ) x y = x
 let ( /. ) = SizeT.div
 let ( %. ) = SizeT.rem  
-let ( *. ) = SizeT.mul
-let ( ~. ) (x: bool): bool = not x
+let ( *. ) (x y: 'a) = x
+let ( ~. ) (x: 'a): 'a = x
+let ( <<. ) #a: a -> u8 -> a = magic ()
+let ( >>. ) #a: a -> u8 -> a = magic ()
 
 let ( =. ) = (=)
 let ( >=. ) (x y: 'a) = true
+let ( <=. ) (x y: 'a) = true
+let ( >. ) (x y: 'a) = true
+let ( <. ) (x y: 'a) = true
 
 let ( <>. ) (x y: SizeT.t) = x <> y
+let ( &. ) (x y: 'a) = x 
+let ( -. ) (x y: 'a) = x 
 
 let cast #a #b (x: a): b = magic ()
 

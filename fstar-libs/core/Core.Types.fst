@@ -1,7 +1,10 @@
 module Core.Types
 
 unfold type u8 = FStar.UInt8.t
+unfold type u16 = FStar.UInt16.t
 unfold type u32 = FStar.UInt32.t
+unfold type u64 = FStar.UInt64.t
+unfold type u128 = FStar.UInt128.t
 unfold type usize = FStar.SizeT.t
 type slice t = s: FStar.Seq.seq t {SizeT.fits (FStar.Seq.length s)}
 type t_Array t (l: usize) = 
@@ -21,3 +24,7 @@ class update_at self idx = {
   (.[]<-): s: self -> i: idx {super_index.in_range s i} -> super_index.output -> self;
 }
 
+
+open Core.Types
+open FStar.UInt128
+let pub_u128 = uint_to_t
