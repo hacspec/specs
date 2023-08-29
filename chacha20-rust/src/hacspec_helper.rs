@@ -52,11 +52,11 @@ pub(super) fn add_state(mut state: State, other: State) -> State {
     state
 }
 
-pub(super) fn update_array(mut array: [u8; 64], val: &[u8]) -> [u8; 64] {
+pub(super) fn update_array(mut arr: [u8; 64], val: &[u8]) -> [u8; 64] {
     // <const L: usize>
     assert!(64 >= val.len());
     for i in 0..val.len() {
-        array[i] = val[i];
+        arr[i] = val[i];
     }
-    array
+    arr
 }
