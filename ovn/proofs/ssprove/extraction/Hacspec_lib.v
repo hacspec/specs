@@ -279,10 +279,12 @@ Defined.
 
 Notation " x '.a[' a ']'" := (array_index (n_seq_array_or_seq x _) a) (at level 40).
 
-Program Definition (* Equations *) array_upd {A: choice_type} {len : uint_size} {L I} (s: both L I (nseq A len)) {WS} (i: both L I (@int WS)) (new_v: both L I A) : both L I (nseq A len) :=
+Program Definition (* Equations *) array_upd {A: choice_type} {len : uint_size} {L1 L2 L3 I1 I2 I3} (s: both L1 I1 (nseq A len)) {WS} (i: both L2 I2 (@int WS)) (new_v: both L3 I3 A) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (nseq A len) :=
   (* array_upd s i new_v := *) Hacspec_Lib.array_upd s i new_v.
 Fail Next Obligation.
 Notation " x '.a[' i ']<-' a" := (array_upd x i a) (at level 40).
+
+Notation update_at := array_upd.
 
 (* Definition update {A : Type}  `{Default A} {len slen} (s : nseq A len) {WS} (start : @int WS) (start_a : array_or_seq A slen) : nseq A len := *)
 (* array_update (a := A) (len := len) s (unsigned start) (as_seq start_a). *)
@@ -358,6 +360,7 @@ Notation classify := id.
 Notation U64_from_U8 := uint64_from_uint8.
 (* Definition Build_Range_t (a b : nat) := (a,b). (* match (b - a)%nat with O => [] | S n => match b with | O => [] | S b' => Build_Range_t a b' ++ [b] end end. *) *)
 Definition Build_t_Range {WS L1 L2 I1 I2} (a : both L1 I1 (int WS)) (b : both L2 I2 (int WS)) := (a,b).
+Notation Build_Range  := Build_t_Range.
 Notation declassify_eq := eq.
 Notation String_t := String.string.
 
@@ -377,4 +380,199 @@ Notation "a <> b" := (negb (eqb a b)).
 Notation "'not'" := (negb).
 Notation "x ':of:' y" := (x : both _ _ y) (at level 100).
 Notation "x ':of0:' y" := (x : both (fset []) (fset []) y) (at level 100).
+
+Class t_Serialize (Self : choice_type).
+Class t_Deserial (Self : choice_type).
+Class t_Serial (Self : choice_type).
+Notation "'t_Eq'" := (EqDec).
 (** end of: Should be moved to Hacspec_Lib.v **)
+
+Definition t_Result A B := result B A.
+
+(** Should be part of core.V **)
+
+Class t_Sized (A : choice_type) := Sized : A -> A.
+Class t_TryFrom (A : choice_type) := TryFrom : A -> A.
+Class t_Into (A : choice_type) := Into : A -> A.
+Class t_PartialEq (A : choice_type) := PartialEq : A -> A.
+Class t_Copy (A : choice_type) := Copy : A -> A.
+Class t_Clone (A : choice_type) := Clone : A -> A.
+Definition t_Option : choice_type -> choice_type := chOption.
+Inductive vec_typ :=
+| t_Global.
+Definition t_Vec : choice_type -> vec_typ -> choice_type := fun A _ => chList A.
+
+Class t_Default A := { default : A }.
+
+#[global] Instance bool_copy : t_Copy 'bool := {Copy x := x}.
+#[global] Instance bool_clone : t_Clone 'bool := {Clone x := x}.
+#[global] Instance bool_sized : t_Sized 'bool := {Sized x := x}.
+
+Definition ilog2 {WS} {L I} (x : both L I (int WS)) : both L I (int WS) := x. (* TODO *)
+
+Definition collect {A} {L I} (x : both L I (chList A)) : both L I (t_Vec A t_Global) := x.
+  
+
+Equations swap_both_list {A L I} (x : list (both L I A)) : both L I (chList A) :=
+  swap_both_list x :=
+  (List.fold_left (fun (x : both L I (chList A)) y =>
+   bind_both x (fun x' =>
+   bind_both y (fun y' =>
+   solve_lift (ret_both ((y' :: x') : chList A))))) x (solve_lift (ret_both ([] : chList A)))).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Equations match_list {A B : choice_type} {L I} (x : both L I (chList A)) (f : list A -> B) : both L I B :=
+  match_list x f :=
+  bind_both x (fun x' => solve_lift (ret_both (f x'))).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Equations map {A B} {L I} (x : both L I (chList A))  (f : both L I A -> both L I B) : both L I (chList B) :=
+  map x f :=
+  bind_both x (fun x' => swap_both_list (List.map (fun y => f (solve_lift (ret_both y))) x')).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Definition cloned {A} {L I} (x : both L I (chList A)) : both L I (chList A) := x.
+
+Equations iter {A L I} (x : both L I (seq A)) : both L I (chList A) :=
+  iter x :=
+  bind_both x (fun x' => solve_lift (ret_both (Hacspec_Lib_Pre.seq_to_list _ x' : chList A))).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Definition dedup {A} {L I} (x : both L I (t_Vec A t_Global)) : both L I (t_Vec A t_Global) := x.
+
+Definition t_String := Coq.Strings.String.string.
+Program Definition new {A L I} : both L I (t_Vec A t_Global) := solve_lift (ret_both ([] : chList A)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Definition enumerate {A} {L I} (x : both L I (t_Vec A t_Global)) : both L I (t_Vec A t_Global) := x.
+
+Inductive ControlFlow {L I} (A : choice_type) (B : choice_type) :=
+| ControlFlow_Continue (val : both L I A)
+| ControlFlow_Break (val : both L I B).
+
+Definition run {A B : choice_type} {L I} (x : ControlFlow A B) : both L I (t_Result A B) :=
+  match x with
+  | ControlFlow_Continue v => Ok v
+  | ControlFlow_Break v => Err v
+  end.
+
+(* Program Definition build_under_impl_1 {A B} : (t_Result A B) := *)
+(*   run (letb layers := (match branch (build_tree_under_impl_1 partial_layers depth) with *)
+(*     | ControlFlow_Break residual => letb hoist1 := (v_Break (from_residual residual)) : both _ _ (t_Never) in *)
+(*       ControlFlow_Continue (never_to_any hoist1) *)
+(*     | ControlFlow_Continue val => ControlFlow_Continue val *)
+(*     end) in *)
+(*   ControlFlow_Continue (Result_Ok (Build_PartialTree layers))). *)
+(* Fail Next Obligation. *)
+
+(** How to handle enums: **)
+
+(* Inductive t_ErrorKind : Type := *)
+(* | ErrorKind_SerializedProofSizeIsIncorrectt_ErrorKind  *)
+(* | ErrorKind_NotEnoughHelperNodest_ErrorKind  *)
+(* | ErrorKind_HashConversionErrort_ErrorKind  *)
+(* | ErrorKind_NotEnoughHashesToCalculateRoott_ErrorKind  *)
+(* | ErrorKind_LeavesIndicesCountMismatcht_ErrorKind. *)
+
+Definition t_ErrorKind : choice_type := chFin (mkpos 5).
+Program Definition ErrorKind_SerializedProofSizeIsIncorrect {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=0) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Program Definition ErrorKind_NotEnoughHelperNodes {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=1) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Program Definition ErrorKind_HashConversionError {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=2) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Program Definition ErrorKind_NotEnoughHashesToCalculateRoot {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=3) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Program Definition ErrorKind_LeavesIndicesCountMismatch {L I} : both L I t_ErrorKind := solve_lift (ret_both (fintype.Ordinal (n:=5) (m:=4) eq_refl : t_ErrorKind)).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+(** How to handle records: **)
+(* TODO: Remove them as a phase? *)
+
+(* Record t_Error : Type := { *)
+(*     f_kind1 : t_ErrorKind *)
+(*     f_kind2 : t_ErrorKind *)
+(*   }. *)
+
+Definition t_Error : choice_type := t_ErrorKind × t_ErrorKind.
+(* Uncurry is Build_.. fn *)
+Equations Build_Error {L I} {f_kind1 : both L I t_ErrorKind} {f_kind2 : both L I t_ErrorKind} : both L I t_Error :=
+  Build_Error (f_kind1 := x) (f_kind2 := y) :=
+  bind_both x (fun x' =>
+  bind_both y (fun y' =>
+  solve_lift (ret_both ((x', y') : t_Error)))).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+Definition f_kind1 (v : t_Error) := fst v.
+Definition f_kind2 (v : t_Error) := snd v.
+(* Make into tuple struct with named projctions! *)
+
+(*** More functions *)
+Definition t_Drain : choice_type -> vec_typ -> choice_type := t_Vec.
+Inductive t_Range := RangeFull.
+Equations drain : forall {L I A}, both L I (t_Vec A t_Global) -> t_Range -> both L I (t_Drain A t_Global × t_Vec A t_Global) :=
+  drain x _ :=
+    bind_both x (fun x' => solve_lift (ret_both ((x', []) : (t_Drain A t_Global × t_Vec A t_Global)))).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+Notation t_Rev := id.
+Equations rev {L I A} (x : both L I (chList A)) : both L I (chList A) := rev x := bind_both x (fun x => solve_lift (ret_both (List.rev x : chList _))).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+
+Definition pop {L I A} : both L I (chList A) -> both L I (chOption A × t_Vec A (t_Global)) :=
+  lift1_both (fun (x : chList A) => (List.hd_error x , List.tl x) : (chOption A × t_Vec A (t_Global))).
+
+Definition push {L1 L2 I1 I2 A} : both L1 I1 (t_Vec A t_Global) -> both L2 I2 A -> both (L1 :|: L2) (I1 :|: I2) (t_Vec A (t_Global)) :=
+  lift2_both (fun  (x : chList A) y => y :: x : chList A).
+
+Notation Option_Some := Some.
+Definition append {L1 L2 I1 I2} {A : choice_type} (l : both L1 I1 (chList A)) (x : both L2 I2 (chList A)) : both (L2 :|: L1) (I2 :|: I1) (chList A × chList A) :=
+  lift2_both (fun (x : chList A) (y : chList A) => (app y x, []) : chList A × chList A) x l.
+
+Notation clone := id.
+Definition seq_unzip {A B} (s : chList (A × B)) : chList A × chList B := (seq.unzip1 s, seq.unzip2 s).
+Definition unzip {L I} {A B} : both L I (chList (A × B)) -> both L I (chList A × chList B) := lift1_both seq_unzip.
+Equations deref {L I A} : both L I (t_Vec A t_Global) -> both L I (seq A) :=
+  deref X := bind_both X (fun x : t_Vec A t_Global => solve_lift (ret_both (Hacspec_Lib_Pre.seq_from_list A x))).
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
+Definition t_Never := False.
+Notation v_Break := id.
+Notation Result_Err := Err.
+Definition never_to_any := tt.
+Notation Result_Ok := Ok.
+
+Notation "'ret_both' 'tt'" := (ret_both (tt : 'unit)).
+
+(** Should be part of concordium.v **)
+Class HasInitContext (Self : choice_type).
+Class t_HasInitContext (Self : choice_type) (something : choice_type).
+Class t_HasActions (Self : choice_type) := {accept : forall {L I}, both L I Self}.
+Class HasReceiveContext (Self : choice_type).
+Definition t_ParamType := 'unit.
+Definition t_ParseError := 'unit.
+(* (t_RegisterParam) *)
+Class t_HasReceiveContext (Self : choice_type) (something : choice_type) := { get : forall {Ctx L I}, both L I (t_ParamType × t_Result Ctx (t_ParseError)) }.
+Arguments get {Self} {something} (t_HasReceiveContext) {Ctx} {L} {I}.
+
+Definition parameter_cursor {T : _} `{ t_Sized (T)} `{ t_HasReceiveContext (T) ('unit)} `{ t_Sized (T)} `{ t_HasReceiveContext (T) ('unit)} {L1 : {fset Location}} {I1 : Interface} (ctx : both L1 I1 (T)) : t_HasReceiveContext (T) ('unit) := _.
+
+
+Definition Continuation B A := (A -> B) -> B.
+Definition monad_ret {B A} (x : A) : Continuation B A := fun f => f x.
+Definition monad_bind {B A C} (x : Continuation B A) (f : A -> Continuation B C) : Continuation B C := (fun g : C -> B => x (fun y : A => f y g)).

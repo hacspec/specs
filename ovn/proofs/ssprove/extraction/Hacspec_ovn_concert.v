@@ -94,7 +94,7 @@ Definition res_loc : Location :=
   inv_loc := (fset [res_loc] : {fset Location});
   inv := (@inv);
   div_loc := (fset [res_loc] : {fset Location});
-    div := (@div)|}.
+  div := (@div)|}.
 Solve All Obligations with exact int_eqdec.
 Fail Next Obligation.
 
@@ -153,15 +153,73 @@ Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_commit_vis' ':=' y ')'" :=
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_g_pow_xi_yi_vis' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := y) (f_zkp_vis := f_zkp_vis x) (f_tally := f_tally x)).
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_zkp_vis' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := f_g_pow_xi_yi_vis x) (f_zkp_vis := y) (f_tally := f_tally x)).
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_tally' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := f_g_pow_xi_yi_vis x) (f_zkp_vis := f_zkp_vis x) (f_tally := y)).
-Definition state_OVN {L : {fset Location}} {I : Interface} (f_g_pow_xis : both L I (nseq t_group_type 20)) (f_zkp_xis : both L I (nseq int32 20)) (f_commit_vis : both L I (nseq int32 20)) (f_g_pow_xi_yi_vis : both L I (nseq t_group_type 20)) (f_zkp_vis : both L I (nseq int32 20)) (f_tally : both L I (int32)) : choice_type :=
+Definition state_OVN : choice_type :=
   t_OvnContractState.
 
-Equations init_ovn_contract {L1 : {fset Location}} {I1 : Interface} {T : _} `{ t_Sized (T)} `{ t_HasInitContext (T) ('unit)} (ctx : both L1 I1 (T)) : both L1 I1 (t_Result (t_OvnContractState) (t_Reject)) :=
+Equations init_ovn_contract {L1 : {fset Location}} {I1 : Interface} {T : _} `{ t_Sized (T)} `{ t_HasInitContext (T) ('unit)} (ctx : both L1 I1 (T)) : both L1 I1 (t_Result ('bool) ('unit)) :=
   init_ovn_contract ctx  :=
-    Result_Ok (solve_lift (Build_OvnContractState (f_g_pow_xis := repeat one (ret_both (20 : uint_size))) (f_zkp_xis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_commit_vis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_g_pow_xi_yi_vis := repeat one (ret_both (20 : uint_size))) (f_zkp_vis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_tally := ret_both (0 : int32)))) : both L1 I1 (t_Result (t_OvnContractState) (t_Reject)).
+    Result_Ok (solve_lift (ret_both (true : 'bool))) : both L1 I1 (t_Result ('bool) ('unit)).
 Fail Next Obligation.
-Definition init_OVN : choice_type :=
-  st.
+
+From ConCert.Utils Require Import Extras.
+From ConCert.Utils Require Import Automation.
+From ConCert.Execution Require Import Serializable.
+From ConCert.Execution Require Import Blockchain.
+From ConCert.Execution Require Import ContractCommon.
+
+Require Import ConCertLib.
+(* Definition Setup :=  *)
+Definition init_OVN (chain : Chain) (ctx : ContractCallContext) (setup : unit) : ResultMonad.result state_OVN state_OVN.
+Proof.
+  pose ctx.(ctx_from).
+  pose ctx.(ctx_origin).
+  pose (repr U32 ctx.(ctx_amount)).
+  
+  pose ((ctx.(ctx_from), ctx.(ctx_origin), repr ctx.(ctx_amount), 0 (* TODO *))).
+  apply ResultMonad.Ok.
+  eapply Build_t_OvnContractState.
+  Unshelve.
+  all: solve_ssprove_obligations.
+  Chain ->
+  ContractCallContext ->
+  state_OVN -> ResultMonad.result state_OVN state_OVN
+(*   st. *)
+
+Inductive Msg: Type :=
+| register : Msg
+| commit_to_vote : Msg
+| cast_vote : Msg
+| tally : Msg.
+
+Print ChainBase.
+Check @Contract.
+(* Setup Msg State Error *)
+(* Serializable Setup -> Serializable Msg -> Serializable State -> Serializable Error *)
+Check build_contract.
+
+(* Instance BaseTypes : ChainBase := {| *)
+(*     Address := nseq int8 (usize 32); *)
+(*     address_eqb a b := a =.? b ; *)
+(*     address_eqb_spec a b := _ ;(* Bool.iff_reflect (a = b) (a array_eq b) (symmetry (eqb_leibniz a b)); *) *)
+(*     (* address_eqdec x y := (EqDecIsDecidable x y); *) *)
+(*     address_countable := nseq_countable _; *)
+(*     address_serializable := nseq_serializable _; *)
+(*                                    address_is_contract := (fun x => Nat.even (nat_from_be_bytes x)); |}. *)
+
+Instance serializeable_msg : Serializable Msg.
+Admitted.
+
+Instance serializeable_state_ovn : Serializable state_OVN.
+Admitted.
+
+Definition auction_contract : Contract _ (* Setup *) Msg state_OVN _.
+Proof.
+  apply build_contract.
+  
+  apply init_OVN.
+  build_contract _ _.
+
+
 
 Equations select_private_voting_key {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (int32)) : both L1 I1 (int32) :=
   select_private_voting_key random  :=
@@ -301,8 +359,3 @@ Equations tally_votes {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interf
 Fail Next Obligation.
 Definition receive_OVN_tally (TallyParameter : _) (st : state_OVN) : choice_type :=
   tally_votes st.
-Inductive Msg: Type :=
-| register : Msg
-| commit_to_vote : Msg
-| cast_vote : Msg
-| tally : Msg.

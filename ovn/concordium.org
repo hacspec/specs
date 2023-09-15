@@ -46,7 +46,7 @@ path = "src/concordium.rs"
 [dependencies]
 hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
 # hacspec-attributes = { path = "../../utils/attributes", version = "0.1.0-beta.1" , features = ["print_attributes", "hacspec_unsafe"] } # , features = ["hacspec_unsafe"] , , optional = true
-creusot-contracts = { git = "https://github.com/xldenis/creusot", rev = "7763b3ae77205fba83182b9a6c3e69ad0b12fec7" }
+# creusot-contracts = { git = "https://github.com/xldenis/creusot", rev = "7763b3ae77205fba83182b9a6c3e69ad0b12fec7" }
 concordium-contracts-common = { git = "https://github.com/Concordium/concordium-contracts-common", rev = "84ff7db509ca1fbf958b47e5e5903b7662295850", version = "=2.0.0", default-features = false }
 hacspec-concordium-derive = { path = "../concordium-derive" }
 
@@ -200,10 +200,10 @@ extern crate hacspec_lib;
 // #[cfg(feature = "hacspec")]
 // use hacspec_attributes::*;
 
-#[cfg(not(feature = "hacspec"))]
-extern crate creusot_contracts;
-#[cfg(not(feature = "hacspec"))]
-use creusot_contracts::*; // {ensures, trusted}; // requires, 
+// #[cfg(not(feature = "hacspec"))]
+// extern crate creusot_contracts;
+// #[cfg(not(feature = "hacspec"))]
+// use creusot_contracts::*; // {ensures, trusted}; // requires, 
 #+END_SRC
 
 ** Coq code
@@ -1007,27 +1007,27 @@ Coerce for public byte sequences.
 
 Extern accept
 #+begin_src rust
-  #[cfg(not(feature = "hacspec"))]
-  extern "C" {
-      pub(crate) fn accept() -> u32;
-  }
+#[cfg(not(feature = "hacspec"))]
+extern "C" {
+    pub(crate) fn accept() -> u32;
+}
 
-  #[cfg(not(feature = "hacspec"))]
-  #[trusted]
-  pub(crate) fn accept_creusot() -> u32 {
-      unsafe { accept() }
-  }
+#[cfg(not(feature = "hacspec"))]
+// #[trusted]
+pub(crate) fn accept_creusot() -> u32 {
+    unsafe { accept() }
+}
 
-  #[cfg(feature = "hacspec")]
-  pub(crate) fn accept_hacspec() -> u32 {
-      1u32
-  }
+#[cfg(feature = "hacspec")]
+pub(crate) fn accept_hacspec() -> u32 {
+    1u32
+}
 
-  #[cfg(not(feature = "hacspec"))]
-  pub(crate) fn accept_hacspec() -> u32 {
-      accept_creusot()
-  }
-  
+#[cfg(not(feature = "hacspec"))]
+pub(crate) fn accept_hacspec() -> u32 {
+    accept_creusot()
+}
+
 #+end_src
 Extern simple transfer
 #+begin_src rust
@@ -1038,7 +1038,7 @@ Extern simple transfer
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn simple_transfer_creusot(addr_bytes: *const u8, amount: u64) -> u32 {
       unsafe { simple_transfer(addr_bytes, amount) }
   }
@@ -1072,7 +1072,7 @@ Extern send
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn send_creusot(
         addr_index: u64,
         addr_subindex: u64,
@@ -1120,7 +1120,7 @@ extern "C" {
 }
 
 #[cfg(not(feature = "hacspec"))]
-#[trusted]
+// #[trusted]
 pub(crate) fn combine_and_creusot(l: u32, r: u32) -> u32 {
     unsafe { combine_and(l, r) }
 }
@@ -1146,7 +1146,7 @@ extern "C" {
 }
 
 #[cfg(not(feature = "hacspec"))]
-#[trusted]
+// #[trusted]
 pub(crate) fn combine_or_creusot(l: u32, r: u32) -> u32 {
     unsafe { combine_or(l, r) }
 }
@@ -1171,7 +1171,7 @@ Extern parameter size
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_parameter_size_creusot() -> u32 {
       unsafe { get_parameter_size() }
   }
@@ -1198,7 +1198,7 @@ Extern for parameter section
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_parameter_section_creusot(start: *mut u8, length: u32, offset: u32) -> u32 {
       unsafe { get_parameter_section(start, length, offset) }
   }
@@ -1230,7 +1230,7 @@ Get policy section extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_policy_section_creusot(policy_bytes: *mut u8, length: u32, offset: u32) -> u32 {
       unsafe { get_policy_section(policy_bytes, length, offset) }
   }
@@ -1263,7 +1263,7 @@ Log event extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn log_event_creusot(start: *const u8, length: u32) -> i32 {
       unsafe { log_event(start, length) }
   }
@@ -1289,7 +1289,7 @@ extern "C" {
 }
 
 #[cfg(not(feature = "hacspec"))]
-#[trusted]
+// #[trusted]
 pub(crate) fn load_state_creusot(start: *mut u8, length: u32, offset: u32) -> u32 {
     unsafe { load_state(start, length, offset) }
 }
@@ -1314,7 +1314,7 @@ extern "C" {
 }
 
 #[cfg(not(feature = "hacspec"))]
-#[trusted]
+// #[trusted]
 pub(crate) fn write_state_creusot(start: *mut u8, length: u32, offset: u32) -> u32 {
     unsafe { write_state(start, length, offset) }
 }
@@ -1342,7 +1342,7 @@ Resize state extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn resize_state_creusot(new_size: u32) -> u32 {
       unsafe { resize_state(new_size) }
   }
@@ -1365,7 +1365,7 @@ extern "C" {
 }
 
 #[cfg(not(feature = "hacspec"))]
-#[trusted]
+// #[trusted]
 pub(crate) fn state_size_creusot() -> u32 {
     unsafe { state_size() }
 }
@@ -1390,7 +1390,7 @@ Get init origin extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_init_origin_creusot(start: *mut u8) {
       unsafe { get_init_origin(start) }
   }
@@ -1417,7 +1417,7 @@ Get receive invoker extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_receive_invoker_creusot(start: *mut u8) {
       unsafe { get_receive_invoker(start) }
   }
@@ -1444,7 +1444,7 @@ Get receive self address extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_receive_self_address_creusot(start: *mut u8) {
       unsafe { get_receive_self_address(start) }
   }
@@ -1471,7 +1471,7 @@ Get receive self balance extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_receive_self_balance_creusot() -> u64 {
       unsafe { get_receive_self_balance() }
   }
@@ -1496,7 +1496,7 @@ Get receive sender extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_receive_sender_creusot(start: *mut u8) {
       unsafe { get_receive_sender(start) }
   }
@@ -1523,7 +1523,7 @@ extern "C" {
 }
 
 #[cfg(not(feature = "hacspec"))]
-#[trusted]
+// #[trusted]
 pub(crate) fn get_receive_owner_creusot(start: *mut u8) {
     unsafe { get_receive_owner(start) }
 }
@@ -1550,7 +1550,7 @@ Get slot time extern
   }
 
   #[cfg(not(feature = "hacspec"))]
-  #[trusted]
+  // #[trusted]
   pub(crate) fn get_slot_time_creusot() -> u64 {
       unsafe { get_slot_time() }
   }
@@ -1770,8 +1770,8 @@ pub fn new_reject_impl(x: i32) -> Option::<i32> { // Option<RejectHacspec>
 We define the coercion function for Reject, and implement the traits
 #+begin_src rust
 #[cfg(not(feature = "hacspec"))]
-#[trusted]
-#[ensures(!(result == 0i32))]
+// #[trusted]
+// #[ensures(!(result == 0i32))]
 pub fn non_zero_i32(v : i32) -> NonZeroI32 {
     unsafe { NonZeroI32::new_unchecked(v) }
 }
@@ -1787,12 +1787,12 @@ pub fn coerce_hacspec_to_rust_reject(hacspec_reject: RejectHacspec) -> Reject {
 **** Reject - From trait
 We modle the unsafe block with unchecked non zero as a precondition using requires giving us the hacspec equivalent
 #+begin_src rust
-#[ensures(!(result == 0i32))] // !=
+// #[ensures(!(result == 0i32))] // !=
 pub fn reject_impl_convert_from_unit() -> RejectHacspec {
     -2_147_483_648i32 + 1i32 // i32::MIN
 }
 
-#[ensures(!(result == 0i32))] // !=
+// #[ensures(!(result == 0i32))] // !=
 pub fn reject_impl_convert_from_parse_error() -> RejectHacspec {
     -2_147_483_648i32 + 2i32 // i32::MIN
 }
@@ -1817,7 +1817,7 @@ impl convert::From<ParseError> for Reject {
 #+end_src
 We define a log error type and function converting from it to the reject type
 #+begin_src rust
-#[ensures(!(result == 0i32))] // !=
+// #[ensures(!(result == 0i32))] // !=
 pub fn reject_impl_from_log_error(le: LogError) -> RejectHacspec {
     match le {
         LogError::Full => -2_147_483_648i32 + 3i32, // i32::MIN
@@ -1848,7 +1848,7 @@ pub enum NewContractNameError {
     NewContractNameErrorInvalidCharacters,
 }
 
-#[ensures(!(result == 0i32))] // !=
+// #[ensures(!(result == 0i32))] // !=
 pub fn reject_impl_from_new_contract_name_error(nre: NewContractNameError) -> RejectHacspec {
     match nre {
         NewContractNameError::NewContractNameErrorMissingInitPrefix => -2_147_483_648i32 + 5i32, // i32::MIN
@@ -1882,7 +1882,7 @@ pub enum NewReceiveNameError {
     NewReceiveNameErrorInvalidCharacters,
 }
 
-#[ensures(!(result == 0i32))] // !=
+// #[ensures(!(result == 0i32))] // !=
 pub fn reject_impl_from_new_receive_name_error(nre: NewReceiveNameError) -> RejectHacspec {
     match nre {
         NewReceiveNameError::NewReceiveNameErrorMissingDotSeparator => -2_147_483_648i32 + 7i32, // i32::MIN
@@ -1908,7 +1908,7 @@ We then implement the traits
 
 We then implement the traits
 #+begin_src rust
-#[ensures(!(result == 0i32))] // !=
+// #[ensures(!(result == 0i32))] // !=
 pub fn reject_impl_from_not_payable_error() -> RejectHacspec {
     -2_147_483_648i32 + 12i32 // i32::MIN
 }

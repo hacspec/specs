@@ -23,10 +23,13 @@ Open Scope hacspec_scope.
 Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
+Require Import Core.
+Require Import Hacspec_lib.
 
 (** Tool: export_name _ 
 Tool: no_std _ 
 Tool: feature _ register_tool
+Tool: register_tool _ hax
 Tool: register_tool _ _hax **)
 Require Import Hacspec_concordium.
 Export Hacspec_concordium.
@@ -34,6 +37,7 @@ Export Hacspec_concordium.
 (** Tool: export_name _ 
 Tool: no_std _ 
 Tool: feature _ register_tool
+Tool: register_tool _ hax
 Tool: register_tool _ _hax **)
 Require Import SeekFrom.
 Export SeekFrom.
@@ -41,6 +45,7 @@ Export SeekFrom.
 (** Tool: export_name _ 
 Tool: no_std _ 
 Tool: feature _ register_tool
+Tool: register_tool _ hax
 Tool: register_tool _ _hax **)
 Require Import ContractState.
 Export ContractState.
@@ -48,6 +53,7 @@ Export ContractState.
 (** Tool: export_name _ 
 Tool: no_std _ 
 Tool: feature _ register_tool
+Tool: register_tool _ hax
 Tool: register_tool _ _hax **)
 Require Import Logger.
 Export Logger.
@@ -55,6 +61,7 @@ Export Logger.
 (** Tool: export_name _ 
 Tool: no_std _ 
 Tool: feature _ register_tool
+Tool: register_tool _ hax
 Tool: register_tool _ _hax **)
 Require Import trap.
 Export trap.

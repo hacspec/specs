@@ -1,10 +1,15 @@
 #![no_std]
+#![feature(register_tool)]
+#![register_tool(hax)]
 
-// use core::*;
-// use hacspec_lib::*;
-// use creusot_contracts::*;
+#[hax_lib_macros::skip]
+extern crate hax_lib_macros;
+#[hax_lib_macros::skip]
+use hax_lib_macros::*;
 
-use hacspec_concordium::*; // ::{HasLogger, HasInitContext, Logger, HasContractState, Reject, Serial, Deserial, Read, ParseResult, Write, Get, ParseError, HasReceiveContext, HasActions, Seek, Action, ReceiveContextExtern, ExternContext, Vec, to_bytes, test_infrastructure::InitContextTest};
+#[skip]
+use hacspec_concordium::*;
+#[skip]
 use hacspec_concordium_derive::*;
 
 /** Interface for group implementation */
@@ -50,11 +55,12 @@ impl Group for z_17 {
     fn inv(x: Self::group_type) -> Self::group_type {
         let mut res = 0;
         for i in 1..Self::q {
-            if Self::pow(Self::g, i) == x {
-                res = i
+            if Self::g_pow(i) == x {
+                res = i;
             }
         }
-        Self::q - res
+        res
+        // [0, 1, 9, 6, 13, 7, 3, 5, 15, 2, 12, 14, 10, 4, 11, 8, 16][x as usize]
     }
 
     fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type {
@@ -64,6 +70,9 @@ impl Group for z_17 {
 
     // }
 }
+
+type G = z_17;
+const n: usize = 20;
 
 // struct eligible_votes {
 //     v_id : u32,
@@ -79,32 +88,46 @@ impl Group for z_17 {
 // use concordium_contracts_common::*;
 // extern crate concordium_std;
 
-#[contract_state(contract = "OVN")]
+
+#[hax::contract_state(contract = "OVN")]
+// #[cfg_attr(not(feature = "hax_compilation"), contract_state(contract = "OVN"))]
 #[derive(Serialize, SchemaType, Clone, Copy)]
-pub struct OvnContractState<G: Group, const n: usize> {
-    g_pow_xis: [G::group_type; n],
+pub struct OvnContractState/* <G: Group, const n: usize> */ {
+    g_pow_xis: [<z_17 as Group>/*G*/::group_type; n],
     zkp_xis: [u32; n],
 
     commit_vis: [u32; n],
 
-    g_pow_xi_yi_vis: [G::group_type; n],
+    g_pow_xi_yi_vis: [<z_17 as Group>/*G*/::group_type; n],
     zkp_vis: [u32; n],
 
     tally: u32,
 }
 
-#[init(contract = "OVN")]
-pub fn init_ovn_contract(ctx: &impl HasInitContext) -> Result<bool, ()> {
-    Ok(true)
+#[hax::init(contract = "OVN")]
+// #[cfg_attr(not(feature = "hax_compilation"), init(contract = "OVN"))]
+// pub fn init_ovn_contract(ctx: &impl HasInitContext) -> Result<bool, ()> {
+pub fn init_ovn_contract<T : HasInitContext>(ctx:&T) -> InitResult<OvnContractState> {
+    Ok(OvnContractState {
+        g_pow_xis: [G::one(); n],
+        zkp_xis: [0; n],
+
+        commit_vis: [0; n],
+
+        g_pow_xi_yi_vis: [G::one(); n],
+        zkp_vis: [0; n],
+
+        tally: 0,
+    })
 }
 
 /** Currently randomness needs to be injected */
-pub fn select_private_voting_key<G: Group>(random: u32) -> u32 {
+pub fn select_private_voting_key/* <G: Group> */(random: u32) -> u32 {
     random % G::q // x_i \in_R Z_q;
 }
 
 /** TODO: Non-interactive Schnorr proof using Fiat-Shamir heuristics */
-pub fn ZKP<G: Group>(g_pow_xi: G::group_type, xi: u32) -> u32 {
+pub fn ZKP/* <G: Group> */(g_pow_xi: <z_17 as Group>/*G*/::group_type, xi: u32) -> u32 {
     0
 }
 
@@ -114,26 +137,26 @@ pub struct RegisterParam {
     xi: u32,
 }
 
-type G = z_17;
-const n: usize = 20;
-
 /** Primary function in round 1 */
-#[receive(contract = "OVN", name = "register", parameter = "RegisterParam")]
-pub fn register_vote<A: HasActions>(
-    ctx: &impl HasReceiveContext,
-    state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> {
-    let params: RegisterParam = ctx.parameter_cursor().get()?;
+#[hax::receive(contract = "OVN", name = "register", parameter = "RegisterParam")]
+// #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "register", parameter = "RegisterParam"))]
+// pub fn register_vote<A: HasActions>(
+//     ctx: &impl HasReceiveContext,
+//     state: OvnContractState/* <G, n> */,
+// ) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
+pub fn register_vote<A: HasActions, T: HasReceiveContext>(
+    ctx: &T,
+    state: OvnContractState/* <G, n> */,
+) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
+    // let params : RegisterParam = ctx.parameter_cursor().get()?; // Result<RegisterParam, ParseError>?
+    // let g_pow_xi = G::g_pow(params.xi);
+    // let zkp_xi = ZKP/* ::<G> */(g_pow_xi, params.xi);
 
-    // let xi = select_private_voting_key::<G>(params.random);
-    let g_pow_xi = G::g_pow(params.xi);
-    let zkp_xi = ZKP::<G>(g_pow_xi, params.xi);
+    // let mut state_ret = state.clone();
+    // state_ret.g_pow_xis[params.i as usize] = g_pow_xi;
+    // state_ret.zkp_xis[params.i as usize] = zkp_xi;
 
-    let mut state_ret = state.clone();
-    state_ret.g_pow_xis[params.i as usize] = g_pow_xi;
-    state_ret.zkp_xis[params.i as usize] = zkp_xi;
-
-    Ok((A::accept(), state_ret))
+    Ok((A::accept(), state/*_ret*/))
 }
 
 #[derive(Serialize, SchemaType)]
@@ -147,12 +170,12 @@ pub fn check_valid(zkp: u32) -> bool {
     true
 }
 
-pub fn compute_group_element_for_vote<G: Group>(
+pub fn compute_group_element_for_vote/* <G: Group> */(
     i: u32,
     xi: u32,
     vote: bool,
-    xis: [G::group_type; n],
-) -> G::group_type {
+    xis: [<z_17 as Group>/*G*/::group_type; n],
+) -> <z_17 as Group>/*G*/::group_type {
     let mut prod1 = G::one();
     for j in 0..(i - 1) as usize {
         prod1 = G::prod(prod1, xis[j]);
@@ -166,93 +189,100 @@ pub fn compute_group_element_for_vote<G: Group>(
     G::prod(G::pow(Yi, xi), G::g_pow(if vote { 1 } else { 0 }))
 }
 
-pub fn commit_to<G: Group>(x: G::group_type) -> u32 {
+pub fn commit_to/* <G: Group> */(x: <z_17 as Group>/*G*/::group_type) -> u32 {
     0
 }
 
 /** Commitment before round 2 */
-#[receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam")]
+#[hax::receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam")]
+// #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam"))]
 pub fn commit_to_vote<A: HasActions>(
     ctx: &impl HasReceiveContext,
-    state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> {
-    let params: CastVoteParam = ctx.parameter_cursor().get()?;
-    for zkp in state.zkp_xis {
-        check_valid(zkp);
-        ()
-    }
+    state: OvnContractState/* <G, n> */,
+) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
+    // let params: CastVoteParam = ctx.parameter_cursor().get()?;
+    // for zkp in state.zkp_xis {
+    //     check_valid(zkp);
+    //     ()
+    // }
 
-    let g_pow_xi_yi_vi =
-        compute_group_element_for_vote::<G>(params.i, params.xi, params.vote, state.g_pow_xis);
-    let commit_vi = commit_to::<G>(g_pow_xi_yi_vi);
+    // let g_pow_xi_yi_vi =
+    //     compute_group_element_for_vote/*:: <G> */(params.i, params.xi, params.vote, state.g_pow_xis);
+    // let commit_vi = commit_to/*:: <G> */(g_pow_xi_yi_vi);
 
-    let mut state_ret = state.clone();
-    state_ret.commit_vis[params.i as usize] = commit_vi;
-    Ok((A::accept(), state_ret))
+    // let mut state_ret = state.clone();
+    // state_ret.commit_vis[params.i as usize] = commit_vi;
+    Ok((A::accept(), state/*_ret*/))
 }
 
 /** Cramer, Damgård and Schoenmakers (CDS) technique */
-pub fn ZKP_one_out_of_two<G: Group>(g_pow_vi: G::group_type, vi: bool) -> u32 {
+pub fn ZKP_one_out_of_two/* <G: Group> */(g_pow_vi: <z_17 as Group>/*G*/::group_type, vi: bool) -> u32 {
     32 // TODO
 }
 
 /** Primary function in round 2, also opens commitment */
-#[receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam")]
+#[hax::receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam")]
+// #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam"))]
 pub fn cast_vote<A: HasActions>(
     ctx: &impl HasReceiveContext,
-    state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> {
-    let params: CastVoteParam = ctx.parameter_cursor().get()?;
+    state: OvnContractState/* <G, n> */,
+) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
+    // let params: CastVoteParam = ctx.parameter_cursor().get()?;
 
-    let g_pow_xi_yi_vi =
-        compute_group_element_for_vote::<G>(params.i, params.xi, params.vote, state.g_pow_xis);
-    let zkp_vi = ZKP_one_out_of_two::<G>(g_pow_xi_yi_vi, params.vote);
+    // let g_pow_xi_yi_vi =
+    //     compute_group_element_for_vote/*:: <G> */(params.i, params.xi, params.vote, state.g_pow_xis);
+    // let zkp_vi = ZKP_one_out_of_two/*:: <G> */(g_pow_xi_yi_vi, params.vote);
 
-    let mut state_ret = state.clone();
-    state_ret.g_pow_xi_yi_vis[params.i as usize] = g_pow_xi_yi_vi;
-    state_ret.zkp_vis[params.i as usize] = zkp_vi;
+    // let mut state_ret = state.clone();
 
-    Ok((A::accept(),state_ret))
+    // let mut g_pow_xi_yi_vis_temp = state_ret.g_pow_xi_yi_vis.clone();
+    // g_pow_xi_yi_vis_temp[params.i as usize] = g_pow_xi_yi_vi;
+    // state_ret.g_pow_xi_yi_vis = g_pow_xi_yi_vis_temp;
+
+    // state_ret.zkp_vis[params.i as usize] = zkp_vi;
+
+    Ok((A::accept(),state/*_ret*/))
 }
 
-pub fn check_valid2<G: Group>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
+pub fn check_valid2/* <G: Group> */(g_pow_xi_yi_vi: <z_17 as Group>/*G*/::group_type, zkp: u32) -> bool {
     true
 }
 
-pub fn check_commitment<G: Group>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
+pub fn check_commitment/* <G: Group> */(g_pow_xi_yi_vi: <z_17 as Group>/*G*/::group_type, zkp: u32) -> bool {
     true
 }
 
 pub struct TallyParameter {}
-#[receive(contract = "OVN", name = "tally", parameter = "TallyParameter")]
+#[hax::receive(contract = "OVN", name = "tally", parameter = "TallyParameter")]
+// #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "tally", parameter = "TallyParameter"))]
 /** Anyone can tally the votes */
 pub fn tally_votes<A: HasActions>(
     _: &impl HasReceiveContext,
-    state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> {
-    for i in 0..n {
-        check_valid2::<G>(state.g_pow_xi_yi_vis[i], state.zkp_vis[i]);
-        check_commitment::<G>(state.g_pow_xi_yi_vis[i], state.commit_vis[i]);
-        ()
-    }
+    state: OvnContractState/* <G, n> */,
+) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
+    // for i in 0..n {
+    //     check_valid2/*:: <G> */(state.g_pow_xi_yi_vis[i], state.zkp_vis[i]);
+    //     check_commitment/*:: <G> */(state.g_pow_xi_yi_vis[i], state.commit_vis[i]);
+    //     ()
+    // }
 
-    let mut vote_result = G::one();
-    for g_pow_vote in state.g_pow_xi_yi_vis {
-        vote_result = G::prod(vote_result, g_pow_vote);
-    }
+    // let mut vote_result = G::one();
+    // for g_pow_vote in state.g_pow_xi_yi_vis {
+    //     vote_result = G::prod(vote_result, g_pow_vote);
+    // }
 
-    let mut tally = 0;
-    for i in 0..n as u32 {
-        // Should be while, but is bounded by n anyways!
-        if G::g_pow(i) == vote_result {
-            tally = i;
-        }
-    }
+    // let mut tally = 0;
+    // for i in 0..n as u32 {
+    //     // Should be while, but is bounded by n anyways!
+    //     if G::g_pow(i) == vote_result {
+    //         tally = i;
+    //     }
+    // }
 
-    let mut state_ret = state.clone();
-    state_ret.tally = tally;
+    // let mut state_ret = state.clone();
+    // state_ret.tally = tally;
 
-    Ok((A::accept(), state_ret))
+    Ok((A::accept(), state/*_ret*/))
 }
 
 // #[cfg(test)]

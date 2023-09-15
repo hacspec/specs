@@ -10,9 +10,10 @@ DDH.v
 OVN.v
 
 # Written by hand
-Hacspec_lib.v
-Core.v
-HashMap.v
+# Hacspec_lib.v
+# Core.v
+# HashMap.v
+ConCertLib.v
 
 # Translated
 # Hacspec_ovn_Schnorr_Random_oracle.v

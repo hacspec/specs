@@ -9,6 +9,7 @@ path = "src/ovn_smart.rs"
 
 [dependencies]
 # hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+hax-lib-macros = { path = "../../hacspec-v2/hax-lib-macros/" }
 # hax-lib-macros = { git = "https://github.com/hacspec/hacspec-v2.git" }
 # creusot-contracts = { git = "https://github.com/xldenis/creusot", rev = "1cca2320e262b2ec9d28b3c84cba759c96829898" } # branch = master
 # concordium-contracts-common = { git = "https://github.com/Concordium/concordium-contracts-common", rev = "84ff7db509ca1fbf958b47e5e5903b7662295850" ,  version = "=2.0.0" , default-features = false } # 0cffb859f736ff6726fa38600428a415d800d7b6
@@ -25,3 +26,6 @@ quickcheck_macros = "1"
 [dev-dependencies]
 criterion = "0.4"
 rand = "0.8"
+
+[features]
+hax_compilation = []
