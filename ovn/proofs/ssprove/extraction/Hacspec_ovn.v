@@ -53,16 +53,41 @@ Class t_Group (Self : choice_type) := {
   div_loc : {fset Location} ;
   div : forall {L1 L2 I1 I2}, both L1 I1 (t_group_type) -> both L2 I2 (t_group_type) -> both (L1 :|: L2 :|: div_loc) (I1 :|: I2) (t_group_type) ;
 }.
+Hint Unfold g_pow_loc.
+Hint Unfold pow_loc.
+Hint Unfold one_loc.
+Hint Unfold prod_loc.
+Hint Unfold inv_loc.
+Hint Unfold div_loc.
 
 Definition t_z_17_ : choice_type :=
   'unit.
-Equations Build_t_z_17_ : both(fset []) (fset []) (t_z_17_) :=
+Equations Build_t_z_17_ : both (fset []) (fset []) (t_z_17_) :=
   Build_t_z_17_  :=
-    solve_lift (ret_both ((_) : (t_z_17_))) : both(fset []) (fset []) (t_z_17_).
+    solve_lift (ret_both ((_) : (t_z_17_))) : both (fset []) (fset []) (t_z_17_).
 Fail Next Obligation.
 
 Definition res_loc : Location :=
   (int32 ; 0%nat).
+
+Equations foldi_both
+        {acc: choice_type}
+        {L1 L2 L3 I1 I2 I3}
+        {L I}
+        `{is_true (fsubset L1 L)} `{is_true (fsubset I1 I)}
+        `{is_true (fsubset L2 L)} `{is_true (fsubset I2 I)}
+        `{is_true (fsubset L3 L)} `{is_true (fsubset I3 I)}
+        (lo_hi: both L2 I2 uint_size * both L3 I3 uint_size)
+        (f: both (L2 :|: L3) (I2 :|: I3) uint_size ->
+            both L I acc ->
+            both L I acc)
+        (init: both L1 I1 acc)
+         : both L I (acc) :=
+  foldi_both lo_hi f init :=
+    foldi (fst lo_hi) (snd lo_hi) (@f) (init).
+Solve All Obligations with intros ; solve_ssprove_obligations.
+Fail Next Obligation.
+
 #[global] Program Instance t_z_17__t_Group : t_Group t_z_17_ :=
   let t_group_type := int32 : choice_type in
   let q := fun  {L : {fset Location}} {I : Interface} => solve_lift (ret_both (17 : int32)) : both L I (int32) in
@@ -72,13 +97,13 @@ Definition res_loc : Location :=
   let one := fun  {L : {fset Location}} {I : Interface} => solve_lift (ret_both (1 : int32)) : both L I (int32) in
   let prod := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (int32)) (y : both L2 I2 (int32)) => solve_lift ((x .* y) .% q) : both (L1 :|: L2) (I1 :|: I2) (int32) in
   let inv := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (int32)) => letb res loc(res_loc) := ret_both (0 : int32) in
-  letb res := foldi_both (into_iter (Build_Range (f_start := ret_both (1 : int32)) (f_end := q))) (fun {L I _ _} =>fun i =>
+  letb res := foldi_both (into_iter (Build_t_Range (f_start := ret_both (1 : int32)) (f_end := q))) ((* fun {L I _ _} => *)fun i =>
     ssp (fun res =>
       solve_lift (ifb (g_pow i) =.? x
       then letb res := i in
         res
       else res))) res in
-  solve_lift res : both (L1 :|: fset [res_loc]) I1 (int32) in
+  res : both (L1 :|: fset [res_loc]) I1 (int32) in
   let div := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (int32)) (y : both L2 I2 (int32)) => solve_lift (prod x (inv y)) : both (L1 :|: L2 :|: fset [res_loc]) (I1 :|: I2) (int32) in
   {| t_group_type := (@t_group_type);
   q := (@q);
@@ -94,9 +119,10 @@ Definition res_loc : Location :=
   inv_loc := (fset [res_loc] : {fset Location});
   inv := (@inv);
   div_loc := (fset [res_loc] : {fset Location});
-    div := (@div)|}.
+  div := (@div)|}.
 Solve All Obligations with exact int_eqdec.
 Fail Next Obligation.
+Hint Unfold t_z_17__t_Group.
 
 Notation "'t_G'" := (t_z_17_).
 
@@ -137,7 +163,7 @@ Equations f_tally {L : {fset Location}} {I : Interface} (s : both L I (t_OvnCont
     bind_both s (fun x =>
       solve_lift (ret_both (snd x : int32))) : both L I (int32).
 Fail Next Obligation.
-Equations Build_t_OvnContractState {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {L5 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} {I5 : Interface} {f_g_pow_xis : both L0 I0 (nseq t_group_type 20)} {f_zkp_xis : both L1 I1 (nseq int32 20)} {f_commit_vis : both L2 I2 (nseq int32 20)} {f_g_pow_xi_yi_vis : both L3 I3 (nseq t_group_type 20)} {f_zkp_vis : both L4 I4 (nseq int32 20)} {f_tally : both L5 I5 (int32)} : both(L0:|:L1:|:L2:|:L3:|:L4:|:L5) (I0:|:I1:|:I2:|:I3:|:I4:|:I5) (t_OvnContractState) :=
+Equations Build_t_OvnContractState {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {L5 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} {I5 : Interface} {f_g_pow_xis : both L0 I0 (nseq t_group_type 20)} {f_zkp_xis : both L1 I1 (nseq int32 20)} {f_commit_vis : both L2 I2 (nseq int32 20)} {f_g_pow_xi_yi_vis : both L3 I3 (nseq t_group_type 20)} {f_zkp_vis : both L4 I4 (nseq int32 20)} {f_tally : both L5 I5 (int32)} : both (L0:|:L1:|:L2:|:L3:|:L4:|:L5) (I0:|:I1:|:I2:|:I3:|:I4:|:I5) (t_OvnContractState) :=
   Build_t_OvnContractState  :=
     bind_both f_tally (fun f_tally =>
       bind_both f_zkp_vis (fun f_zkp_vis =>
@@ -145,7 +171,7 @@ Equations Build_t_OvnContractState {L0 : {fset Location}} {L1 : {fset Location}}
           bind_both f_commit_vis (fun f_commit_vis =>
             bind_both f_zkp_xis (fun f_zkp_xis =>
               bind_both f_g_pow_xis (fun f_g_pow_xis =>
-                solve_lift (ret_both ((f_g_pow_xis,f_zkp_xis,f_commit_vis,f_g_pow_xi_yi_vis,f_zkp_vis,f_tally) : (t_OvnContractState))))))))) : both(L0:|:L1:|:L2:|:L3:|:L4:|:L5) (I0:|:I1:|:I2:|:I3:|:I4:|:I5) (t_OvnContractState).
+                solve_lift (ret_both ((f_g_pow_xis,f_zkp_xis,f_commit_vis,f_g_pow_xi_yi_vis,f_zkp_vis,f_tally) : (t_OvnContractState))))))))) : both (L0:|:L1:|:L2:|:L3:|:L4:|:L5) (I0:|:I1:|:I2:|:I3:|:I4:|:I5) (t_OvnContractState).
 Fail Next Obligation.
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_g_pow_xis' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := y) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := f_g_pow_xi_yi_vis x) (f_zkp_vis := f_zkp_vis x) (f_tally := f_tally x)).
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_zkp_xis' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := y) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := f_g_pow_xi_yi_vis x) (f_zkp_vis := f_zkp_vis x) (f_tally := f_tally x)).
@@ -153,15 +179,11 @@ Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_commit_vis' ':=' y ')'" :=
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_g_pow_xi_yi_vis' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := y) (f_zkp_vis := f_zkp_vis x) (f_tally := f_tally x)).
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_zkp_vis' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := f_g_pow_xi_yi_vis x) (f_zkp_vis := y) (f_tally := f_tally x)).
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_tally' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := f_g_pow_xi_yi_vis x) (f_zkp_vis := f_zkp_vis x) (f_tally := y)).
-Definition state_OVN {L : {fset Location}} {I : Interface} (f_g_pow_xis : both L I (nseq t_group_type 20)) (f_zkp_xis : both L I (nseq int32 20)) (f_commit_vis : both L I (nseq int32 20)) (f_g_pow_xi_yi_vis : both L I (nseq t_group_type 20)) (f_zkp_vis : both L I (nseq int32 20)) (f_tally : both L I (int32)) : choice_type :=
-  t_OvnContractState.
 
 Equations init_ovn_contract {L1 : {fset Location}} {I1 : Interface} {T : _} `{ t_Sized (T)} `{ t_HasInitContext (T) ('unit)} (ctx : both L1 I1 (T)) : both L1 I1 (t_Result (t_OvnContractState) (t_Reject)) :=
   init_ovn_contract ctx  :=
-    Result_Ok (solve_lift (Build_OvnContractState (f_g_pow_xis := repeat one (ret_both (20 : uint_size))) (f_zkp_xis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_commit_vis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_g_pow_xi_yi_vis := repeat one (ret_both (20 : uint_size))) (f_zkp_vis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_tally := ret_both (0 : int32)))) : both L1 I1 (t_Result (t_OvnContractState) (t_Reject)).
+    Result_Ok (solve_lift (Build_t_OvnContractState (f_g_pow_xis := repeat one (ret_both (20 : uint_size))) (f_zkp_xis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_commit_vis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_g_pow_xi_yi_vis := repeat one (ret_both (20 : uint_size))) (f_zkp_vis := repeat (ret_both (0 : int32)) (ret_both (20 : uint_size))) (f_tally := ret_both (0 : int32)))) : both L1 I1 (t_Result (t_OvnContractState) (t_Reject)).
 Fail Next Obligation.
-Definition init_OVN : choice_type :=
-  st.
 
 Equations select_private_voting_key {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (int32)) : both L1 I1 (int32) :=
   select_private_voting_key random  :=
@@ -175,59 +197,57 @@ Fail Next Obligation.
 
 Definition t_RegisterParam : choice_type :=
   (int32 × int32).
-Equations f_i {L : {fset Location}} {I : Interface} (s : both L I (t_RegisterParam)) : both L I (int32) :=
-  f_i s  :=
+Equations f_rp_i {L : {fset Location}} {I : Interface} (s : both L I (t_RegisterParam)) : both L I (int32) :=
+  f_rp_i s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (fst x : int32))) : both L I (int32).
 Fail Next Obligation.
-Equations f_xi {L : {fset Location}} {I : Interface} (s : both L I (t_RegisterParam)) : both L I (int32) :=
-  f_xi s  :=
+Equations f_rp_xi {L : {fset Location}} {I : Interface} (s : both L I (t_RegisterParam)) : both L I (int32) :=
+  f_rp_xi s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd x : int32))) : both L I (int32).
 Fail Next Obligation.
-Equations Build_t_RegisterParam {L0 : {fset Location}} {L1 : {fset Location}} {I0 : Interface} {I1 : Interface} {f_i : both L0 I0 (int32)} {f_xi : both L1 I1 (int32)} : both(L0:|:L1) (I0:|:I1) (t_RegisterParam) :=
+Equations Build_t_RegisterParam {L0 : {fset Location}} {L1 : {fset Location}} {I0 : Interface} {I1 : Interface} {f_rp_i : both L0 I0 (int32)} {f_rp_xi : both L1 I1 (int32)} : both (L0:|:L1) (I0:|:I1) (t_RegisterParam) :=
   Build_t_RegisterParam  :=
-    bind_both f_xi (fun f_xi =>
-      bind_both f_i (fun f_i =>
-        solve_lift (ret_both ((f_i,f_xi) : (t_RegisterParam))))) : both(L0:|:L1) (I0:|:I1) (t_RegisterParam).
+    bind_both f_rp_xi (fun f_rp_xi =>
+      bind_both f_rp_i (fun f_rp_i =>
+        solve_lift (ret_both ((f_rp_i,f_rp_xi) : (t_RegisterParam))))) : both (L0:|:L1) (I0:|:I1) (t_RegisterParam).
 Fail Next Obligation.
-Notation "'Build_t_RegisterParam' '[' x ']' '(' 'f_i' ':=' y ')'" := (Build_t_RegisterParam (f_i := y) (f_xi := f_xi x)).
-Notation "'Build_t_RegisterParam' '[' x ']' '(' 'f_xi' ':=' y ')'" := (Build_t_RegisterParam (f_i := f_i x) (f_xi := y)).
+Notation "'Build_t_RegisterParam' '[' x ']' '(' 'f_rp_i' ':=' y ')'" := (Build_t_RegisterParam (f_rp_i := y) (f_rp_xi := f_rp_xi x)).
+Notation "'Build_t_RegisterParam' '[' x ']' '(' 'f_rp_xi' ':=' y ')'" := (Build_t_RegisterParam (f_rp_i := f_rp_i x) (f_rp_xi := y)).
 
 Equations register_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {A : _} {T : _} `{ t_Sized (A)} `{ t_Sized (T)} `{ t_HasActions (A)} `{ t_HasReceiveContext (T) ('unit)} `{ t_Sized (A)} `{ t_Sized (T)} `{ t_HasActions (A)} `{ t_HasReceiveContext (T) ('unit)} (ctx : both L1 I1 (T)) (state : both L2 I2 (t_OvnContractState)) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)) :=
   register_vote ctx state  :=
     Result_Ok (solve_lift (prod_b (accept,state))) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)).
 Fail Next Obligation.
-Definition receive_OVN_register (RegisterParam : _) (st : state_OVN) : choice_type :=
-  register_vote st.
 
 Definition t_CastVoteParam : choice_type :=
   (int32 × int32 × 'bool).
-Equations f_i {L : {fset Location}} {I : Interface} (s : both L I (t_CastVoteParam)) : both L I (int32) :=
-  f_i s  :=
+Equations f_cvp_i {L : {fset Location}} {I : Interface} (s : both L I (t_CastVoteParam)) : both L I (int32) :=
+  f_cvp_i s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (fst (fst x) : int32))) : both L I (int32).
 Fail Next Obligation.
-Equations f_xi {L : {fset Location}} {I : Interface} (s : both L I (t_CastVoteParam)) : both L I (int32) :=
-  f_xi s  :=
+Equations f_cvp_xi {L : {fset Location}} {I : Interface} (s : both L I (t_CastVoteParam)) : both L I (int32) :=
+  f_cvp_xi s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst x) : int32))) : both L I (int32).
 Fail Next Obligation.
-Equations f_vote {L : {fset Location}} {I : Interface} (s : both L I (t_CastVoteParam)) : both L I ('bool) :=
-  f_vote s  :=
+Equations f_cvp_vote {L : {fset Location}} {I : Interface} (s : both L I (t_CastVoteParam)) : both L I ('bool) :=
+  f_cvp_vote s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd x : 'bool))) : both L I ('bool).
 Fail Next Obligation.
-Equations Build_t_CastVoteParam {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {f_i : both L0 I0 (int32)} {f_xi : both L1 I1 (int32)} {f_vote : both L2 I2 ('bool)} : both(L0:|:L1:|:L2) (I0:|:I1:|:I2) (t_CastVoteParam) :=
+Equations Build_t_CastVoteParam {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {f_cvp_i : both L0 I0 (int32)} {f_cvp_xi : both L1 I1 (int32)} {f_cvp_vote : both L2 I2 ('bool)} : both (L0:|:L1:|:L2) (I0:|:I1:|:I2) (t_CastVoteParam) :=
   Build_t_CastVoteParam  :=
-    bind_both f_vote (fun f_vote =>
-      bind_both f_xi (fun f_xi =>
-        bind_both f_i (fun f_i =>
-          solve_lift (ret_both ((f_i,f_xi,f_vote) : (t_CastVoteParam)))))) : both(L0:|:L1:|:L2) (I0:|:I1:|:I2) (t_CastVoteParam).
+    bind_both f_cvp_vote (fun f_cvp_vote =>
+      bind_both f_cvp_xi (fun f_cvp_xi =>
+        bind_both f_cvp_i (fun f_cvp_i =>
+          solve_lift (ret_both ((f_cvp_i,f_cvp_xi,f_cvp_vote) : (t_CastVoteParam)))))) : both (L0:|:L1:|:L2) (I0:|:I1:|:I2) (t_CastVoteParam).
 Fail Next Obligation.
-Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_i' ':=' y ')'" := (Build_t_CastVoteParam (f_i := y) (f_xi := f_xi x) (f_vote := f_vote x)).
-Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_xi' ':=' y ')'" := (Build_t_CastVoteParam (f_i := f_i x) (f_xi := y) (f_vote := f_vote x)).
-Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_vote' ':=' y ')'" := (Build_t_CastVoteParam (f_i := f_i x) (f_xi := f_xi x) (f_vote := y)).
+Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_i' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := y) (f_cvp_xi := f_cvp_xi x) (f_cvp_vote := f_cvp_vote x)).
+Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_xi' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := f_cvp_i x) (f_cvp_xi := y) (f_cvp_vote := f_cvp_vote x)).
+Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_vote' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := f_cvp_i x) (f_cvp_xi := f_cvp_xi x) (f_cvp_vote := y)).
 
 Equations check_valid {L1 : {fset Location}} {I1 : Interface} (zkp : both L1 I1 (int32)) : both L1 I1 ('bool) :=
   check_valid zkp  :=
@@ -238,20 +258,38 @@ Definition prod2_loc : Location :=
   (int32 ; 2%nat).
 Definition prod1_loc : Location :=
   (int32 ; 1%nat).
+
+Equations foldi_both_
+        {acc: choice_type}
+        {L1 L2 L3 I1 I2 I3}
+        {L I}
+        `{is_true (fsubset (L1 :|: L2 :|: L3) L)} `{is_true (fsubset (I1 :|: I2 :|: I3) I)}
+        (lo_hi: both L2 I2 uint_size * both L3 I3 uint_size)
+        (f: both (L2 :|: L3) (I2 :|: I3) uint_size ->
+            both L I acc ->
+            both L I acc)
+        (init: both L1 I1 acc)
+         : both L I (acc) :=
+  foldi_both_ lo_hi f init :=
+    foldi (fst lo_hi) (snd lo_hi) (@f) (init).
+Solve All Obligations with intros ; (solve_ssprove_obligations || solve_fsubset_trans).
+Solve All Obligations with solve_ssprove_obligations ; solve_fsubset_trans.
+Fail Next Obligation.
+
 Equations compute_group_element_for_vote {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} (i : both L1 I1 (int32)) (xi : both L2 I2 (int32)) (vote : both L3 I3 ('bool)) (xis : both L4 I4 (nseq int32 20)) : both (L1 :|: L2 :|: L3 :|: L4 :|: fset [prod2_loc;prod1_loc;res_loc]) (I1 :|: I2 :|: I3 :|: I4) (int32) :=
   compute_group_element_for_vote i xi vote xis  :=
-    letb prod1 loc(prod1_loc) := one in
-    letb prod1 := foldi_both (into_iter (Build_Range (f_start := ret_both (0 : uint_size)) (f_end := cast_int (WS2 := _) (i .- (ret_both (1 : int32)))))) (fun {L I _ _} =>fun j =>
+    (letb prod1 loc(prod1_loc) := one in
+    letb prod1 := foldi_both_ (into_iter (Build_t_Range (f_start := ret_both (0 : uint_size)) (f_end := cast_int (WS2 := _) (i .- (ret_both (1 : int32)))))) ((* fun {L I _ _} => *)fun j =>
       ssp (fun prod1 =>
-        solve_lift (prod prod1 (xis.a[j])))) prod1 in
+             solve_lift (prod prod1 (xis.a[j])) : both (L1 :|: L4 :|: fset [prod1_loc]) (I1 :|: I4) _)) prod1 in
     letb prod2 loc(prod2_loc) := one in
-    letb prod2 := foldi_both (into_iter (Build_Range (f_start := cast_int (WS2 := _) (i .+ (ret_both (1 : int32)))) (f_end := n))) (fun {L I _ _} =>fun j =>
+    letb prod2 := foldi_both (into_iter (Build_t_Range (f_start := cast_int (WS2 := _) (i .+ (ret_both (1 : int32)))) (f_end := n))) ((* fun {L I _ _} => *)fun j =>
       ssp (fun prod2 =>
-        solve_lift (prod prod2 (xis.a[j])))) prod2 in
+        solve_lift (prod prod2 (xis.a[j])) : both (L1 :|: L4 :|: fset [prod2_loc]) (I1 :|: I4) _ )) prod2 in
     letb Yi := div prod1 prod2 in
     solve_lift (prod (pow Yi xi) (g_pow (ifb vote
     then ret_both (1 : int32)
-    else ret_both (0 : int32)))) : both (L1 :|: L2 :|: L3 :|: L4 :|: fset [prod2_loc;prod1_loc;res_loc]) (I1 :|: I2 :|: I3 :|: I4) (int32).
+                                         else ret_both (0 : int32)))) : both (L1 :|: L2 :|: L3 :|: L4 :|: fset [prod2_loc;prod1_loc;res_loc]) (I1 :|: I2 :|: I3 :|: I4) (int32)).
 Fail Next Obligation.
 
 Equations commit_to {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (int32)) : both L1 I1 (int32) :=
@@ -259,24 +297,20 @@ Equations commit_to {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (int
     solve_lift (ret_both (0 : int32)) : both L1 I1 (int32).
 Fail Next Obligation.
 
-Equations commit_to_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {A : _} {impl HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized (impl HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext (impl HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized (impl HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext (impl HasReceiveContext) ('unit)} (ctx : both L1 I1 (impl HasReceiveContext)) (state : both L2 I2 (t_OvnContractState)) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)) :=
+Equations commit_to_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {A : _} {(* impl *) HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} (ctx : both L1 I1 ((* impl *) HasReceiveContext)) (state : both L2 I2 (t_OvnContractState)) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)) :=
   commit_to_vote ctx state  :=
     Result_Ok (solve_lift (prod_b (accept,state))) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)).
 Fail Next Obligation.
-Definition receive_OVN_commit_to_vote (CastVoteParam : _) (st : state_OVN) : choice_type :=
-  commit_to_vote st.
 
 Equations v_ZKP_one_out_of_two {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (g_pow_vi : both L1 I1 (int32)) (vi : both L2 I2 ('bool)) : both (L1 :|: L2) (I1 :|: I2) (int32) :=
   v_ZKP_one_out_of_two g_pow_vi vi  :=
     solve_lift (ret_both (32 : int32)) : both (L1 :|: L2) (I1 :|: I2) (int32).
 Fail Next Obligation.
 
-Equations cast_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {A : _} {impl HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized (impl HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext (impl HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized (impl HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext (impl HasReceiveContext) ('unit)} (ctx : both L1 I1 (impl HasReceiveContext)) (state : both L2 I2 (t_OvnContractState)) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)) :=
+Equations cast_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {A : _} {(* impl *) HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} (ctx : both L1 I1 ((* impl *) HasReceiveContext)) (state : both L2 I2 (t_OvnContractState)) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)) :=
   cast_vote ctx state  :=
     Result_Ok (solve_lift (prod_b (accept,state))) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)).
 Fail Next Obligation.
-Definition receive_OVN_cast_vote (CastVoteParam : _) (st : state_OVN) : choice_type :=
-  cast_vote st.
 
 Equations check_valid2 {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (g_pow_xi_yi_vi : both L1 I1 (int32)) (zkp : both L2 I2 (int32)) : both (L1 :|: L2) (I1 :|: I2) ('bool) :=
   check_valid2 g_pow_xi_yi_vi zkp  :=
@@ -290,19 +324,71 @@ Fail Next Obligation.
 
 Definition t_TallyParameter : choice_type :=
   'unit.
-Equations Build_t_TallyParameter : both(fset []) (fset []) (t_TallyParameter) :=
+Equations Build_t_TallyParameter : both (fset []) (fset []) (t_TallyParameter) :=
   Build_t_TallyParameter  :=
-    solve_lift (ret_both ((_) : (t_TallyParameter))) : both(fset []) (fset []) (t_TallyParameter).
+    solve_lift (ret_both ((_) : (t_TallyParameter))) : both (fset []) (fset []) (t_TallyParameter).
 Fail Next Obligation.
 
-Equations tally_votes {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {A : _} {impl HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized (impl HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext (impl HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized (impl HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext (impl HasReceiveContext) ('unit)} (_ : both L1 I1 (impl HasReceiveContext)) (state : both L2 I2 (t_OvnContractState)) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)) :=
+Equations tally_votes {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {A : _} {(* impl *) HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} (_ : both L1 I1 ((* impl *) HasReceiveContext)) (state : both L2 I2 (t_OvnContractState)) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)) :=
   tally_votes _ state  :=
     Result_Ok (solve_lift (prod_b (accept,state))) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)).
 Fail Next Obligation.
-Definition receive_OVN_tally (TallyParameter : _) (st : state_OVN) : choice_type :=
-  tally_votes st.
-Inductive Msg: Type :=
-| register : Msg
-| commit_to_vote : Msg
-| cast_vote : Msg
-| tally : Msg.
+
+Definition state_OVN : choice_type :=
+  t_OvnContractState.
+
+From ConCert.Utils Require Import Extras.
+From ConCert.Utils Require Import Automation.
+From ConCert.Execution Require Import Serializable.
+From ConCert.Execution Require Import Blockchain.
+From ConCert.Execution Require Import ContractCommon.
+Require Import ConCertLib.
+
+Definition init_OVN (chain : Chain) (ctx : ContractCallContext) (st : state_OVN) : ResultMonad.result (state_OVN) (state_OVN) :=
+  ResultMonad.Ok st.
+
+Instance sized_RegisterParam : t_Sized t_RegisterParam := { Sized := id }.
+Instance has_receive_context_RegisterParam : t_HasReceiveContext t_RegisterParam 'unit.
+Admitted.
+
+
+Equations receive_OVN_register {L1 L2 I1 I2} {A : _} {T : _} `{ t_Sized (A)} `{ t_Sized (T)} `{ t_HasActions (A)} `{ t_HasReceiveContext (T) ('unit)} `{ t_Sized (A)} `{ t_Sized (T)} `{ t_HasActions (A)} `{ t_HasReceiveContext (T) ('unit)} (RegisterParam : both L1 I1 t_RegisterParam) (st : both L2 I2 state_OVN) : both (L1 :|: L2) (I1 :|: I2) (t_Result ((A × t_OvnContractState)) (t_ParseError)) :=
+  receive_OVN_register RegisterParam st :=
+  register_vote RegisterParam (st).
+
+(* Definition receive_OVN_commit_to_vote (CastVoteParam : _) (st : state_OVN) : choice_type := *)
+(*   commit_to_vote CastVoteParam st. *)
+
+(* Definition receive_OVN_cast_vote (CastVoteParam : _) (st : state_OVN) : choice_type := *)
+(*   cast_vote st. *)
+
+(* Definition receive_OVN_tally (TallyParameter : _) (st : state_OVN) : choice_type := *)
+(*   tally_votes st. *)
+
+Inductive Msg_OVN: Type :=
+| msg_register : Msg_OVN
+| msg_commit_to_vote : Msg_OVN
+| msg_cast_vote : Msg_OVN
+| msg_tally : Msg_OVN.
+Definition receive_OVN (chain : Chain) (ctx : ContractCallContext) (st : state_OVN) (msg : Datatypes.option Msg_OVN) : ResultMonad.result (state_OVN * list ActionBody) state_OVN :=
+  match msg with
+  | Some msg_register =>
+    ResultMonad.Ok (st, [])
+  | Some msg_commit_to_vote =>
+    ResultMonad.Ok (st, [])
+  | Some msg_cast_vote =>
+    ResultMonad.Ok (st, [])
+  | Some msg_tally =>
+    ResultMonad.Ok (st, [])
+  | _ =>
+    ResultMonad.Err st
+  end.
+
+Instance serialize_state_OVN : Serializable state_OVN.
+Admitted.
+
+Instance serialize_msg_OVN : Serializable Msg_OVN.
+Admitted.
+
+Definition contract_OVN : Contract state_OVN Msg_OVN state_OVN state_OVN :=
+  build_contract init_OVN receive_OVN.

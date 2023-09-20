@@ -133,8 +133,8 @@ pub fn ZKP/* <G: Group> */(g_pow_xi: <z_17 as Group>/*G*/::group_type, xi: u32) 
 
 #[derive(Serialize, SchemaType)]
 pub struct RegisterParam {
-    i: u32,
-    xi: u32,
+    rp_i: u32,
+    rp_xi: u32,
 }
 
 /** Primary function in round 1 */
@@ -149,21 +149,21 @@ pub fn register_vote<A: HasActions, T: HasReceiveContext>(
     state: OvnContractState/* <G, n> */,
 ) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
     // let params : RegisterParam = ctx.parameter_cursor().get()?; // Result<RegisterParam, ParseError>?
-    // let g_pow_xi = G::g_pow(params.xi);
-    // let zkp_xi = ZKP/* ::<G> */(g_pow_xi, params.xi);
+    // let g_pow_xi = G::g_pow(params.rp_xi);
+    // let zkp_xi = ZKP/* ::<G> */(g_pow_xi, params.rp_xi);
 
     // let mut state_ret = state.clone();
-    // state_ret.g_pow_xis[params.i as usize] = g_pow_xi;
-    // state_ret.zkp_xis[params.i as usize] = zkp_xi;
+    // state_ret.g_pow_xis[params.rp_i as usize] = g_pow_xi;
+    // state_ret.zkp_xis[params.rp_i as usize] = zkp_xi;
 
     Ok((A::accept(), state/*_ret*/))
 }
 
 #[derive(Serialize, SchemaType)]
 pub struct CastVoteParam {
-    i: u32,
-    xi: u32,
-    vote: bool,
+    cvp_i: u32,
+    cvp_xi: u32,
+    cvp_vote: bool,
 }
 
 pub fn check_valid(zkp: u32) -> bool {
@@ -207,11 +207,11 @@ pub fn commit_to_vote<A: HasActions>(
     // }
 
     // let g_pow_xi_yi_vi =
-    //     compute_group_element_for_vote/*:: <G> */(params.i, params.xi, params.vote, state.g_pow_xis);
+    //     compute_group_element_for_vote/*:: <G> */(params.cvp_i, params.cvp_xi, params.cvp_vote, state.g_pow_xis);
     // let commit_vi = commit_to/*:: <G> */(g_pow_xi_yi_vi);
 
     // let mut state_ret = state.clone();
-    // state_ret.commit_vis[params.i as usize] = commit_vi;
+    // state_ret.commit_vis[params.cvp_i as usize] = commit_vi;
     Ok((A::accept(), state/*_ret*/))
 }
 
@@ -230,16 +230,16 @@ pub fn cast_vote<A: HasActions>(
     // let params: CastVoteParam = ctx.parameter_cursor().get()?;
 
     // let g_pow_xi_yi_vi =
-    //     compute_group_element_for_vote/*:: <G> */(params.i, params.xi, params.vote, state.g_pow_xis);
-    // let zkp_vi = ZKP_one_out_of_two/*:: <G> */(g_pow_xi_yi_vi, params.vote);
+    //     compute_group_element_for_vote/*:: <G> */(params.cvp_i, params.cvp_xi, params.cvp_vote, state.g_pow_xis);
+    // let zkp_vi = ZKP_one_out_of_two/*:: <G> */(g_pow_xi_yi_vi, params.cvp_vote);
 
     // let mut state_ret = state.clone();
 
     // let mut g_pow_xi_yi_vis_temp = state_ret.g_pow_xi_yi_vis.clone();
-    // g_pow_xi_yi_vis_temp[params.i as usize] = g_pow_xi_yi_vi;
+    // g_pow_xi_yi_vis_temp[params.cvp_i as usize] = g_pow_xi_yi_vi;
     // state_ret.g_pow_xi_yi_vis = g_pow_xi_yi_vis_temp;
 
-    // state_ret.zkp_vis[params.i as usize] = zkp_vi;
+    // state_ret.zkp_vis[params.cvp_i as usize] = zkp_vi;
 
     Ok((A::accept(),state/*_ret*/))
 }

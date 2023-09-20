@@ -201,7 +201,7 @@ fn init_worker(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
 	contract_function_optional_args_tokens(&attrs, &amount_ident, &mut required_args);
 
     let mut out = if contains_attribute(attrs.iter(), "low_level") {
-	required_args.push("state: &mut ContractState");
+	required_args.push("state: ContractState");
 	quote! {
 	    #[export_name = #wasm_export_fn_name]
 	    pub extern "C" fn #rust_export_fn_name(#amount_ident: hacspec_concordium::Amount) -> i32 {
@@ -418,7 +418,7 @@ fn receive_worker(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStre
 	contract_function_optional_args_tokens(&attrs, &amount_ident, &mut required_args);
 
     let mut out = if contains_attribute(&attrs, "low_level") {
-	required_args.push("state: &mut ContractState");
+	required_args.push("state: ContractState");
 	quote! {
 	    #[export_name = #wasm_export_fn_name]
 	    pub extern "C" fn #rust_export_fn_name(#amount_ident: hacspec_concordium::Amount) -> i32 {
@@ -426,9 +426,10 @@ fn receive_worker(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStre
 		#setup_fn_optional_args
 		let ctx = ExternContext::<ReceiveContextExtern>::open(());
 		let mut state = ContractState::open(());
-		let res: Result<Action, _> = #fn_name(&ctx, #(#fn_optional_args, )* &mut state);
+		let res: Result<(Action, _), _> = #fn_name(&ctx, #(#fn_optional_args, )* state);
 		match res {
-		    Ok(act) => {
+		    Ok((act, state_res)) => {
+                        state = state_res;
 			act.tag() as i32
 		    }
 		    Err(reject) => {
@@ -443,7 +444,7 @@ fn receive_worker(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStre
 	    }
 	}
     } else {
-	required_args.push("state: &mut MyState");
+	required_args.push("state: MyState");
 
 	quote! {
 	    #[export_name = #wasm_export_fn_name]
@@ -453,9 +454,10 @@ fn receive_worker(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStre
 		let ctx = ExternContext::<ReceiveContextExtern>::open(());
 		let mut state_bytes = ContractState::open(());
 		if let Ok(mut state) = (&mut state_bytes).get() {
-		    let res: Result<Action, _> = #fn_name(&ctx, #(#fn_optional_args, )* &mut state);
+		    let res : Result<(Action, _), _> = #fn_name(&ctx, #(#fn_optional_args, )* state);
 		    match res {
-			Ok(act) => {
+			Ok((act, state_res)) => {
+                            state = state_res;
 			    let res = state_bytes
 				.seek(SeekFrom::Start(0))
 				.and_then(|_| state.serial(&mut state_bytes));
@@ -529,7 +531,7 @@ fn contract_function_optional_args_tokens<'a, I: Copy + IntoIterator<Item = &'a 
     };
 
     if contains_attribute(attrs, "enable_logger") {
-	required_args.push("logger: &mut impl HasLogger");
+	required_args.push("logger: impl HasLogger");
 	let logger_ident = format_ident!("logger");
 	setup_fn_args.extend(quote!(let mut #logger_ident = hacspec_concordium::Logger::init();));
 	fn_args.push(quote!(&mut #logger_ident));

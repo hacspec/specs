@@ -24,6 +24,6 @@ members = [
     # "halo2",
     # "weierstrass-curves",
     "ovn",
-    # "concordium",
-    # "concordium-derive",
+    "concordium",
+    "concordium-derive",
 ]

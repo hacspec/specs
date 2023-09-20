@@ -1,11 +1,9 @@
-#[cfg(not(feature = "hacspec"))]
-use crate::*;
-
 // //! This module implements traits for the contract interface.
 // //! This allows setting-up mock objects for testing individual
 // //! contract invocations.
 
-#[cfg(not(feature = "hacspec"))]
+use crate::*;
+
 /// Objects which can access parameters to contracts.
 ///
 /// This trait has a Read supertrait which means that structured parameters can
@@ -18,14 +16,13 @@ pub trait HasParameter: Read {
     fn size(&self) -> u32;
 }
 
-#[cfg(not(feature = "hacspec"))]
 /// Objects which can access chain metadata.
 pub trait HasChainMetadata {
     /// Get time in milliseconds at the beginning of this block.
     fn slot_time(&self) -> SlotTime;
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// A type which has access to a policy of a credential.
 /// Since policies can be large this is deliberately written in a relatively
 /// low-level style to enable efficient traversal of all the attributes without
@@ -50,10 +47,10 @@ pub trait HasPolicy {
     /// an Iterator for this type is that with the supplied buffer we can
     /// iterate through the elements more efficiently, without any allocations,
     /// the consumer being responsible for allocating the buffer.
-    fn next_item(&mut self, buf: &mut [u8; 31]) -> Option<(AttributeTag, u8)>;
+    fn next_item(self, buf: [u8; 31]) -> (Option<(AttributeTag, u8)>, [u8; 31], Self);
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// Common data accessible to both init and receive methods.
 pub trait HasCommonData {
     type PolicyType: HasPolicy;
@@ -74,7 +71,7 @@ pub trait HasCommonData {
     fn parameter_cursor(&self) -> Self::ParamType;
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// Types which can act as init contexts.
 pub trait HasInitContext<Error: Default = ()>: HasCommonData {
     /// Data needed to open the context.
@@ -85,7 +82,7 @@ pub trait HasInitContext<Error: Default = ()>: HasCommonData {
     fn init_origin(&self) -> AccountAddress;
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// Types which can act as receive contexts.
 pub trait HasReceiveContext<Error: Default = ()>: HasCommonData {
     type ReceiveData;
@@ -106,7 +103,7 @@ pub trait HasReceiveContext<Error: Default = ()>: HasCommonData {
     fn owner(&self) -> AccountAddress;
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// A type that can serve as the contract state type.
 pub trait HasContractState<Error: Default = ()>
 where
@@ -124,15 +121,15 @@ where
     /// Truncate the state to the given size. If the given size is more than the
     /// current state size this operation does nothing. The new position is at
     /// most at the end of the stream.
-    fn truncate(&mut self, new_size: u32);
+    fn truncate(&self, new_size: u32) -> Self;
 
     /// Make sure that the memory size is at least that many bytes in size.
     /// Returns true iff this was successful. The new bytes are initialized as
     /// 0.
-    fn reserve(&mut self, len: u32) -> bool;
+    fn reserve(&self, len: u32) -> (bool, Self);
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// Objects which can serve as loggers.
 ///
 /// Logging functionality can be used by smart contracts to record events that
@@ -145,20 +142,21 @@ pub trait HasLogger {
 
     /// Log the given slice as-is. If logging is not successful an error will be
     /// returned.
-    fn log_raw(&mut self, event: &[u8]) -> Result<(), LogError>;
+    fn log_raw(&self, event: &[u8]) -> (Result<(), LogError>, Self);
 
-    #[inline(always)]
+    // #[inline(always)]
     /// Log a serializable event by serializing it with a supplied serializer.
-    fn log<S: Serial>(&mut self, event: &S) -> Result<(), LogError> {
-        let mut out = Vec::new();
-        if event.serial(&mut out).is_err() {
-            trap(); // should not happen
-        }
-        self.log_raw(&out)
-    }
+    fn log<S: Serial>(&self, event: &S) -> (Result<(), LogError>, Self);
+    // {
+    //     let mut out = Vec::new();
+    //     if event.serial(&mut out).is_err() {
+    //         trap(); // should not happen
+    //     }
+    //     self.log_raw(&out)
+    // }
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// An object that can serve to construct actions.
 ///
 /// The actions that a smart contract can produce as a
@@ -187,7 +185,7 @@ pub trait HasActions {
     fn or_else(self, el: Self) -> Self;
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// Add optimized unwrap behaviour that aborts the process instead of
 /// panicking.
 pub trait UnwrapAbort {
@@ -202,7 +200,7 @@ pub trait UnwrapAbort {
     fn unwrap_abort(self) -> Self::Unwrap;
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// Analogue of the `expect` methods on types such as [Option](https://doc.rust-lang.org/std/option/enum.Option.html),
 /// but useful in a Wasm setting.
 pub trait ExpectReport {
@@ -212,7 +210,7 @@ pub trait ExpectReport {
     fn expect_report(self, msg: &str) -> Self::Unwrap;
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// Analogue of the `expect_err` methods on [Result](https://doc.rust-lang.org/std/result/enum.Result.html),
 /// but useful in a Wasm setting.
 pub trait ExpectErrReport {
@@ -222,7 +220,7 @@ pub trait ExpectErrReport {
     fn expect_err_report(self, msg: &str) -> Self::Unwrap;
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// Analogue of the `expect_none` methods on [Option](https://doc.rust-lang.org/std/option/enum.Option.html),
 /// but useful in a Wasm setting.
 pub trait ExpectNoneReport {
@@ -231,7 +229,7 @@ pub trait ExpectNoneReport {
     fn expect_none_report(self, msg: &str);
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// The `SerialCtx` trait provides a means of writing structures into byte-sinks
 /// (`Write`) using contextual information.
 /// The contextual information is:
@@ -248,11 +246,11 @@ pub trait SerialCtx {
     fn serial_ctx<W: Write>(
         &self,
         size_length: schema::SizeLength,
-        out: &mut W,
-    ) -> Result<(), W::Err>;
+        out: &W,
+    ) -> (Result<(), W::Err>, W);
 }
 
-#[cfg(not(feature = "hacspec"))]
+
 /// The `DeserialCtx` trait provides a means of reading structures from
 /// byte-sources (`Read`) using contextual information.
 /// The contextual information is:
@@ -267,6 +265,6 @@ pub trait DeserialCtx: Sized {
     fn deserial_ctx<R: Read>(
         size_length: schema::SizeLength,
         ensure_ordered: bool,
-        source: &mut R,
-    ) -> ParseResult<Self>;
+        source: &R,
+    ) -> (ParseResult<Self>, R);
 }

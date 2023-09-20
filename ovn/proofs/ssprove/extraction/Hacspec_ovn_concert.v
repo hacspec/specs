@@ -96,7 +96,7 @@ Definition res_loc : Location :=
   div_loc := (fset [res_loc] : {fset Location});
   div := (@div)|}.
 Solve All Obligations with exact int_eqdec.
-Fail Next Obligation.
+Fail Next Obligation. 
 
 Notation "'t_G'" := (t_z_17_).
 
@@ -166,59 +166,44 @@ From ConCert.Utils Require Import Automation.
 From ConCert.Execution Require Import Serializable.
 From ConCert.Execution Require Import Blockchain.
 From ConCert.Execution Require Import ContractCommon.
+Require Import ConCertLib.
+
+Instance int_default {WS} : Default (int WS) := {| default := 0 |}.
+Instance nseq_default {A : choice_type} {len} `{Default A} : Default (nseq_ A len) := {|
+    default := eq_rect (Datatypes.length (List.repeat default len))
+     (fun n : nat => nseq_ A n) (Hacspec_Lib_Pre.array_from_list (List.repeat default len)) len (List.repeat_length default len)
+  |}.
+Program Instance both_default {A : choice_type} `{Default A} : Default (both (fset []) (fset []) A) := {|
+    default := ret_both default
+  |}.
+Solve All Obligations with solve_ssprove_obligations.
+Fail Next Obligation.
 
 Require Import ConCertLib.
 (* Definition Setup :=  *)
-Definition init_OVN (chain : Chain) (ctx : ContractCallContext) (setup : unit) : ResultMonad.result state_OVN state_OVN.
-Proof.
-  pose ctx.(ctx_from).
-  pose ctx.(ctx_origin).
-  pose (repr U32 ctx.(ctx_amount)).
-  
-  pose ((ctx.(ctx_from), ctx.(ctx_origin), repr ctx.(ctx_amount), 0 (* TODO *))).
-  apply ResultMonad.Ok.
-  eapply Build_t_OvnContractState.
-  Unshelve.
-  all: solve_ssprove_obligations.
-  Chain ->
-  ContractCallContext ->
-  state_OVN -> ResultMonad.result state_OVN state_OVN
-(*   st. *)
+Definition init_OVN (chain : Chain) (ctx : ContractCallContext) (st : state_OVN) : ResultMonad.result state_OVN state_OVN :=
+  ResultMonad.Ok st.
 
-Inductive Msg: Type :=
-| register : Msg
-| commit_to_vote : Msg
-| cast_vote : Msg
-| tally : Msg.
+Inductive OVN_Msg: Type :=
+| register : OVN_Msg
+| commit_to_vote : OVN_Msg
+| cast_vote : OVN_Msg
+| tally : OVN_Msg.
 
-Print ChainBase.
-Check @Contract.
-(* Setup Msg State Error *)
-(* Serializable Setup -> Serializable Msg -> Serializable State -> Serializable Error *)
-Check build_contract.
+Definition OVN_receive (chain : Chain) (ctx : ContractCallContext) (state  : state_OVN) (msg : Datatypes.option OVN_Msg) : ResultMonad.result (state_OVN * list ActionBody) state_OVN :=
+  match msg with
+  | Some register => ResultMonad.Ok (state, [])
+  | Some v => ResultMonad.Ok (state, [])
+  | None => ResultMonad.Err state
+  end.
 
-(* Instance BaseTypes : ChainBase := {| *)
-(*     Address := nseq int8 (usize 32); *)
-(*     address_eqb a b := a =.? b ; *)
-(*     address_eqb_spec a b := _ ;(* Bool.iff_reflect (a = b) (a array_eq b) (symmetry (eqb_leibniz a b)); *) *)
-(*     (* address_eqdec x y := (EqDecIsDecidable x y); *) *)
-(*     address_countable := nseq_countable _; *)
-(*     address_serializable := nseq_serializable _; *)
-(*                                    address_is_contract := (fun x => Nat.even (nat_from_be_bytes x)); |}. *)
-
-Instance serializeable_msg : Serializable Msg.
+Instance serializeable_msg : Serializable OVN_Msg.
 Admitted.
 
 Instance serializeable_state_ovn : Serializable state_OVN.
 Admitted.
 
-Definition auction_contract : Contract _ (* Setup *) Msg state_OVN _.
-Proof.
-  apply build_contract.
-  
-  apply init_OVN.
-  build_contract _ _.
-
+Definition auction_contract : Contract _ (* Setup *) OVN_Msg state_OVN _ := build_contract init_OVN OVN_receive.
 
 
 Equations select_private_voting_key {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (int32)) : both L1 I1 (int32) :=
