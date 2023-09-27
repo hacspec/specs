@@ -1,140 +1,378 @@
-Set Warnings "-notation-overridden,-ambiguous-paths".
-From Crypt Require Import choice_type Package Prelude.
-Import PackageNotation.
-From extructures Require Import ord fset.
-From mathcomp Require Import ssrZ word.
+From Crypt Require Import choice_type .
 From Jasmin Require Import word.
-
 From Coq Require Import ZArith.
-From Coq Require Import Strings.String.
-   Import List.ListNotations.
-Open Scope list_scope.
 Open Scope Z_scope.
-Open Scope bool_scope.
 
-From Hacspec Require Import ChoiceEquality.
-From Hacspec Require Import LocationUtility.
-From Hacspec Require Import Hacspec_Lib_Comparable.
 From Hacspec Require Import Hacspec_Lib_Pre.
-From Hacspec Require Import Hacspec_Lib.
 
 Open Scope hacspec_scope.
 Import choice.Choice.Exports.
 
-From Hacspec Require Import ChoiceEquality.
-From Hacspec Require Import LocationUtility.
-From Hacspec Require Import Hacspec_Lib_Comparable.
-From Hacspec Require Import Hacspec_Lib_Pre.
-From Hacspec Require Import Hacspec_Lib.
-
-From Coq Require Import Morphisms ZArith.
-From Coq Require Import List.
-Import ListNotations.
-Open Scope Z_scope.
-Open Scope bool_scope.
-Open Scope hacspec_scope.
-
-(* From QuickChick Require Import QuickChick. *)
-(* Require Import QuickChickLib. *)
-
 From ConCert.Execution Require Import Serializable.
-From ConCert.Execution Require Import Blockchain.
 
-(* Require Import Hacspec_Concordium. *)
-(* Export Hacspec_Concordium. *)
-
-Global Program Instance int_serializable {ws : wsize} : Serializable (int ws) :=
-  {| serialize m := (serialize (unsigned m)) ;
-    deserialize l := option_map (fun (x : Z) => @repr ws x) (deserialize l) |}.
+Program Definition serialize_by_other {A B} (f_to : B -> A) (f_from : A -> B)  `(forall m, f_from (f_to m) = m) `{Serializable A} : Serializable B :=
+  {|
+      serialize m := serialize (f_to m);
+      deserialize m := option_map f_from (deserialize m) ;
+  |}.
 Next Obligation.
   intros. hnf. rewrite deserialize_serialize.
-  unfold option_map. now rewrite wrepr_unsigned.
+  unfold option_map. now f_equal.
 Defined.
 
-(* Global Program Instance nseq_serializable len : Serializable (nseq int8 len) := *)
-(*   {| serialize m := (serialize (nat_from_be_bytes m)) ; *)
-(*     deserialize l := option_map (fun (x : nat) => nat_to_be_bytes x) (deserialize l) |}. *)
-(* Next Obligation. *)
-(*   intros. cbn. rewrite deserialize_serialize. cbn. rewrite nat_to_from_be_bytes. reflexivity. *)
-(* Defined. *)
+#[global] Instance hacspec_int_serializable {ws : wsize} : Serializable (int ws) := serialize_by_other (unsigned) (@repr ws) (@wrepr_unsigned ws).
 
-(* Global Program Instance nseq_countable len : countable.Countable (nseq int8 len) := *)
-(* {| *)
-(*     countable.encode := fun X : nseq int8 _ => countable.encode (nat_from_be_bytes X); *)
-(*     countable.decode := fun H : positive => option_map (@nat_to_be_bytes _) (countable.decode H : option nat); *)
-(* |}. *)
-(* Next Obligation. *)
-(*   intros. *)
-(*   rewrite countable.decode_encode. *)
-(*   cbn. *)
-(*   now rewrite nat_to_from_be_bytes. *)
-(* Qed. *)
+Lemma eqtype_ord_ext :
+  forall n, forall x y : fintype.ordinal n, (@eqtype.eq_op
+        (ord.Ord.eqType
+           (@ord.Ord.clone _
+              (ord.ordinal_ordType n)
+              _
+              id)) x y) = (@eqtype.eq_op ssrnat.nat_eqType (fintype.nat_of_ord x) (fintype.nat_of_ord y)).
+Proof.
+  intros.
+  destruct x.
+  simpl.
+  destruct y.
+  simpl.
+  reflexivity.
+Qed.
 
-Instance BaseTypes : ChainBase := {|
-    Address := int32;
-    address_eqb := Hacspec_Lib_Comparable.eqb ;
-    address_eqb_spec := Hacspec_Lib_Comparable.eqbP ;
-    (* address_eqdec x y := (EqDecIsDecidable x y); *)
-    address_countable := (* nseq_countable *) _;
-    address_serializable := (* nseq_serializable *) _;
-    address_is_contract := (fun x => Nat.even ((* nat_from_be_bytes x *) Z.to_nat (unsigned x))); |}.
+Theorem lift_set_commute :
+  forall {A : choice_type} {len} (a : nseq_ A (S len)) (b : fintype.ordinal (S len)) (c : A),
+    @lift_nseq A (S _) (fmap.setm a b c) =
+      fmap.setm (@lift_nseq A (S _) a) (lift_ordinal _ b) c.
+Proof.
+  clear ; intros ; fold chElement in *.
+  simpl in b.
+  unfold lift_nseq.
+  apply fmap.eq_fmap. intros x ; simpl in x.
+  rewrite fmap.setmE.
+  unfold fmap.getm.
+  simpl fmap.FMap.fmval.
+  destruct a ; induction fmval ; simpl lift_fval.
+  - now rewrite (lift_fval_equation_2 _ (len) (b, c) nil).
+  - {
+      destruct x , b.
+      rewrite (eqtype_ord_ext (S (S (len)))).
+      simpl eqtype.eq_op.
+      destruct eqtype.eq_op eqn:eq_o at 2.
+      + apply (ssrbool.elimT eqtype.eqP) in eq_o.
+        subst.
+        destruct ord.Ord.lt.
+        * simpl.
+          rewrite (lift_fval_equation_2 _ (len)).
+          simpl.
+          rewrite (eqtype_ord_ext (S (S ( len)))).
+          simpl.
+          rewrite eqtype.eq_refl.
+          reflexivity.
+        * rewrite (eqtype_ord_ext (S (len))).
+          simpl.
+          set (eqtype.eq_op _ _).
+          destruct b eqn:eq_b_o ; subst b.
+          -- apply (ssrbool.elimT eqtype.eqP) in eq_b_o.
+             subst.
+             rewrite (lift_fval_equation_2 _ (len)).
+             simpl.
+             rewrite (eqtype_ord_ext (S (S (len)))).
+             simpl.
+             rewrite eqtype.eq_refl.
+             reflexivity.
+          -- rewrite (lift_fval_equation_2 _ (len)).
+             simpl.
+             rewrite (eqtype_ord_ext (S (S (len)))).
+             simpl.
+             destruct (fst _).
+             simpl in *.
+             rewrite ssrnat.eqSS.
+             rewrite eq_b_o.
 
-(* Definition context_t_from_context (ctx : ContractCallContext) : context_t := *)
-(*   (ctx.(ctx_from), ctx.(ctx_origin), repr (ctx.(ctx_amount))). *)
+             rewrite IHfmval.
+             rewrite (eqtype_ord_ext (S (S (len)))).
+             simpl.
+             rewrite eqtype.eq_refl.
+             reflexivity.
 
-(* Definition accept (ctx : ContractCallContext) := act_transfer ctx.(ctx_origin) ctx.(ctx_amount). *)
+             (* apply (path_sorted_tl _). *)
+             {
+               intros.
+               destruct fmval. reflexivity.
+               - cbn.
+                 cbn in i.
+                 destruct (seq.unzip1 fmval).
+                 + reflexivity.
+                 + cbn in i.
+                   now rewrite LocationUtility.is_true_split_and in i.
+             }
+      + destruct ord.Ord.lt.
+        * simpl.
+          rewrite (lift_fval_equation_2 _ (len)).
+          simpl.
+          rewrite (eqtype_ord_ext (S (S (len)))).
+          simpl.
+          rewrite eq_o.
+          reflexivity.
+        * rewrite (eqtype_ord_ext (S (len))).
+          simpl.
+          set (eqtype.eq_op _ _).
+          destruct b eqn:eq_b_o ; subst b.
+          -- apply (ssrbool.elimT eqtype.eqP) in eq_b_o.
+             subst.
+             rewrite (lift_fval_equation_2 _ (len)).
+             simpl.
+             rewrite (eqtype_ord_ext (S (S (len)))).
+             simpl.
+             rewrite eq_o.
+             rewrite (lift_fval_equation_2 _ (len)).
+             simpl.
+             rewrite (eqtype_ord_ext (S (S (len)))).
+             simpl.
+             unfold lift_ordinal.
+             destruct (fst _).
+             simpl.
+             simpl in eq_o.
+             rewrite eq_o.
+             reflexivity.
+          -- rewrite (lift_fval_equation_2 _ (len)).
+             simpl.
+             rewrite (eqtype_ord_ext (S (S (len)))).
+             simpl.
+             destruct a.
+             destruct s.
+             simpl in *.
+             set (b := eqtype.eq_op _ _) ; destruct b eqn:eq_m_o ; subst b.
+             ++ apply (ssrbool.elimT eqtype.eqP) in eq_m_o.
+                subst.
+                rewrite (lift_fval_equation_2 _ (len)).
+                simpl.
+                rewrite (eqtype_ord_ext (S (S (len)))).
+                simpl.
+                now rewrite eqtype.eq_refl.
+             ++ rewrite IHfmval.
+                rewrite (eqtype_ord_ext (S (S (len)))).
+                simpl.
+                rewrite eq_o.
+                rewrite (lift_fval_equation_2 _ (len)).
+                simpl.
+                rewrite (eqtype_ord_ext (S (S (len)))).
+                simpl.
+                rewrite eq_m_o.
+                reflexivity.
+                (* apply (path_sorted_tl _). *)
+                {
+                  intros.
+                  destruct fmval. reflexivity.
+                  - cbn.
+                    cbn in i.
+                    destruct (seq.unzip1 fmval).
+                    + reflexivity.
+                    + cbn in i.
+                      now rewrite LocationUtility.is_true_split_and in i.
+                }
+    }
+Qed.
 
-(* Definition has_action_t := ActionBody. *)
+Theorem array_from_list_helper_inverse : forall {A} len (m : nseq_ A (S len)),
+    array_from_option_list_helper
+      (nseq_hd_option m)
+      (array_to_option_list (nseq_tl m)) len = m.
+Proof.
+  intros.
+  induction len.
+  - unfold nseq_tl.
+    unfold nseq_hd_option.
+    rewrite array_to_option_list_equation_1.
+    destruct m, fmval.
+    + now apply fmap.eq_fmap.
+    + apply fmap.eq_fmap. intros x ; simpl in x.
 
-(* Definition action_body_t := ActionBody. *)
-(* Definition list_action_t := list ActionBody. *)
-(* Definition ACT_TRANSFER (p : Address ∏ int64) := act_transfer (fst p) (unsigned (snd p)).   *)
-(* Instance d_ab : Default ActionBody := {| default := act_transfer (array_new_ (default : int8) 32) 0 |}. *)
+      unfold fmap.getm at 2 ; simpl.
+      destruct (fst _), m ; [ | discriminate ] ; simpl.
+      rewrite array_from_option_list_helper_equation_1.
+      unfold setm_option.
+      rewrite fmap.setmE.
+      now destruct x , m ; [ | discriminate ] ; simpl.
+  - rewrite array_to_option_list_equation_2.
 
-(* Program Definition to_action_body (ctx : ContractCallContext) (y : has_action_t) : ActionBody := *)
-(*   match y with *)
-(*   | (Accept _) => act_transfer (ctx.(ctx_from)) (ctx.(ctx_amount)) *)
-(*   | (SimpleTransfer (ua, i)) => act_transfer (ua) (i) *)
-(*   | (SendRaw (ua, receive_name, amount, data)) => *)
-(*       act_call (ua) (amount) (list_rect (fun _ : list int8 => SerializedValue) *)
-(*                                         (build_ser_value ser_unit tt) *)
-(*                                         (fun a _ IHdata => *)
-(*                                            build_ser_value *)
-(*                                              (ser_pair ser_int (ser_value_type IHdata)) *)
-(*                                              (unsigned a, ser_value IHdata)) *)
-(*                                         data) *)
-(*   end. *)
-(* Instance default_has_action : Default has_action_t := {| default := Accept tt |}. *)
+    assert (forall (T : ord.Ord.type) (S : choice_type)
+         (m : @fmap.FMap.fmap_of T S
+                (ssreflect.Phant (ord.Ord.sort T -> S)))
+         (k : ord.Ord.sort T) (v : chOption S) (k' : ord.Ord.sort T),
+       @fmap.getm T S (setm_option m k v) k' =
+         match v with
+         | Some v => @fmap.getm T S (fmap.setm m k v) k'
+         | None => @fmap.getm T S m k'
+         end) by now destruct v.
 
-(* Global Instance serializable_has_action_t : Serializable has_action_t := *)
-(*   Derive Serializable has_action_t_rect<Accept,SimpleTransfer,SendRaw>. *)
-(* Global Instance show_has_action_t : Show (has_action_t) := *)
-(*  @Build_Show (has_action_t) (fun x => *)
-(*  match x with *)
-(*  Accept a => ("Accept" ++ show a)%string *)
-(*  | SimpleTransfer a => ("SimpleTransfer" ++ show a)%string *)
-(*  | SendRaw a => ("SendRaw" ++ show a)%string *)
-(*  end). *)
-(* Definition g_has_action_t : G (has_action_t) := oneOf_ (bindGen arbitrary (fun a => returnGen (Accept a))) [bindGen arbitrary (fun a => returnGen (Accept a));bindGen arbitrary (fun a => returnGen (SimpleTransfer a))]. *)
-(* Global Instance gen_has_action_t : Gen (has_action_t) := Build_Gen has_action_t g_has_action_t. *)
+    rewrite array_from_option_list_helper_equation_3.
+    rewrite (IHlen (nseq_tl m)).
 
-(* Definition to_action_body_list (ctx : ContractCallContext) {X} (k : option (X ∏ list has_action_t)) : ResultMonad.result (X ∏ list ActionBody) unit  := *)
-(*   match (option_map (fun '(x, y) => (x, List.map (to_action_body ctx) y)) k) with *)
-(*     Some a => ResultMonad.Ok a *)
-(*   | None => ResultMonad.Err tt *)
-(*   end. *)
+    clear.
+    
+    apply fmap.eq_fmap.
+    intros x ; simpl in x.
+    destruct m ; induction fmval.
+    + now unfold fmap.getm ; cbn ; rewrite lift_fval_equation_1.
+    + {
+        specialize (IHfmval (path_sorted_tl i)).
+        unfold nseq_hd_option in *.
+        simpl.
+        destruct a.
+        destruct s.
+        unfold fmap.getm at 2.
+        simpl.
+        destruct m.
+        {
+          setoid_rewrite <- IHfmval ; clear.
 
+          setoid_rewrite fmap.setmE.
+          rewrite !(eqtype_ord_ext (S (S len))).
+          simpl eqtype.eq_op.
+          replace (_ - _)%nat with O by (set (temp := nseq_tl _) ; rewrite <- (array_to_length_option_list_is_len A len temp) at 1; now rewrite Nat.sub_diag).
 
-(* Instance show_user_address_t : Show (user_address_t) := Build_Show (user_address_t) show. *)
-(* Definition g_user_address_t : G (user_address_t) := arbitrary. *)
-(* Instance gen_user_address_t : Gen (user_address_t) := Build_Gen user_address_t g_user_address_t. *)
+          destruct x , m ; [ reflexivity | ].
+          rewrite tl_fmap_equation_2.
+          unfold setm_option.
+          destruct fmval ; [reflexivity | ].
+          simpl.
+          destruct p, s.
+          simpl.
+          destruct m0 ; [ discriminate | ].
 
-(* Global Instance serializable_context_t : Serializable context_t := *)
-(*   Derive Serializable context_t_rect<Context>. *)
-(* Global Instance show_context_t : Show (context_t) := *)
-(*  @Build_Show (context_t) (fun x => *)
-(*  match x with *)
-(*  Context a => ("Context" ++ show a)%string *)
-(*  end). *)
-(* Definition g_context_t : G (context_t) := oneOf_ (bindGen arbitrary (fun a => returnGen (Context a))) [bindGen arbitrary (fun a => returnGen (Context a))]. *)
-(* Global Instance gen_context_t : Gen (context_t) := Build_Gen context_t g_context_t. *)
+          rewrite tl_fmap_equation_3.
+
+          unfold fmap.getm.
+          simpl.
+
+          set (@fmap.getm_def _ _).
+          set (lift_fval _).
+          set (lift_fval _).
+          assert (l = l0) ; [ subst l l0 | now rewrite H ].
+          f_equal.
+
+          now apply lower_fval_ext_list.
+        }
+        {
+          setoid_rewrite <- IHfmval ; clear.
+          unfold setm_option.
+          unfold fmap.getm.
+          simpl.
+
+          rewrite tl_fmap_equation_3.
+          destruct (eqtype.eq_op _ _) eqn:eq_o.
+          - apply (ssrbool.elimT eqtype.eqP) in eq_o.
+            rewrite eq_o.
+
+            subst.
+            simpl.
+
+            rewrite lower_fval_equation_2.
+            rewrite lift_fval_equation_2.
+            simpl.
+
+            rewrite !(eqtype_ord_ext (S (S len))).
+            simpl.
+            rewrite eqtype.eq_refl.
+            reflexivity.
+          - unfold setm_option.
+            destruct fmval.
+            + (* discriminate. *)
+              rewrite tl_fmap_equation_1.
+              simpl.
+
+              rewrite lower_fval_equation_2.
+              rewrite lift_fval_equation_2.
+              simpl.
+
+              rewrite lower_fval_equation_1.
+              simpl.
+
+              rewrite !(eqtype_ord_ext (S (S len))).
+              simpl.
+              rewrite !(eqtype_ord_ext (S (S len))) in eq_o.
+              simpl in eq_o.
+              rewrite eq_o.
+              simpl.
+              reflexivity.
+            + destruct p , s.
+              destruct m0 ; [ discriminate | ].
+              simpl.
+              
+              rewrite lower_fval_equation_2.
+              rewrite lift_fval_equation_2.
+              simpl.
+
+              rewrite lower_fval_equation_2.
+              rewrite lift_fval_equation_2.
+              simpl.
+
+              rewrite tl_fmap_equation_3.
+              simpl.
+
+              rewrite lower_fval_equation_2.
+              rewrite lift_fval_equation_2.
+              simpl.
+
+              rewrite !(eqtype_ord_ext (S (S len))).
+              simpl.
+
+              rewrite (eqtype_ord_ext (S (S len))) in eq_o.
+              simpl in eq_o.
+              rewrite eq_o.
+
+              apply (ssrbool.elimF eqtype.eqP) in eq_o.
+              
+              destruct (eqtype.eq_op _ _) eqn:eq_o2 ; [ reflexivity | ].
+
+              
+              simpl.
+
+              set (@fmap.getm_def _ _).
+              set (lift_fval _).
+              set (lift_fval _).
+              assert (l = l0) ; [ subst l l0 | now rewrite H ].
+              f_equal.
+              apply lower_fval_ext_list.
+              apply (path_sorted_tl (path_sorted_tl i)).
+              apply (path_sorted_tl (path_sorted_tl i)).
+              reflexivity.
+        }              
+      }
+Qed.
+
+Theorem array_from_list_to_list_unit : forall {A} len (m : nseq_ A len),
+    array_from_option_list' (array_to_option_list m) len = m.
+Proof.
+  intros.
+  induction len.
+  - now destruct m. (* unit element equailty *)
+  - simpl.
+    pose (resize_to_length_idemp (array_to_option_list m)).
+    rewrite (array_to_length_option_list_is_len A (S len) m) in e.
+    rewrite <- e ; clear e.
+    rewrite array_to_option_list_equation_2.
+    specialize (IHlen (nseq_tl m)).
+    apply array_from_list_helper_inverse.
+Qed.
+
+Definition defaulted_nseq {A len} (m : nseq_ A (S len)) :=
+  forall i, match fmap.getm m i with
+       | Some x => x <> chCanonical A
+       | None => True
+       end.
+
+#[global] Instance nseq_serializable {A : choice_type} {len} `{Serializable A} : Serializable (nseq_ A len) :=
+  serialize_by_other (array_to_option_list) (fun x => array_from_option_list' x len) (array_from_list_to_list_unit len).
+
+Ltac serialize_enum := intros ; autounfold ; repeat apply @product_serializable ; fold chElement.
+
+(* From ConCert.Execution Require Import Blockchain. *)
+
+(* Instance BaseTypes : ConCert.Execution.Blockchain.ChainBase := *)
+(*   {| *)
+(*     Address := nat; *)
+(*     address_eqb := Nat.eqb ; *)
+(*     address_eqb_spec := Nat.eqb_spec; *)
+(*     address_is_contract := Nat.even; *)
+(*   |}. *)
