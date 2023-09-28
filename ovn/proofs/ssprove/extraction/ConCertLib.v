@@ -20,6 +20,18 @@ Next Obligation.
   unfold option_map. now f_equal.
 Defined.
 
+Program Definition serialize_by_other_option {A B} (f_to : B -> Datatypes.option A) (f_from : Datatypes.option A -> Datatypes.option B)  `(forall m, f_from (f_to m) = Some m) `{Serializable A} : Serializable B :=
+  {|
+      serialize m := serialize (f_to m);
+    deserialize m := match (deserialize m) with
+                     | Some m => f_from m
+                     | _ => None
+                     end;
+  |}.
+Next Obligation.
+  intros. hnf. rewrite deserialize_serialize. now f_equal.
+Defined.
+
 #[global] Instance hacspec_int_serializable {ws : wsize} : Serializable (int ws) := serialize_by_other (unsigned) (@repr ws) (@wrepr_unsigned ws).
 
 Lemma eqtype_ord_ext :
@@ -376,3 +388,17 @@ Ltac serialize_enum := intros ; autounfold ; repeat apply @product_serializable 
 (*     address_eqb_spec := Nat.eqb_spec; *)
 (*     address_is_contract := Nat.even; *)
 (*   |}. *)
+
+Theorem both_ext_prog :
+  forall {L I A} (x y : both L I A), both_prog x = both_prog y <-> x = y.
+Proof.
+  intros L I A [both_x valid_x eq_x] [both_y valid_y eq_y] ; simpl.
+  split.
+  - intros ; subst.
+    f_equal ; easy.
+  - easy.
+Qed.
+
+Instance serializable_both {L I} {A : choice_type} `{Serializable A} : Serializable (both L I A).
+Proof.
+Admitted.
