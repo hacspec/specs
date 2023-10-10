@@ -2,13 +2,6 @@
 -arg -w
 -arg all
 
-# Taken from Crypt (as branches are not merged!)
-pkg_advantage.v
-SigmaProtocol.v
-Schnorr.v
-DDH.v
-OVN.v
-
 # Written by hand
 # Hacspec_lib.v
 # Core.v
@@ -19,6 +12,13 @@ ConCertLib.v
 # Hacspec_ovn_Schnorr_Random_oracle.v
 # Hacspec_ovn_Schnorr.v
 Hacspec_ovn.v
+
+# Taken from Crypt (as branches are not merged!)
+pkg_advantage.v
+SigmaProtocol.v
+Schnorr.v
+DDH.v
+OVN.v
 
 # Equality proof between the two versions!
 ovn_eq_proof.v

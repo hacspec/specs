@@ -25,11 +25,11 @@ Program Definition serialize_by_other_option {A B} (f_to : B -> Datatypes.option
       serialize m := serialize (f_to m);
     deserialize m := match (deserialize m) with
                      | Some m => f_from m
-                     | _ => None
+                     | None => None
                      end;
   |}.
 Next Obligation.
-  intros. hnf. rewrite deserialize_serialize. now f_equal.
+  intros. hnf. simpl. rewrite deserialize_serialize. now f_equal.
 Defined.
 
 #[global] Instance hacspec_int_serializable {ws : wsize} : Serializable (int ws) := serialize_by_other (unsigned) (@repr ws) (@wrepr_unsigned ws).
@@ -379,15 +379,18 @@ Definition defaulted_nseq {A len} (m : nseq_ A (S len)) :=
 
 Ltac serialize_enum := intros ; autounfold ; repeat apply @product_serializable ; fold chElement.
 
-(* From ConCert.Execution Require Import Blockchain. *)
+From ConCert.Execution Require Import Blockchain.
 
-(* Instance BaseTypes : ConCert.Execution.Blockchain.ChainBase := *)
-(*   {| *)
-(*     Address := nat; *)
-(*     address_eqb := Nat.eqb ; *)
-(*     address_eqb_spec := Nat.eqb_spec; *)
-(*     address_is_contract := Nat.even; *)
-(*   |}. *)
+#[global] Instance BaseTypes : ConCert.Execution.Blockchain.ChainBase :=
+  {|
+    Address := nat;
+    address_eqb := Nat.eqb ;
+    address_eqb_spec := Nat.eqb_spec;
+    address_is_contract := Nat.even;
+  |}.
+
+From Hacspec Require Import ChoiceEquality.
+From Hacspec Require Import Hacspec_Lib.
 
 Theorem both_ext_prog :
   forall {L I A} (x y : both L I A), both_prog x = both_prog y <-> x = y.
@@ -399,6 +402,83 @@ Proof.
   - easy.
 Qed.
 
-Instance serializable_both {L I} {A : choice_type} `{Serializable A} : Serializable (both L I A).
+Print pkg_core_definition.typed_raw_function.
+
+Instance serializable_code {L I} {A : choice_type} `{Serializable A} : Serializable (pkg_core_definition.code L I A).
 Proof.
 Admitted.
+
+Instance serializable_both {L I} {A : choice_type} `{Serializable A} : Serializable (both L I A).
+Proof.
+  (* refine {| serialize *)
+  (*             '{| both_prog := *)
+  (*                {| *)
+  (*                  is_state := is_state; *)
+  (*                  is_pure := is_pure *)
+  (*                |} ; *)
+  (*                both_prog_valid := *)
+  (*                {| *)
+  (*                  is_valid_code := is_valid_code ; *)
+  (*                  is_valid_both := is_valid_both *)
+  (*                |} ; *)
+  (*                p_eq := p_eq |} := *)
+  (*          serialize *)
+  (*            (is_pure, *)
+  (*              {| *)
+  (*                pkg_core_definition.prog := is_state; *)
+  (*                pkg_core_definition.prog_valid := is_valid_code |}, *)
+  (*              is_valid_both, *)
+  (*              p_eq) ; *)
+  (*          deserialize x := *)
+  (*            option_map (fun y => solve_lift ret_both y) (deserialize x) *)
+  (*        |}. *)
+  (* Unshelve. *)
+  (* 2:{ *)
+  (*   eapply product_serializable. *)
+  (*   Unshelve. *)
+  (*   eapply product_serializable. *)
+  (*   Unshelve. *)
+  (*   simpl. *)
+  (*   eapply product_serializable. *)
+  (*   Unshelve. *)
+  (* } *)
+  
+  (* eapply (@serialize_by_other *)
+  (*           (A * pkg_core_definition.code L I A * valid_both) *)
+  (*           (both L I A) *)
+  (*           (fun x => (is_pure x, {| pkg_core_definition.prog := is_state x; pkg_core_definition.prog_valid := is_valid_code (both_prog_valid x) |})) *)
+  (*           (fun '(z , {| pkg_core_definition.prog := y ; pkg_core_definition.prog_valid := x |}) => *)
+  (*              _ *)
+  (*        )). *)
+  (* Unshelve. *)
+  (* 3:{ *)
+  (*   epose {| is_pure := z ; is_state := y |}. *)
+  (*   assert (y = is_state r) by reflexivity. *)
+  (*   rewrite H0 in *. *)
+  (*   eapply {| *)
+  (*     both_prog := r ; *)
+  (*     both_prog_valid := {| is_valid_code := x |} *)
+  (*   |}. *)
+  (* } *)
+
+  (* intros. *)
+  (* destruct m. *)
+  (* apply both_ext_prog. *)
+  (* simpl. *)
+  (* destruct both_prog. *)
+  (* simpl. *)
+  (* reflexivity. *)
+  (* apply product_serializable. *)
+  (* Unshelve. *)
+  
+  (* - apply y. *)
+  (* - destruct y. *)
+  (*   simpl. *)
+  (*   destruct prog. *)
+  (*   simpl. *)
+  (*   eapply both_valid_ret. *)
+  
+  (* apply both *)
+  
+Admitted.
+Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.

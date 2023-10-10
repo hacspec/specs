@@ -14,59 +14,60 @@ use hacspec_concordium_derive::*;
 
 /** Interface for group implementation */
 pub trait Group {
-    type GroupType: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
+    type group_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
 
     const q: u32; // Prime order
-    const g: Self::GroupType; // Generator (elemnent of group)
+    const g: Self::group_type; // Generator (elemnent of group)
 
-    fn g_pow(x: u32) -> Self::GroupType;
-    fn pow(g: Self::GroupType, x: u32) -> Self::GroupType;
-    fn one() -> Self::GroupType;
-    fn prod(x: Self::GroupType, y: Self::GroupType) -> Self::GroupType;
-    fn inv(x: Self::GroupType) -> Self::GroupType;
-    fn div(x: Self::GroupType, y: Self::GroupType) -> Self::GroupType;
-    // fn random_element() -> Self::GroupType;
+    fn g_pow(x: u32) -> Self::group_type;
+    fn pow(g: Self::group_type, x: u32) -> Self::group_type;
+    fn one() -> Self::group_type;
+    fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type;
+    fn inv(x: Self::group_type) -> Self::group_type;
+    fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type;
+    // fn random_element() -> Self::group_type;
 }
 
 #[derive(Clone, Copy)]
 pub struct z_17 {}
 impl Group for z_17 {
-    type GroupType = u32;
+    type group_type = u32;
 
     const q: u32 = 17; // Prime order
-    const g: Self::GroupType = 3; // Generator (elemnent of group)
+    const g: Self::group_type = 3; // Generator (elemnent of group)
 
-    fn g_pow(x: u32) -> Self::GroupType {
+    fn g_pow(x: u32) -> Self::group_type {
         (Self::g ^ x) % Self::q
     }
 
-    fn pow(g: Self::GroupType, x: u32) -> Self::GroupType {
+    fn pow(g: Self::group_type, x: u32) -> Self::group_type {
         (Self::g ^ x) % Self::q
     }
 
-    fn one() -> Self::GroupType {
+    fn one() -> Self::group_type {
         1
     }
 
-    fn prod(x: Self::GroupType, y: Self::GroupType) -> Self::GroupType {
+    fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type {
         (x * y) % Self::q
     }
 
-    fn inv(x: Self::GroupType) -> Self::GroupType {
+    fn inv(x: Self::group_type) -> Self::group_type {
         let mut res = 0;
         for i in 1..Self::q {
+            let i_computation = i;
             if Self::g_pow(i) == x {
-                res = i;
+                res = i_computation;
             }
         }
         res
         // [0, 1, 9, 6, 13, 7, 3, 5, 15, 2, 12, 14, 10, 4, 11, 8, 16][x as usize]
     }
 
-    fn div(x: Self::GroupType, y: Self::GroupType) -> Self::GroupType {
+    fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type {
         Self::prod(x, Self::inv(y))
     }
-    // fn random_element() -> Self::GroupType {
+    // fn random_element() -> Self::group_type {
 
     // }
 }
@@ -93,12 +94,12 @@ const n: usize = 20;
 // #[cfg_attr(not(feature = "hax_compilation"), contract_state(contract = "OVN"))]
 #[derive(Serialize, SchemaType, Clone, Copy)]
 pub struct OvnContractState/* <G: Group, const n: usize> */ {
-    g_pow_xis: [<z_17 as Group>/*G*/::GroupType; n],
+    g_pow_xis: [<z_17 as Group>/*G*/::group_type; n],
     zkp_xis: [u32; n],
 
     commit_vis: [u32; n],
 
-    g_pow_xi_yi_vis: [<z_17 as Group>/*G*/::GroupType; n],
+    g_pow_xi_yi_vis: [<z_17 as Group>/*G*/::group_type; n],
     zkp_vis: [u32; n],
 
     tally: u32,
@@ -127,7 +128,7 @@ pub fn select_private_voting_key/* <G: Group> */(random: u32) -> u32 {
 }
 
 /** TODO: Non-interactive Schnorr proof using Fiat-Shamir heuristics */
-pub fn ZKP/* <G: Group> */(g_pow_xi: <z_17 as Group>/*G*/::GroupType, xi: u32) -> u32 {
+pub fn ZKP/* <G: Group> */(g_pow_xi: <z_17 as Group>/*G*/::group_type, xi: u32) -> u32 {
     0
 }
 
@@ -152,11 +153,11 @@ pub fn register_vote<A: HasActions, T: HasReceiveContext>(
     let g_pow_xi = G::g_pow(params.rp_xi);
     let zkp_xi = ZKP/* ::<G> */(g_pow_xi, params.rp_xi);
 
-    let mut state_ret = state.clone();
-    state_ret.g_pow_xis[params.rp_i as usize] = g_pow_xi;
-    state_ret.zkp_xis[params.rp_i as usize] = zkp_xi;
+    let mut register_vote_state_ret = state.clone();
+    register_vote_state_ret.g_pow_xis[params.rp_i as usize] = g_pow_xi;
+    register_vote_state_ret.zkp_xis[params.rp_i as usize] = zkp_xi;
 
-    Ok((A::accept(), state_ret))
+    Ok((A::accept(), register_vote_state_ret))
 }
 
 #[derive(Serialize, SchemaType)]
@@ -174,8 +175,8 @@ pub fn compute_group_element_for_vote/* <G: Group> */(
     i: u32,
     xi: u32,
     vote: bool,
-    xis: [<z_17 as Group>/*G*/::GroupType; n],
-) -> <z_17 as Group>/*G*/::GroupType {
+    xis: [<z_17 as Group>/*G*/::group_type; n],
+) -> <z_17 as Group>/*G*/::group_type {
     let mut prod1 = G::one();
     for j in 0..(i - 1) as usize {
         prod1 = G::prod(prod1, xis[j]);
@@ -189,7 +190,7 @@ pub fn compute_group_element_for_vote/* <G: Group> */(
     G::prod(G::pow(Yi, xi), G::g_pow(if vote { 1 } else { 0 }))
 }
 
-pub fn commit_to/* <G: Group> */(x: <z_17 as Group>/*G*/::GroupType) -> u32 {
+pub fn commit_to/* <G: Group> */(x: <z_17 as Group>/*G*/::group_type) -> u32 {
     0
 }
 
@@ -210,13 +211,13 @@ pub fn commit_to_vote<A: HasActions>(
         compute_group_element_for_vote/*:: <G> */(params.cvp_i, params.cvp_xi, params.cvp_vote, state.g_pow_xis);
     let commit_vi = commit_to/*:: <G> */(g_pow_xi_yi_vi);
 
-    let mut state_ret = state.clone();
-    state_ret.commit_vis[params.cvp_i as usize] = commit_vi;
-    Ok((A::accept(), state_ret))
+    let mut commit_to_vote_state_ret = state.clone();
+    commit_to_vote_state_ret.commit_vis[params.cvp_i as usize] = commit_vi;
+    Ok((A::accept(), commit_to_vote_state_ret))
 }
 
 /** Cramer, Damgård and Schoenmakers (CDS) technique */
-pub fn ZKP_one_out_of_two/* <G: Group> */(g_pow_vi: <z_17 as Group>/*G*/::GroupType, vi: bool) -> u32 {
+pub fn ZKP_one_out_of_two/* <G: Group> */(g_pow_vi: <z_17 as Group>/*G*/::group_type, vi: bool) -> u32 {
     32 // TODO
 }
 
@@ -233,22 +234,18 @@ pub fn cast_vote<A: HasActions>(
         compute_group_element_for_vote/*:: <G> */(params.cvp_i, params.cvp_xi, params.cvp_vote, state.g_pow_xis);
     let zkp_vi = ZKP_one_out_of_two/*:: <G> */(g_pow_xi_yi_vi, params.cvp_vote);
 
-    let mut state_ret = state.clone();
+    let mut cast_vote_state_ret = state.clone();
+    cast_vote_state_ret.g_pow_xi_yi_vis[params.cvp_i as usize] = g_pow_xi_yi_vi;
+    cast_vote_state_ret.zkp_vis[params.cvp_i as usize] = zkp_vi;
 
-    let mut g_pow_xi_yi_vis_temp = state_ret.g_pow_xi_yi_vis.clone();
-    g_pow_xi_yi_vis_temp[params.cvp_i as usize] = g_pow_xi_yi_vi;
-    state_ret.g_pow_xi_yi_vis = g_pow_xi_yi_vis_temp;
-
-    state_ret.zkp_vis[params.cvp_i as usize] = zkp_vi;
-
-    Ok((A::accept(),state_ret))
+    Ok((A::accept(),cast_vote_state_ret))
 }
 
-pub fn check_valid2/* <G: Group> */(g_pow_xi_yi_vi: <z_17 as Group>/*G*/::GroupType, zkp: u32) -> bool {
+pub fn check_valid2/* <G: Group> */(g_pow_xi_yi_vi: <z_17 as Group>/*G*/::group_type, zkp: u32) -> bool {
     true
 }
 
-pub fn check_commitment/* <G: Group> */(g_pow_xi_yi_vi: <z_17 as Group>/*G*/::GroupType, zkp: u32) -> bool {
+pub fn check_commitment/* <G: Group> */(g_pow_xi_yi_vi: <z_17 as Group>/*G*/::group_type, zkp: u32) -> bool {
     true
 }
 
@@ -266,7 +263,7 @@ pub fn tally_votes<A: HasActions>(
         ()
     }
 
-    let mut vote_result = G::one();
+    let mut vote_result = /*G*/ G::one();
     for g_pow_vote in state.g_pow_xi_yi_vis {
         vote_result = G::prod(vote_result, g_pow_vote);
     }
@@ -279,10 +276,10 @@ pub fn tally_votes<A: HasActions>(
         }
     }
 
-    let mut state_ret = state.clone();
-    state_ret.tally = tally;
+    let mut tally_votes_state_ret = state.clone();
+    tally_votes_state_ret.tally = tally;
 
-    Ok((A::accept(), state_ret))
+    Ok((A::accept(), tally_votes_state_ret))
 }
 
 // #[cfg(test)]
