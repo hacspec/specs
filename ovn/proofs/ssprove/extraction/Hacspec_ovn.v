@@ -392,13 +392,15 @@ Definition state_OVN : choice_type :=
 Definition init_OVN (chain : Chain) (ctx : ContractCallContext) (st : (state_OVN)) : ResultMonad.result ((state_OVN)) (t_ParseError) :=
   ResultMonad.Ok st.
 
-#[global] Instance t_RegisterParam_t_HasReceiveContext : t_HasReceiveContext t_RegisterParam 'unit. Admitted.
-#[global] Instance t_RegisterParam_t_Sized : t_Sized t_RegisterParam. Admitted.
+(* Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations. *)
+
+#[global] Program Instance t_RegisterParam_t_HasReceiveContext : t_HasReceiveContext t_RegisterParam 'unit := { get x L I := (solve_lift (@ret_both (t_ParamType × t_Result x t_ParseError)) (tt, inr tt)) }.
+#[global] Instance t_RegisterParam_t_Sized : t_Sized t_RegisterParam := { Sized x := x }.
 Definition receive_OVN_register {A : _} {T : _} `{ t_Sized (A)} `{ t_Sized (T)} `{ t_HasActions (A)} `{ t_HasReceiveContext (T) ('unit)} `{ t_Sized (A)} `{ t_Sized (T)} `{ t_HasActions (A)} `{ t_HasReceiveContext (T) ('unit)} {L0 : {fset Location}} {L1 : {fset Location}} {I0 : Interface} {I1 : Interface} (ctx : both L0 I0 (t_RegisterParam)) (st : both L1 I1 (state_OVN)) : both _ _ (t_Result ((A × state_OVN)) (t_ParseError)) :=
   register_vote ctx st.
 
-#[global] Instance t_CastVoteParam_t_HasReceiveContext : t_HasReceiveContext t_CastVoteParam 'unit. Admitted.
-#[global] Instance t_CastVoteParam_t_Sized : t_Sized t_CastVoteParam. Admitted.
+#[global] Program Instance t_CastVoteParam_t_HasReceiveContext : t_HasReceiveContext t_CastVoteParam 'unit := { get x L I := (solve_lift (@ret_both (t_ParamType × t_Result x t_ParseError)) (tt, inr tt)) }.
+#[global] Instance t_CastVoteParam_t_Sized : t_Sized t_CastVoteParam  := { Sized x := x }.
 Definition receive_OVN_commit_to_vote {A : _} {(* impl *) HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} {L0 : {fset Location}} {L1 : {fset Location}} {I0 : Interface} {I1 : Interface} (ctx : both L0 I0 (t_CastVoteParam)) (st : both L1 I1 (state_OVN)) : both _ _ (t_Result ((A × state_OVN)) (t_ParseError)) :=
   commit_to_vote ctx st.
 
@@ -407,20 +409,18 @@ Definition receive_OVN_commit_to_vote {A : _} {(* impl *) HasReceiveContext : _}
 Definition receive_OVN_cast_vote {A : _} {(* impl *) HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} {L0 : {fset Location}} {L1 : {fset Location}} {I0 : Interface} {I1 : Interface} (ctx : both L0 I0 (t_CastVoteParam)) (st : both L1 I1 (state_OVN)) : both _ _ (t_Result ((A × state_OVN)) (t_ParseError)) :=
   cast_vote ctx st.
 
-#[global] Instance t_TallyParameter_t_HasReceiveContext : t_HasReceiveContext t_TallyParameter 'unit. Admitted.
-#[global] Instance t_TallyParameter_t_Sized : t_Sized t_TallyParameter. Admitted.
+#[global] Program Instance t_TallyParameter_t_HasReceiveContext : t_HasReceiveContext t_TallyParameter 'unit := { get x L I := (solve_lift (@ret_both (t_ParamType × t_Result x t_ParseError)) (tt, inr tt)) }.
+#[global] Instance t_TallyParameter_t_Sized : t_Sized t_TallyParameter := { Sized x := x }.
 Definition receive_OVN_tally {A : _} {(* impl *) HasReceiveContext : _} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} `{ t_Sized (A)} `{ t_Sized ((* impl *) HasReceiveContext)} `{ t_HasActions (A)} `{ t_HasReceiveContext ((* impl *) HasReceiveContext) ('unit)} {L0 : {fset Location}} {L1 : {fset Location}} {I0 : Interface} {I1 : Interface} (ctx : both L0 I0 (t_TallyParameter)) (st : both L1 I1 (state_OVN)) : both _ _ (t_Result ((A × state_OVN)) (t_ParseError)) :=
   tally_votes ctx st.
-
-Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
 Inductive Msg_OVN: Type :=
 | msg_OVN_register : t_RegisterParam -> Msg_OVN
 | msg_OVN_commit_to_vote : t_CastVoteParam -> Msg_OVN
 | msg_OVN_cast_vote : t_CastVoteParam -> Msg_OVN
 | msg_OVN_tally : t_TallyParameter -> Msg_OVN.
-#[global] Instance state_OVN_t_HasReceiveContext : t_HasReceiveContext state_OVN 'unit. Admitted.
-#[global] Instance state_OVN_t_Sized : t_Sized state_OVN. Admitted.
+#[global] Program Instance state_OVN_t_HasReceiveContext : t_HasReceiveContext state_OVN 'unit := { get x L I := (solve_lift (@ret_both (t_ParamType × t_Result x t_ParseError)) (tt, inr tt)) }.
+#[global] Instance state_OVN_t_Sized : t_Sized state_OVN := { Sized x := x }.
 #[global] Instance state_OVN_t_HasActions : t_HasActions state_OVN. Admitted.
 Equations receive_OVN (chain : Chain) (ctx : ContractCallContext) (st : (state_OVN)) (msg : Datatypes.option Msg_OVN) : ResultMonad.result (state_OVN * list ActionBody) t_ParseError :=
   receive_OVN chain ctx st msg  :=
@@ -449,7 +449,7 @@ Equations receive_OVN (chain : Chain) (ctx : ContractCallContext) (st : (state_O
       ResultMonad.Err tt
     end : ResultMonad.result (state_OVN * list ActionBody) t_ParseError.
 Fail Next Obligation.
-#[global] Instance state_OVN_Serializable : Serializable state_OVN. Admitted.
+#[global] Instance state_OVN_Serializable : Serializable state_OVN := _.
 #[global] Instance Msg_OVN_Serializable : Serializable Msg_OVN. Admitted.
 Definition contract_OVN : Contract ((state_OVN)) (Msg_OVN) ((state_OVN)) (t_ParseError) :=
   build_contract init_OVN receive_OVN.
