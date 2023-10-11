@@ -1,4 +1,4 @@
-#![no_std]
+x#![no_std]
 #![feature(register_tool)]
 #![register_tool(hax)]
 
@@ -25,7 +25,6 @@ pub trait Group {
     fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type;
     fn inv(x: Self::group_type) -> Self::group_type;
     fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type;
-    // fn random_element() -> Self::group_type;
 }
 
 #[derive(Clone, Copy)]
@@ -67,9 +66,6 @@ impl Group for z_17 {
     fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type {
         Self::prod(x, Self::inv(y))
     }
-    // fn random_element() -> Self::group_type {
-
-    // }
 }
 
 type G = z_17;
@@ -141,15 +137,11 @@ pub struct RegisterParam {
 /** Primary function in round 1 */
 #[hax::receive(contract = "OVN", name = "register", parameter = "RegisterParam")]
 // #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "register", parameter = "RegisterParam"))]
-// pub fn register_vote<A: HasActions>(
-//     ctx: &impl HasReceiveContext,
-//     state: OvnContractState/* <G, n> */,
-// ) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
-pub fn register_vote<A: HasActions, T: HasReceiveContext>(
-    ctx: &T,
+pub fn register_vote<A: HasActions>(
+    ctx:  &impl HasReceiveContext,
     state: OvnContractState/* <G, n> */,
 ) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
-    let params : RegisterParam = ctx.parameter_cursor().get()?; // Result<RegisterParam, ParseError>?
+    let params : RegisterParam = ctx.parameter_cursor().get()?;
     let g_pow_xi = G::g_pow(params.rp_xi);
     let zkp_xi = ZKP/* ::<G> */(g_pow_xi, params.rp_xi);
 
