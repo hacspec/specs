@@ -1,4 +1,4 @@
-x#![no_std]
+#![no_std]
 #![feature(register_tool)]
 #![register_tool(hax)]
 
@@ -103,8 +103,7 @@ pub struct OvnContractState/* <G: Group, const n: usize> */ {
 
 #[hax::init(contract = "OVN")]
 // #[cfg_attr(not(feature = "hax_compilation"), init(contract = "OVN"))]
-// pub fn init_ovn_contract(ctx: &impl HasInitContext) -> Result<bool, ()> {
-pub fn init_ovn_contract<T : HasInitContext>(ctx:&T) -> InitResult<OvnContractState> {
+pub fn init_ovn_contract(_: &impl HasInitContext) -> InitResult<OvnContractState> {
     Ok(OvnContractState {
         g_pow_xis: [G::one(); n],
         zkp_xis: [0; n],
