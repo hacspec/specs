@@ -3,12 +3,12 @@ Set Warnings "-notation-overridden,-ambiguous-paths".
 From Crypt Require Import choice_type Package Prelude.
 Import PackageNotation.
 From extructures Require Import ord fset.
-From mathcomp Require Import ssrZ word.
+From mathcomp Require Import word_ssrZ word.
 From Jasmin Require Import word.
 
 From Coq Require Import ZArith.
 From Coq Require Import Strings.String.
-   Import List.ListNotations.
+Import List.ListNotations.
 Open Scope list_scope.
 Open Scope Z_scope.
 Open Scope bool_scope.

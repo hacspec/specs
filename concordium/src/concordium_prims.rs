@@ -1,12 +1,12 @@
 #![feature(register_tool)]
 #![register_tool(hax)]
 
-#[hax_lib_macros::skip]
+#[hax_lib_macros::exclude]
 extern crate hax_lib_macros;
-#[hax_lib_macros::skip]
+#[hax_lib_macros::exclude]
 use hax_lib_macros::*;
 
-#[skip]
+#[exclude]
 use crate::*;
 
 extern "C" {
@@ -20,7 +20,8 @@ extern "C" {
 
 extern "C" {
   // Send a message to a smart contract.
-  pub(crate) fn send(
+  pub// (crate)
+    fn send(
       addr_index: u64,
       addr_subindex: u64,
       receive_name: *const u8,

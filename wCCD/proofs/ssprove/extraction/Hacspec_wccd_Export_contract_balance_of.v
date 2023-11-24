@@ -3,12 +3,12 @@ Set Warnings "-notation-overridden,-ambiguous-paths".
 From Crypt Require Import choice_type Package Prelude.
 Import PackageNotation.
 From extructures Require Import ord fset.
-From mathcomp Require Import ssrZ word.
+From mathcomp Require Import word_ssrZ word.
 From Jasmin Require Import word.
 
 From Coq Require Import ZArith.
 From Coq Require Import Strings.String.
-   Import List.ListNotations.
+Import List.ListNotations.
 Open Scope list_scope.
 Open Scope Z_scope.
 Open Scope bool_scope.
@@ -24,6 +24,17 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Require Import Crate.
-Export Crate.
-Inductive Msg: Type :=.
+Require Import Hacspec_concordium.
+Export Hacspec_concordium.
+
+Require Import SeekFrom.
+Export SeekFrom.
+
+Require Import ContractState.
+Export ContractState.
+
+Require Import Logger.
+Export Logger.
+
+Require Import trap.
+Export trap.

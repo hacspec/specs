@@ -24,18 +24,17 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Require Import Super.
-Export Super.
+Require Import Hacspec_concordium.
+Export Hacspec_concordium.
 
-Class t_ContextType (Self : choice_type) := {
-}.
+Require Import trap.
+Export trap.
 
-#[global] Program Instance t_InitContextExtern_t_ContextType : t_ContextType t_InitContextExtern :=
-  _.
-Fail Next Obligation.
-Hint Unfold t_InitContextExtern_t_ContextType.
+Require Import ExternContext.
+Export ExternContext.
 
-#[global] Program Instance t_ReceiveContextExtern_t_ContextType : t_ContextType t_ReceiveContextExtern :=
-  _.
-Fail Next Obligation.
-Hint Unfold t_ReceiveContextExtern_t_ContextType.
+Require Import InitContextExtern.
+Export InitContextExtern.
+
+Require Import ContractState.
+Export ContractState.

@@ -221,7 +221,7 @@ Proof.
     rewrite (IHlen (nseq_tl m)).
 
     clear.
-    
+
     apply fmap.eq_fmap.
     intros x ; simpl in x.
     destruct m ; induction fmval.
@@ -310,7 +310,7 @@ Proof.
             + destruct p , s.
               destruct m0 ; [ discriminate | ].
               simpl.
-              
+
               rewrite lower_fval_equation_2.
               rewrite lift_fval_equation_2.
               simpl.
@@ -334,10 +334,10 @@ Proof.
               rewrite eq_o.
 
               apply (ssrbool.elimF eqtype.eqP) in eq_o.
-              
+
               destruct (eqtype.eq_op _ _) eqn:eq_o2 ; [ reflexivity | ].
 
-              
+
               simpl.
 
               set (@fmap.getm_def _ _).
@@ -349,7 +349,7 @@ Proof.
               apply (path_sorted_tl (path_sorted_tl i)).
               apply (path_sorted_tl (path_sorted_tl i)).
               reflexivity.
-        }              
+        }
       }
 Qed.
 
@@ -442,7 +442,7 @@ Proof.
   (*   eapply product_serializable. *)
   (*   Unshelve. *)
   (* } *)
-  
+
   (* eapply (@serialize_by_other *)
   (*           (A * pkg_core_definition.code L I A * valid_both) *)
   (*           (both L I A) *)
@@ -470,15 +470,15 @@ Proof.
   (* reflexivity. *)
   (* apply product_serializable. *)
   (* Unshelve. *)
-  
+
   (* - apply y. *)
   (* - destruct y. *)
   (*   simpl. *)
   (*   destruct prog. *)
   (*   simpl. *)
   (*   eapply both_valid_ret. *)
-  
+
   (* apply both *)
-  
+
 Admitted.
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.

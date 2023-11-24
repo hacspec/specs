@@ -3,12 +3,12 @@ Set Warnings "-notation-overridden,-ambiguous-paths".
 From Crypt Require Import choice_type Package Prelude.
 Import PackageNotation.
 From extructures Require Import ord fset.
-From mathcomp Require Import ssrZ word.
+From mathcomp Require Import word_ssrZ word.
 From Jasmin Require Import word.
 
 From Coq Require Import ZArith.
 From Coq Require Import Strings.String.
-   Import List.ListNotations.
+Import List.ListNotations.
 Open Scope list_scope.
 Open Scope Z_scope.
 Open Scope bool_scope.
@@ -23,9 +23,6 @@ Open Scope hacspec_scope.
 Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
-
-Require Import Crate_Num.
-Export Crate_Num.
 
 Definition t_ContractState : choice_type :=
   (int32).
@@ -122,18 +119,18 @@ Equations Build_t_Action {L0 : {fset Location}} {I0 : Interface} {f__private_act
 Fail Next Obligation.
 Notation "'Build_t_Action' '[' x ']' '(' 'f__private_action' ':=' y ')'" := (Build_t_Action (f__private_action := y)).
 
-Equations tag_under_impl {L1 : {fset Location}} {I1 : Interface} (self : both L1 I1 (t_Action)) : both L1 I1 (int32) :=
-  tag_under_impl self  :=
+Equations tag {L1 : {fset Location}} {I1 : Interface} (self : both L1 I1 (t_Action)) : both L1 I1 (int32) :=
+  tag self  :=
     solve_lift (f__private_action self) : both L1 I1 (int32).
 Fail Next Obligation.
 
-Equations v___ {L : {fset Location}} {I : Interface} : both L I ('unit) :=
-  v___  :=
+Equations v____ {L : {fset Location}} {I : Interface} : both L I ('unit) :=
+  v____  :=
     solve_lift (ret_both (tt : 'unit)) : both L I ('unit).
 Fail Next Obligation.
 
-Equations refinement_under___ {L1 : {fset Location}} {I1 : Interface} (error_code : both L1 I1 (t_NonZeroI32)) : both L1 I1 ('bool) :=
-  refinement_under___ error_code  :=
+Equations v______refinement {L1 : {fset Location}} {I1 : Interface} (error_code : both L1 I1 (t_NonZeroI32)) : both L1 I1 ('bool) :=
+  v______refinement error_code  :=
     solve_lift (ret_both (true : 'bool)) : both L1 I1 ('bool).
 Fail Next Obligation.
 
@@ -152,9 +149,9 @@ Fail Next Obligation.
 Notation "'Build_t_Reject' '[' x ']' '(' 'f_error_code' ':=' y ')'" := (Build_t_Reject (f_error_code := y)).
 
 #[global] Program Instance t_Reject_t_Default : t_Default t_Reject :=
-  
-  {| |}.
+  _.
 Fail Next Obligation.
+Hint Unfold t_Reject_t_Default.
 
 (*Not implemented yet? todo(item)*)
 
@@ -172,20 +169,22 @@ Fail Next Obligation.
 
 (*Not implemented yet? todo(item)*)
 
-Definition t_ReceiveResult {A : _} : choice_type :=
-  t_Result (A) (t_Reject).
+Definition t_ReceiveResult {v_A : _} `{ t_Sized (v_A)} : choice_type :=
+  t_Result (v_A) (t_Reject).
 
-Definition t_InitResult {S : _} : choice_type :=
-  t_Result (S) (t_Reject).
+Definition t_InitResult {v_S : _} `{ t_Sized (v_S)} : choice_type :=
+  t_Result (v_S) (t_Reject).
 
-Definition t_ExternContext {T : _} `{ t_Sized (T)} `{ t_ContextType (T)} : choice_type :=
-  (t_PhantomData (T)).
-Equations f_marker {L : {fset Location}} {I : Interface} {T : _} `{ t_Sized (T)} `{ t_ContextType (T)} (s : both L I (t_ExternContext)) : both L I (t_PhantomData (T)) :=
+(*Not implemented yet? todo(item)*)
+
+Definition t_ExternContext {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} : choice_type :=
+  (t_PhantomData (v_T)).
+Equations f_marker {L : {fset Location}} {I : Interface} {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} (s : both L I (t_ExternContext)) : both L I (t_PhantomData (v_T)) :=
   f_marker s  :=
     bind_both s (fun x =>
-      solve_lift (ret_both (x : t_PhantomData (T)))) : both L I (t_PhantomData (T)).
+      solve_lift (ret_both (x : t_PhantomData (v_T)))) : both L I (t_PhantomData (v_T)).
 Fail Next Obligation.
-Equations Build_t_ExternContext {L0 : {fset Location}} {I0 : Interface} {T : _} `{ t_Sized (T)} `{ t_ContextType (T)} {f_marker : both L0 I0 (t_PhantomData (T))} : both L0 I0 (t_ExternContext) :=
+Equations Build_t_ExternContext {L0 : {fset Location}} {I0 : Interface} {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} {f_marker : both L0 I0 (t_PhantomData (v_T))} : both L0 I0 (t_ExternContext) :=
   Build_t_ExternContext  :=
     bind_both f_marker (fun f_marker =>
       solve_lift (ret_both ((f_marker) : (t_ExternContext)))) : both L0 I0 (t_ExternContext).
@@ -212,5 +211,3 @@ Equations Build_t_ReceiveContextExtern : both (fset []) (fset []) (t_ReceiveCont
   Build_t_ReceiveContextExtern  :=
     solve_lift (ret_both ((_) : (t_ReceiveContextExtern))) : both (fset []) (fset []) (t_ReceiveContextExtern).
 Fail Next Obligation.
-
-(*Not implemented yet? todo(item)*)

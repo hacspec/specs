@@ -1,12 +1,12 @@
 #![feature(register_tool)]
 #![register_tool(hax)]
 
-#[hax_lib_macros::skip]
+#[hax_lib_macros::exclude]
 extern crate hax_lib_macros;
-#[hax_lib_macros::skip]
+#[hax_lib_macros::exclude]
 use hax_lib_macros::*;
 
-// #[skip]
+#[exclude]
 use crate::num::*;
 
 /// A type representing the constract state bytes.
@@ -77,16 +77,16 @@ impl Action {
 /// displayed. The valid range for an error code is from i32::MIN to  -1.
 #[derive(Debug, Eq, PartialEq)] // TODO: Creusot issue re-add "Debug" attribute
 #[repr(transparent)]
-#[hax_lib_macros::hax_attributes]
+// #[hax_lib_macros::hax_attributes]
 pub struct Reject {
-    #[refine(true)]
+    // #[refine(true)]
     pub error_code: NonZeroI32,
 }
 
 /// Default error is i32::MIN.
 impl Default for Reject {
     #[inline(always)]
-    #[skip] // TODO: Unsafe
+    #[exclude] // TODO: Unsafe
     fn default() -> Self {
         Self {
             error_code: unsafe {NonZeroI32::new_unchecked(i32::MIN)},
@@ -96,7 +96,7 @@ impl Default for Reject {
 
 impl Reject {
     /// This returns `None` for all values >= 0 and `Some` otherwise.
-    #[skip]
+    #[exclude]
     pub fn new(x: i32) -> Option<Self> {
         if x < 0 {
             let error_code = unsafe { NonZeroI32::new_unchecked(x) };
@@ -314,6 +314,16 @@ pub type ReceiveResult<A> = Result<A, Reject>;
 /// // ```
 pub type InitResult<S> = Result<S, Reject>;
 
+pub(crate) mod sealed {
+    use super::*;
+    /// Marker trait intended to indicate which context type we have.
+    /// This is deliberately a sealed trait, so that it is only implementable
+    /// by types in this crate.
+    pub trait ContextType {}
+    impl ContextType for InitContextExtern {}
+    impl ContextType for ReceiveContextExtern {}
+}
+
 /// Context backed by host functions.
 #[derive(Default)]
 #[doc(hidden)]
@@ -330,13 +340,3 @@ pub struct InitContextExtern;
 #[derive(Default)]
 #[doc(hidden)]
 pub struct ReceiveContextExtern;
-
-pub(crate) mod sealed {
-    use super::*;
-    /// Marker trait intended to indicate which context type we have.
-    /// This is deliberately a sealed trait, so that it is only implementable
-    /// by types in this crate.
-    pub trait ContextType {}
-    impl ContextType for InitContextExtern {}
-    impl ContextType for ReceiveContextExtern {}
-}
