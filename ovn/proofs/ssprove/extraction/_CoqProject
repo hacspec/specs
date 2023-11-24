@@ -2,15 +2,6 @@
 -arg -w
 -arg all
 
-# Written by hand
-# Hacspec_lib.v
-# Core.v
-# HashMap.v
-ConCertLib.v
-
-# Translated
-# Hacspec_ovn_Schnorr_Random_oracle.v
-# Hacspec_ovn_Schnorr.v
 Hacspec_ovn.v
 
 # Taken from Crypt (as branches are not merged!)
