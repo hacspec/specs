@@ -26,5 +26,4 @@ members = [
     "ovn",
     "concordium",
     "concordium-derive",
-    "wCCD",
 ]
