@@ -1,0 +1,16 @@
+[package]
+name = "findatastructures"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+hax-lib-macros = { git = "https://github.com/hacspec/hax.git" }
+
+[dev-dependencies]
+findatastructures = { path = "." }
