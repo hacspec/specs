@@ -153,6 +153,19 @@ where
     }
 }
 
+impl<'a, V> IntoIterator for &'a FinSetVec<V>
+where
+    V: Copy + PartialEq + Ord,
+{
+    type Item = &'a V;
+    type IntoIter = std::slice::Iter<'a, V>;
+
+    /// Create an iterator over a set
+    fn into_iter(self) -> Self::IntoIter {
+        self.vec.iter()
+    }
+}
+
 impl<V> FromIterator<V> for FinSetVec<V>
 where
     V: Copy + Clone + PartialEq + Ord,

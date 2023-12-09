@@ -106,6 +106,20 @@ where
     fn len(&self) -> usize {
         self.vec.len()
     }
+
+    #[hax::ensures(|result|
+        forall(|v: Self::V| result.contains(&v) == self.contains_key(&v))
+    )]
+    fn keys(&self) -> Vec<&Self::K> {
+        self.into_iter().map(|(k, _)| k).collect()
+    }
+
+    #[hax::ensures(|result|
+        forall(|k: Self::K| result.contains(&k) == self.get(&k).is_some())
+    )]
+    fn values(&self) -> Vec<&Self::V> {
+        self.into_iter().map(|(_, v)| v).collect()
+    }
 }
 
 impl<K, V> IntoIterator for FinMapVec<K, V>
@@ -119,6 +133,20 @@ where
     /// Create an iterator over the map
     fn into_iter(self) -> Self::IntoIter {
         self.vec.into_iter()
+    }
+}
+
+impl<'a, K, V> IntoIterator for &'a FinMapVec<K, V>
+where
+    K: Copy + PartialEq + Ord,
+    V: Copy + PartialEq,
+{
+    type Item = &'a (K, V);
+    type IntoIter = std::slice::Iter<'a, (K, V)>;
+
+    /// Create an iterator over the map
+    fn into_iter(self) -> Self::IntoIter {
+        self.vec.iter()
     }
 }
 

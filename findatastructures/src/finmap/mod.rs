@@ -18,6 +18,10 @@ pub trait FinMap: PartialEq + Clone {
     fn is_empty(&self) -> bool;
     /// Get the number of key-value pairs in the map
     fn len(&self) -> usize;
+    /// Get the keys in the map
+    fn keys(&self) -> Vec<&Self::K>;
+    /// Get the values in the map
+    fn values(&self) -> Vec<&Self::V>;
 }
 
 pub mod vecmap;
