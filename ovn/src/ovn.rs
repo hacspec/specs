@@ -12,34 +12,6 @@ use hacspec_concordium::*;
 #[exclude]
 use hacspec_concordium_derive::*;
 
-pub enum vals {
-    MyVal,
-    YourVal (u32),
-    YourSecondVal (u32, u32),
-    StrangeVal {a : u32, b : u32, c : u32},
-}
-
-pub fn test_v() -> vals {
-    vals::YourVal(32)
-}
-
-pub fn test_vals ( x : vals) -> u32 {
-    match x {
-        vals::MyVal => 0,
-        vals::YourVal(x) => x,
-        vals::YourSecondVal(x, y) => y,
-        vals::StrangeVal { a, c, b } => c
-    }
-}
-
-pub struct alt_test {d : u32, e : u32, f : u32}
-
-pub fn test_alt_vals ( x : alt_test) -> u32 {
-    match x {
-        alt_test { d, f, e } => f
-    }
-}
-
 /** Interface for group implementation */
 pub trait Group {
     type group_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize
