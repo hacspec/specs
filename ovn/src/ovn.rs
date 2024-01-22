@@ -86,13 +86,48 @@ const n: usize = 20;
 // use concordium_contracts_common::*;
 // extern crate concordium_std;
 
+// use hacspec_sha256::*;
+
+/** TODO: Hash function */
+pub fn Hash((u,c,z) : (u32,u32,u32)) -> u32 {
+    0
+}
+
+#[derive(Serialize, SchemaType, Clone, Copy)]
+struct SchnorrZKPCommit {
+    u: <z_17 as Group>/*G*/::group_type,
+    c: <z_17 as Group>/*G*/::group_type,
+    z: <z_17 as Group>/*G*/::group_type,
+}
+
+/** Non-interactive Schnorr proof using Fiat-Shamir heuristics */
+// https://crypto.stanford.edu/cs355/19sp/lec5.pdf
+pub fn schnorr_ZKP(
+    random : u32,
+    g_pow_x: <z_17 as Group>/*G*/::group_type,
+    x: u32,
+) -> SchnorrZKPCommit {
+    let r = random % G::q; // x_i \in_R Z_q;;
+    let u = G::g_pow(r);
+    let c = Hash((G::g,g_pow_x,u));
+    let z = r + c * x;
+
+    return SchnorrZKPCommit {u, c, z};
+}
+
+// https://crypto.stanford.edu/cs355/19sp/lec5.pdf
+pub fn schnorr_ZKP_validate(g_pow_x: <z_17 as Group>/*G*/::group_type, pi: SchnorrZKPCommit) -> bool {
+    pi.c == Hash((G::g, g_pow_x, pi.u)) && G::g_pow(pi.z) == pi.u * G::pow(g_pow_x, pi.c)
+}
 
 #[hax::contract_state(contract = "OVN")]
 // #[cfg_attr(not(feature = "hax_compilation"), contract_state(contract = "OVN"))]
 #[derive(Serialize, SchemaType, Clone, Copy)]
 pub struct OvnContractState/* <G: Group, const n: usize> */ {
+    zkp_random : u32,
+    
     g_pow_xis: [<z_17 as Group>/*G*/::group_type; n],
-    zkp_xis: [u32; n],
+    zkp_xis: [SchnorrZKPCommit; n],
 
     commit_vis: [u32; n],
 
@@ -106,8 +141,10 @@ pub struct OvnContractState/* <G: Group, const n: usize> */ {
 // #[cfg_attr(not(feature = "hax_compilation"), init(contract = "OVN"))]
 pub fn init_ovn_contract(_: &impl HasInitContext) -> InitResult<OvnContractState> {
     Ok(OvnContractState {
+        zkp_random: 0, // TODO
+        
         g_pow_xis: [G::one(); n],
-        zkp_xis: [0; n],
+        zkp_xis: [SchnorrZKPCommit { u: 0, z: 0, c: 0 }; n],
 
         commit_vis: [0; n],
 
@@ -121,11 +158,6 @@ pub fn init_ovn_contract(_: &impl HasInitContext) -> InitResult<OvnContractState
 /** Currently randomness needs to be injected */
 pub fn select_private_voting_key/* <G: Group> */(random: u32) -> u32 {
     random % G::q // x_i \in_R Z_q;
-}
-
-/** TODO: Non-interactive Schnorr proof using Fiat-Shamir heuristics */
-pub fn ZKP/* <G: Group> */(g_pow_xi: <z_17 as Group>/*G*/::group_type, xi: u32) -> u32 {
-    0
 }
 
 #[derive(Serialize, SchemaType)]
@@ -143,7 +175,8 @@ pub fn register_vote<A: HasActions>(
 ) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
     let params : RegisterParam = ctx.parameter_cursor().get()?;
     let g_pow_xi = G::g_pow(params.rp_xi);
-    let zkp_xi = ZKP/* ::<G> */(g_pow_xi, params.rp_xi);
+
+    let zkp_xi = schnorr_ZKP/* ::<G> */(state.zkp_random, g_pow_xi, params.rp_xi);
 
     let mut register_vote_state_ret = state.clone();
     register_vote_state_ret.g_pow_xis[params.rp_i as usize] = g_pow_xi;
@@ -157,10 +190,6 @@ pub struct CastVoteParam {
     cvp_i: u32,
     cvp_xi: u32,
     cvp_vote: bool,
-}
-
-pub fn check_valid(zkp: u32) -> bool {
-    true
 }
 
 pub fn compute_group_element_for_vote/* <G: Group> */(
@@ -194,9 +223,11 @@ pub fn commit_to_vote<A: HasActions>(
     state: OvnContractState/* <G, n> */,
 ) -> Result<(A, OvnContractState/* <G, n> */), ParseError> {
     let params: CastVoteParam = ctx.parameter_cursor().get()?;
-    for zkp in state.zkp_xis {
-        check_valid(zkp);
-        ()
+
+    for i in 0..n {
+        if !schnorr_ZKP_validate(state.g_pow_xis[i], state.zkp_xis[i]) {
+            return Err(ParseError {  });
+        }
     }
 
     let g_pow_xi_yi_vi =
@@ -274,59 +305,59 @@ pub fn tally_votes<A: HasActions>(
     Ok((A::accept(), tally_votes_state_ret))
 }
 
-// #[cfg(test)]
-// #[concordium_test]
-// pub fn test_correctness<G : Group>() {
-//     let randomness : Vec<u32> = Vec::new();
-//     let votes : Vec<bool> = Vec::new();
+#[cfg(test)]
+#[concordium_test]
+pub fn test_correctness<G : Group>() {
+    let randomness : Vec<u32> = Vec::new();
+    let votes : Vec<bool> = Vec::new();
 
-//     // Setup the context
-//     let mut ctx = InitContextTest::empty();
-//     // ctx.set_sender(ADDRESS_0);
+    // Setup the context
+    let mut ctx = InitContextTest::empty();
+    // ctx.set_sender(ADDRESS_0);
 
-//     let mut state = init_ovn_contract();
+    let mut state = init_ovn_contract();
 
-//     let xis = Vec::new();
-//     for i in 0..n {
-//         xis.push(select_private_voting_key::<G>(randomness[i]));
-//     }
+    let xis = Vec::new();
+    for i in 0..n {
+        xis.push(select_private_voting_key::<G>(randomness[i]));
+    }
 
-//     for i in 0..n {
-//         let parameter = RegisterParam { i, xi: xis[i] };
-//         let parameter_bytes = to_bytes(&parameter);
-//         ctx.set_parameter(&parameter_bytes);
+    for i in 0..n {
+        let parameter = RegisterParam { rp_i: i, rp_xi: xis[i] };
+        let parameter_bytes = to_bytes(&parameter);
+        ctx.set_parameter(&parameter_bytes);
 
-//         register_vote(ctx, state);
-//     }
+        register_vote(ctx, state);
+    }
 
-//     for i in 0..n {
-//         let parameter = CastVoteParam { i, xi: xis[i], vote: votes[i] };
-//         let parameter_bytes = to_bytes(&parameter);
-//         ctx.set_parameter(&parameter_bytes);
+    for i in 0..n {
+        let parameter = CastVoteParam { cvp_i: i, cvp_xi: xis[i], cvp_vote: votes[i] };
+        let parameter_bytes = to_bytes(&parameter);
+        ctx.set_parameter(&parameter_bytes);
 
-//         commit_to_vote(ctx, state);
-//     }
+        commit_to_vote(ctx, state);
+    }
 
-//     for i in 0..n {
-//         let parameter = CastVoteParam { i, xi: xis[i], vote: votes[i] };
-//         let parameter_bytes = to_bytes(&parameter);
-//         ctx.set_parameter(&parameter_bytes);
+    for i in 0..n {
+        let parameter = CastVoteParam { cvp_i: i, cvp_xi: xis[i], cvp_vote: votes[i] };
+        let parameter_bytes = to_bytes(&parameter);
+        ctx.set_parameter(&parameter_bytes);
 
-//         cast_vote(ctx, state);
-//     }
+        cast_vote(ctx, state);
+    }
 
-//     let parameter = TallyParameter {};
-//     let parameter_bytes = to_bytes(&parameter);
-//     ctx.set_parameter(&parameter_bytes);
+    let parameter = TallyParameter {};
+    let parameter_bytes = to_bytes(&parameter);
+    ctx.set_parameter(&parameter_bytes);
 
-//     tally_votes(ctx, state);
+    tally_votes(ctx, state);
 
-//     let mut count = 0;
-//     for v in votes {
-//         if v {
-//             count = count + 1; // += 1 does not work correctly
-//         }
-//     }
+    let mut count = 0;
+    for v in votes {
+        if v {
+            count = count + 1; // += 1 does not work correctly
+        }
+    }
 
-//     claim_eq!(state.tally, count, "The tally should equal the number of positive votes");
-// }
+    claim_eq!(state.tally, count, "The tally should equal the number of positive votes");
+}
