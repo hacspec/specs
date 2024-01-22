@@ -225,14 +225,14 @@ Equations Build_t_TallyParameter : both (fset []) (fset []) (t_TallyParameter) :
     solve_lift (ret_both (tt (* Empty tuple *) : (t_TallyParameter))) : both (fset []) (fset []) (t_TallyParameter).
 Fail Next Obligation.
 
-Equations schnorr_ZKP {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (random : both L1 I1 (int32)) (g_pow_x : both L2 I2 (f_group_type)) (x : both L3 I3 (f_field_type)) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (t_SchnorrZKPCommit (v_Z) (v_G)) :=
+Equations schnorr_ZKP {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (random : both L1 I1 (int32)) (g_pow_x : both L2 I2 (f_group_type)) (x : both L3 I3 (f_field_type)) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)) :=
   schnorr_ZKP random g_pow_x x  :=
     solve_lift (run (letb r := f_random_field_elem random in
     letb u := f_g_pow r in
     letb c := v_Hash (prod_b (f_g,g_pow_x,u)) in
     letb z := f_add r (f_mul c x) in
-    letm[choice_typeMonad.result_bind_code (t_SchnorrZKPCommit (v_Z) (v_G))] hoist1 := v_Break (Build_t_SchnorrZKPCommit (f_u := u) (f_c := c) (f_z := z)) in
-    ControlFlow_Continue (never_to_any hoist1))) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (t_SchnorrZKPCommit (v_Z) (v_G)).
+    letm[choice_typeMonad.result_bind_code (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G))] hoist1 := v_Break (Build_t_SchnorrZKPCommit (f_u := u) (f_c := c) (f_z := z)) in
+    ControlFlow_Continue (never_to_any hoist1))) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)).
 Fail Next Obligation.
 
 Equations schnorr_ZKP_validate {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_x : both L1 I1 (f_group_type)) (pi : both L2 I2 (t_SchnorrZKPCommit (v_Z) (v_G))) : both (L1 :|: L2) (I1 :|: I2) ('bool) :=
