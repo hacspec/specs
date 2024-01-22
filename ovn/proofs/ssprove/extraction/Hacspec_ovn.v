@@ -138,7 +138,7 @@ Equations compute_group_element_for_vote {L1 : {fset Location}} {L2 : {fset Loca
     solve_lift (f_prod (f_pow v_Yi xi) (f_g_pow (ifb vote
     then f_field_one (ret_both (tt : 'unit))
     else f_field_zero (ret_both (tt : 'unit))))) : both (L1 :|: L2 :|: L3 :|: L4 :|: f_group_one_loc :|: f_field_one_loc:|: f_g_pow_loc :|: f_field_zero_loc :|: f_div_loc :|: f_prod_loc :|: f_pow_loc :|: fset [prod1_loc;prod2_loc]) (I1 :|: I2 :|: I3 :|: I4) (f_group_type).
-Solve All Obligations with ( (solve_ssprove_obligations ; now (rewrite !fset0E ; apply (ret_both 0))) || (destruct from_uint_size ; easy)).
+Solve All Obligations with ( solve_ssprove_obligations ; ((now (rewrite !fset0E ; apply (ret_both 0))) || (now destruct from_uint_size))).
 Fail Next Obligation.
 
 Definition t_CastVoteParam {v_Z : _} `{ t_Sized (v_Z)} `{ t_Z_Field (v_Z)} : choice_type :=
