@@ -14,12 +14,12 @@ use hacspec_concordium_derive::*;
 
 use hacspec_bls12_381::*;
 
-pub trait Z_Field : core::marker::Copy {
+pub trait Z_Field: core::marker::Copy {
     type field_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
 
-    const q : usize;
+    const q: usize;
 
-    fn random_field_elem(random : u32) -> Self::field_type;
+    fn random_field_elem(random: u32) -> Self::field_type;
 
     fn field_zero() -> Self::field_type;
     fn field_one() -> Self::field_type;
@@ -29,12 +29,12 @@ pub trait Z_Field : core::marker::Copy {
 }
 
 /** Interface for group implementation */
-pub trait Group<Z: Z_Field> : core::marker::Copy {
+pub trait Group<Z: Z_Field>: core::marker::Copy {
     type group_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
 
     const g: Self::group_type; // Generator (elemnent of group)
 
-    fn random_group_elem(random : u32) -> Self::group_type;
+    fn random_group_elem(random: u32) -> Self::group_type;
 
     fn g_pow(x: Z::field_type) -> Self::group_type;
     fn pow(g: Self::group_type, x: Z::field_type) -> Self::group_type; // TODO: Link with q
@@ -42,6 +42,8 @@ pub trait Group<Z: Z_Field> : core::marker::Copy {
     fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type;
     fn inv(x: Self::group_type) -> Self::group_type;
     fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type;
+
+    fn hash(x: Self::group_type, y: Self::group_type, z: Self::group_type) -> Z::field_type;
 }
 
 // struct eligible_votes {
@@ -60,14 +62,8 @@ pub trait Group<Z: Z_Field> : core::marker::Copy {
 
 // use hacspec_sha256::*;
 
-/** TODO: Hash function */
-pub fn Hash<Z : Z_Field, G : Group<Z>>(v : (G::group_type, G::group_type, G::group_type)) -> Z::field_type {
-    let (a, b, c) = v;
-    Z::field_one()
-}
-
 #[derive(Serialize, SchemaType, Clone, Copy)]
-struct SchnorrZKPCommit<Z : Z_Field, G: Group<Z>> {
+pub struct SchnorrZKPCommit<Z: Z_Field, G: Group<Z>> {
     u: G::group_type,
     c: Z::field_type,
     z: Z::field_type,
@@ -75,24 +71,64 @@ struct SchnorrZKPCommit<Z : Z_Field, G: Group<Z>> {
 
 /** Non-interactive Schnorr proof using Fiat-Shamir heuristics */
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
-pub fn schnorr_ZKP<Z : Z_Field, G: Group<Z>>(random: u32, g_pow_x: G::group_type, x: Z::field_type) -> SchnorrZKPCommit<Z, G> {
+pub fn schnorr_zkp<Z: Z_Field, G: Group<Z>>(
+    random: u32,
+    g_pow_x: G::group_type,
+    x: Z::field_type,
+) -> SchnorrZKPCommit<Z, G> {
     let r = Z::random_field_elem(random);
     let u = G::g_pow(r);
-    let c = Hash::<Z,G>((G::g, g_pow_x, u));
-    let z = Z::add(r , Z::mul(c , x) );
+    let c = G::hash(G::g, g_pow_x, u);
+    let z = Z::add(r, Z::mul(c, x));
 
     return SchnorrZKPCommit { u, c, z };
 }
 
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
-pub fn schnorr_ZKP_validate<Z : Z_Field, G: Group<Z>>(g_pow_x: G::group_type, pi: SchnorrZKPCommit<Z, G>) -> bool {
-    pi.c == Hash::<Z,G>((G::g, g_pow_x, pi.u)) && G::g_pow(pi.z) == G::prod(pi.u , G::pow(g_pow_x, pi.c))
+pub fn schnorr_zkp_validate<Z: Z_Field, G: Group<Z>>(
+    g_pow_x: G::group_type,
+    pi: SchnorrZKPCommit<Z, G>,
+) -> bool {
+    pi.c == G::hash(G::g, g_pow_x, pi.u) && G::g_pow(pi.z) == G::prod(pi.u, G::pow(g_pow_x, pi.c))
+}
+
+#[derive(Serialize, SchemaType, Clone, Copy)]
+pub struct OrZKPCommit<Z: Z_Field, G: Group<Z>> {
+    a: G::group_type,
+    r: Z::field_type,
+}
+
+/** Cramer, Damgård and Schoenmakers (CDS) technique */
+pub fn zkp_one_out_of_two<Z: Z_Field, G: Group<Z>>(
+    random: u32,
+    g_pow_xi_yi_vi: G::group_type,
+    vi: bool,
+) -> OrZKPCommit<Z, G> {
+    let w = if vi { Z::field_one() } else { Z::field_zero() };
+    let x = g_pow_xi_yi_vi;
+
+    let z = Z::random_field_elem(random);
+    let a = G::g_pow(z);
+    let c = G::hash(G::g, x, a);
+    let r = Z::add(z, Z::mul(c, w));
+
+    OrZKPCommit { a, r }
+}
+
+pub fn zkp_one_out_of_two_validate<Z: Z_Field, G: Group<Z>>(
+    g_pow_xi_yi_vi: G::group_type,
+    zkp: OrZKPCommit<Z, G>,
+) -> bool {
+    let x = g_pow_xi_yi_vi;
+
+    let c = G::hash(G::g, x, zkp.a);
+    G::g_pow(zkp.r) == G::prod(zkp.a, G::pow(x, c))
 }
 
 #[hax::contract_state(contract = "OVN")]
 // #[cfg_attr(not(feature = "hax_compilation"), contract_state(contract = "OVN"))]
 #[derive(Serialize, SchemaType, Clone, Copy)]
-pub struct OvnContractState<Z : Z_Field, G: Group<Z>, const n: usize> {
+pub struct OvnContractState<Z: Z_Field, G: Group<Z>, const n: usize> {
     zkp_random: u32,
 
     g_pow_xis: [G::group_type; n],
@@ -101,38 +137,45 @@ pub struct OvnContractState<Z : Z_Field, G: Group<Z>, const n: usize> {
     commit_vis: [u32; n],
 
     g_pow_xi_yi_vis: [G::group_type; n],
-    zkp_vis: [u32; n],
+    zkp_vis: [OrZKPCommit<Z, G>; n],
 
     tally: u32,
 }
 
 #[hax::init(contract = "OVN")]
 // #[cfg_attr(not(feature = "hax_compilation"), init(contract = "OVN"))]
-pub fn init_ovn_contract<Z : Z_Field, G: Group<Z>, const n: usize>(
+pub fn init_ovn_contract<Z: Z_Field, G: Group<Z>, const n: usize>(
     _: &impl HasInitContext,
-) -> InitResult<OvnContractState<Z,G,n>> {
-    Ok(OvnContractState::<Z,G,n> {
+) -> InitResult<OvnContractState<Z, G, n>> {
+    Ok(OvnContractState::<Z, G, n> {
         zkp_random: 0, // TODO
 
         g_pow_xis: [G::group_one(); n],
-        zkp_xis: [SchnorrZKPCommit::<Z, G> { u: G::group_one(), z: Z::field_zero(), c: Z::field_zero() }; n],
+        zkp_xis: [SchnorrZKPCommit::<Z, G> {
+            u: G::group_one(),
+            z: Z::field_zero(),
+            c: Z::field_zero(),
+        }; n],
 
         commit_vis: [0; n],
 
         g_pow_xi_yi_vis: [G::group_one(); n],
-        zkp_vis: [0; n],
+        zkp_vis: [OrZKPCommit::<Z, G> {
+            a: G::group_one(),
+            r: Z::field_zero(),
+        }; n],
 
         tally: 0,
     })
 }
 
 /** Currently randomness needs to be injected */
-pub fn select_private_voting_key<Z : Z_Field, G : Group<Z>>(random: u32) -> G::group_type {
+pub fn select_private_voting_key<Z: Z_Field, G: Group<Z>>(random: u32) -> G::group_type {
     G::random_group_elem(random) // x_i \in_R Z_q;
 }
 
 #[derive(Serialize, SchemaType)]
-pub struct RegisterParam<Z : Z_Field> {
+pub struct RegisterParam<Z: Z_Field> {
     rp_i: u32,
     rp_xi: Z::field_type,
 }
@@ -140,14 +183,14 @@ pub struct RegisterParam<Z : Z_Field> {
 /** Primary function in round 1 */
 #[hax::receive(contract = "OVN", name = "register", parameter = "RegisterParam")]
 // #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "register", parameter = "RegisterParam"))]
-pub fn register_vote<Z : Z_Field, G : Group<Z>, const n : usize, A: HasActions>(
+pub fn register_vote<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     ctx: &impl HasReceiveContext,
     state: OvnContractState<Z, G, n>,
 ) -> Result<(A, OvnContractState<Z, G, n>), ParseError> {
     let params: RegisterParam<Z> = ctx.parameter_cursor().get()?;
     let g_pow_xi = G::g_pow(params.rp_xi);
 
-    let zkp_xi = schnorr_ZKP::<Z, G>(state.zkp_random, g_pow_xi, params.rp_xi);
+    let zkp_xi = schnorr_zkp::<Z, G>(state.zkp_random, g_pow_xi, params.rp_xi);
 
     let mut register_vote_state_ret = state.clone();
     register_vote_state_ret.g_pow_xis[params.rp_i as usize] = g_pow_xi;
@@ -157,13 +200,13 @@ pub fn register_vote<Z : Z_Field, G : Group<Z>, const n : usize, A: HasActions>(
 }
 
 #[derive(Serialize, SchemaType)]
-pub struct CastVoteParam<Z : Z_Field> {
+pub struct CastVoteParam<Z: Z_Field> {
     cvp_i: u32,
     cvp_xi: Z::field_type,
     cvp_vote: bool,
 }
 
-pub fn compute_group_element_for_vote<Z : Z_Field, G: Group<Z>, const n: usize>(
+pub fn compute_group_element_for_vote<Z: Z_Field, G: Group<Z>, const n: usize>(
     i: u32,
     xi: Z::field_type,
     vote: bool,
@@ -179,29 +222,41 @@ pub fn compute_group_element_for_vote<Z : Z_Field, G: Group<Z>, const n: usize>(
     }
     let Yi = G::div(prod1, prod2);
     // implicityly: Y_i = g^y_i
-    G::prod(G::pow(Yi, xi), G::g_pow(if vote { Z::field_one() } else { Z::field_zero() }))
+    G::prod(
+        G::pow(Yi, xi),
+        G::g_pow(if vote {
+            Z::field_one()
+        } else {
+            Z::field_zero()
+        }),
+    )
 }
 
-pub fn commit_to<Z : Z_Field, G: Group<Z>>(x: G::group_type) -> u32 {
+pub fn commit_to<Z: Z_Field, G: Group<Z>>(x: G::group_type) -> u32 {
     0
 }
 
 /** Commitment before round 2 */
 #[hax::receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam")]
 // #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam"))]
-pub fn commit_to_vote<Z : Z_Field, G : Group<Z>, const n : usize, A: HasActions>(
+pub fn commit_to_vote<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     ctx: &impl HasReceiveContext,
     state: OvnContractState<Z, G, n>,
 ) -> Result<(A, OvnContractState<Z, G, n>), ParseError> {
     let params: CastVoteParam<Z> = ctx.parameter_cursor().get()?;
 
     for i in 0..n {
-        if !schnorr_ZKP_validate(state.g_pow_xis[i], state.zkp_xis[i]) {
+        if !schnorr_zkp_validate(state.g_pow_xis[i], state.zkp_xis[i]) {
             return Err(ParseError {});
         }
     }
 
-    let g_pow_xi_yi_vi = compute_group_element_for_vote::<Z, G, n>(params.cvp_i, params.cvp_xi, params.cvp_vote, state.g_pow_xis);
+    let g_pow_xi_yi_vi = compute_group_element_for_vote::<Z, G, n>(
+        params.cvp_i,
+        params.cvp_xi,
+        params.cvp_vote,
+        state.g_pow_xis,
+    );
     let commit_vi = commit_to::<Z, G>(g_pow_xi_yi_vi);
 
     let mut commit_to_vote_state_ret = state.clone();
@@ -209,22 +264,26 @@ pub fn commit_to_vote<Z : Z_Field, G : Group<Z>, const n : usize, A: HasActions>
     Ok((A::accept(), commit_to_vote_state_ret))
 }
 
-/** Cramer, Damgård and Schoenmakers (CDS) technique */
-pub fn ZKP_one_out_of_two<Z : Z_Field, G: Group<Z>>(g_pow_vi: G::group_type, vi: bool) -> u32 {
-    32 // TODO
-}
-
 /** Primary function in round 2, also opens commitment */
 #[hax::receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam")]
 // #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam"))]
-pub fn cast_vote<Z : Z_Field, G : Group<Z>, const n : usize, A: HasActions>(
+pub fn cast_vote<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     ctx: &impl HasReceiveContext,
     state: OvnContractState<Z, G, n>,
 ) -> Result<(A, OvnContractState<Z, G, n>), ParseError> {
     let params: CastVoteParam<Z> = ctx.parameter_cursor().get()?;
 
-    let g_pow_xi_yi_vi = compute_group_element_for_vote::<Z, G, n>(params.cvp_i, params.cvp_xi, params.cvp_vote, state.g_pow_xis);
-    let zkp_vi = ZKP_one_out_of_two::<Z, G>(g_pow_xi_yi_vi, params.cvp_vote);
+    let g_pow_xi_yi_vi = compute_group_element_for_vote::<Z, G, n>(
+        params.cvp_i,
+        params.cvp_xi,
+        params.cvp_vote,
+        state.g_pow_xis,
+    );
+    let zkp_vi = zkp_one_out_of_two::<Z, G>(
+        0u32, /* TODO: Randomness */
+        g_pow_xi_yi_vi,
+        params.cvp_vote,
+    );
 
     let mut cast_vote_state_ret = state.clone();
     cast_vote_state_ret.g_pow_xi_yi_vis[params.cvp_i as usize] = g_pow_xi_yi_vi;
@@ -233,11 +292,7 @@ pub fn cast_vote<Z : Z_Field, G : Group<Z>, const n : usize, A: HasActions>(
     Ok((A::accept(), cast_vote_state_ret))
 }
 
-pub fn check_valid2<Z : Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
-    true
-}
-
-pub fn check_commitment<Z : Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
+pub fn check_commitment<Z: Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
     true
 }
 
@@ -245,12 +300,12 @@ pub struct TallyParameter {}
 #[hax::receive(contract = "OVN", name = "tally", parameter = "TallyParameter")]
 // #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "tally", parameter = "TallyParameter"))]
 /** Anyone can tally the votes */
-pub fn tally_votes<Z : Z_Field, G: Group<Z>, const n : usize, A: HasActions>(
+pub fn tally_votes<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     _: &impl HasReceiveContext,
     state: OvnContractState<Z, G, n>,
 ) -> Result<(A, OvnContractState<Z, G, n>), ParseError> {
     for i in 0..n {
-        check_valid2::<Z, G>(state.g_pow_xi_yi_vis[i], state.zkp_vis[i]);
+        zkp_one_out_of_two_validate::<Z, G>(state.g_pow_xi_yi_vis[i], state.zkp_vis[i]);
         check_commitment::<Z, G>(state.g_pow_xi_yi_vis[i], state.commit_vis[i]);
         ()
     }
@@ -279,7 +334,7 @@ pub fn tally_votes<Z : Z_Field, G: Group<Z>, const n : usize, A: HasActions>(
 
 #[cfg(test)]
 #[concordium_test]
-pub fn test_correctness<Z : Z_Field, G: Group<Z>>() {
+pub fn test_correctness<Z: Z_Field, G: Group<Z>>() {
     let randomness: Vec<u32> = Vec::new();
     let votes: Vec<bool> = Vec::new();
 
