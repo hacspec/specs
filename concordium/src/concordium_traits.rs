@@ -121,12 +121,12 @@ where
     /// Truncate the state to the given size. If the given size is more than the
     /// current state size this operation does nothing. The new position is at
     /// most at the end of the stream.
-    fn truncate(&self, new_size: u32) -> Self;
+    fn truncate(self, new_size: u32) -> Self;
 
     /// Make sure that the memory size is at least that many bytes in size.
     /// Returns true iff this was successful. The new bytes are initialized as
     /// 0.
-    fn reserve(&self, len: u32) -> (bool, Self);
+    fn reserve(self, len: u32) -> (bool, Self);
 }
 
 
@@ -142,16 +142,16 @@ pub trait HasLogger {
 
     /// Log the given slice as-is. If logging is not successful an error will be
     /// returned.
-    fn log_raw(&self, event: &[u8]) -> (Result<(), LogError>, Self);
+    fn log_raw(self, event: &[u8]) -> (Result<(), LogError>, Self);
 
     // #[inline(always)]
-    /// Log a serializable event by serializing it with a supplied serializer.
-    fn log<S: Serial>(&self, event: &S) -> (Result<(), LogError>, Self);
+    // /// Log a serializable event by serializing it with a supplied serializer.
+    // fn log<S: Serial>(self, event: &S) -> (Result<(), LogError>, Self);
     // {
     //     let mut out = Vec::new();
-    //     if event.serial(&mut out).is_err() {
-    //         trap(); // should not happen
-    //     }
+    //     // if event.serial(&mut out).is_err() {
+    //     //     trap(); // should not happen
+    //     // }
     //     self.log_raw(&out)
     // }
 }

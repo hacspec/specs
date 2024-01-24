@@ -261,7 +261,7 @@ pub struct InitOnlyDataTest {
 pub type ReceiveContextTest<'a> = ContextTest<'a, ReceiveOnlyDataTest>;
 
 #[cfg(not(feature = "hacspec"))]
-#[derive(Default)]
+#[derive(Default, Clone)]
 #[doc(hidden)]
 pub struct ReceiveOnlyDataTest {
     pub(crate) invoker:      Option<AccountAddress>,
@@ -308,9 +308,8 @@ impl<'a, C> ContextTest<'a, C> {
         self
     }
 
-    pub fn set_parameter(&mut self, value: &'a [u8]) -> &mut Self {
-        self.common.parameter = Some(value);
-        self
+    pub fn set_parameter(self, value: &'a [u8]) -> Self {
+        Self { common: CommonDataTest { parameter: Some(value), ..self.common }, ..self }
     }
 
     /// Get a mutable reference to the chain meta data placeholder
@@ -395,14 +394,14 @@ impl HasPolicy for TestPolicy {
 
     fn valid_to(&self) -> Timestamp { self.policy.valid_to }
 
-    fn next_item(&mut self, buf: &mut [u8; 31]) -> Option<(AttributeTag, u8)> {
+    fn next_item(self, buf: [u8; 31]) -> (Option<(AttributeTag, u8)>, [u8; 31], Self) {
         if let Some(item) = self.policy.items.get(self.position) {
             let len = item.1.len();
-            buf[0..len].copy_from_slice(&item.1);
-            self.position += 1;
-            Some((item.0, len as u8))
+            let mut temp_buf : [u8; 31] = [0; 31];
+            temp_buf[0..len].copy_from_slice(&item.1);
+            (Some((item.0, len as u8)), temp_buf, Self { position: self.position + 1, policy: self.policy })
         } else {
-            None
+            (None, buf, self)
         }
     }
 }
@@ -475,15 +474,16 @@ impl HasLogger for LogRecorder {
         }
     }
 
-    fn log_raw(&mut self, event: &[u8]) -> Result<(), LogError> {
+    fn log_raw(self, event: &[u8]) -> (Result<(), LogError>, Self) {
         if event.len() > constants::MAX_LOG_SIZE {
-            return Err(LogError::Malformed);
+            return (Err(LogError::Malformed), self);
         }
         if self.logs.len() >= constants::MAX_NUM_LOGS {
-            return Err(LogError::Full);
+            return (Err(LogError::Full), self);
         }
-        self.logs.push(event.to_vec());
-        Ok(())
+        let mut temp_logs = self.logs;
+        temp_logs.push(event.to_vec());
+        (Ok(()), Self {logs: temp_logs})
     }
 }
 
@@ -647,26 +647,33 @@ impl<T: AsMut<Vec<u8>> + AsMut<[u8]> + AsRef<[u8]>> HasContractState<ContractSta
 
     fn size(&self) -> u32 { self.cursor.data.as_ref().len() as u32 }
 
-    fn truncate(&mut self, new_size: u32) {
+    fn truncate(self, new_size: u32) -> Self {
         if self.size() > new_size {
             let new_size = new_size as usize;
-            let data: &mut Vec<u8> = self.cursor.data.as_mut();
-            data.truncate(new_size);
-            if self.cursor.offset > new_size {
-                self.cursor.offset = new_size
+            // TODO:
+            let data: Self::ContractStateData = self.cursor.data;
+            // data.truncate(new_size); // TODO
+            let mut offset = self.cursor.offset;
+            if offset > new_size {
+                offset = new_size
             }
+            Self { cursor: Cursor { offset: offset, data: data } }
+        }
+        else {
+            self // TODO
         }
     }
 
-    fn reserve(&mut self, len: u32) -> bool {
+    fn reserve(self, len: u32) -> (bool, Self) {
         if len <= constants::MAX_CONTRACT_STATE_SIZE {
-            if self.size() < len {
-                let data: &mut Vec<u8> = self.cursor.data.as_mut();
-                data.resize(len as usize, 0u8);
-            }
-            true
+            // TODO:
+            // if self.size() < len {
+            //     let data: T = self.cursor.data;
+            //     data.resize(len as usize, 0u8);
+            // }
+            (true, self) // TODO
         } else {
-            false
+            (false, self) // TODO
         }
     }
 }

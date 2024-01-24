@@ -76,11 +76,11 @@ pub fn fp2conjugate(n: Fp2) -> Fp2 {
 
 /* Arithmetic for Fp6 elements */
 //Algorithms from: https://eprint.iacr.org/2010/354.pdf
-fn fp6fromfp2(n: Fp2) -> Fp6 {
+pub fn fp6fromfp2(n: Fp2) -> Fp6 {
     (n, fp2zero(), fp2zero())
 }
 
-fn fp6zero() -> Fp6 {
+pub fn fp6zero() -> Fp6 {
     fp6fromfp2(fp2zero())
 }
 

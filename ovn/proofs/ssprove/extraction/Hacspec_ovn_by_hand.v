@@ -299,7 +299,7 @@ Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_tally' ':=' y ')'" := (Bui
 Definition cast_vote_state_ret_loc {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} : Location :=
   (t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *);2%nat).
 
-Obligation Tactic := try timeout 8 solve_ssprove_obligations.
+Obligation Tactic := try timeout 5 solve_ssprove_obligations.
 Equations cast_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} (ctx : both L1 I1 (impl_574521470_)) (state : both L2 I2 (t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *))) : both (L1 :|: L2 :|: fset [cast_vote_state_ret_loc (n := n);prod1_loc (n := n);prod2_loc (n := n)] :|: f_group_one_loc :|: f_field_one_loc :|: f_g_pow_loc :|: f_field_zero_loc :|: f_div_loc :|: f_prod_loc :|: f_pow_loc) (I1 :|: I2) (t_Result ((v_A × t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *))) (t_ParseError)) :=
   cast_vote ctx state  :=
     solve_lift (run (letb '(_,out) := f_get (f_parameter_cursor ctx) in
@@ -318,29 +318,13 @@ Equations cast_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interfac
     letb cast_vote_state_ret := Build_t_OvnContractState[cast_vote_state_ret] (f_g_pow_xi_yi_vis := update_at_usize (f_g_pow_xi_yi_vis cast_vote_state_ret) (cast_int (WS2 := _) (f_cvp_i params)) g_pow_xi_yi_vi) in
     letb cast_vote_state_ret := Build_t_OvnContractState[cast_vote_state_ret] (f_zkp_vis := update_at_usize (f_zkp_vis cast_vote_state_ret) (cast_int (WS2 := _) (f_cvp_i params)) zkp_vi) in
 Result_Ok (prod_b (f_accept (* (ret_both (tt : 'unit)) *),cast_vote_state_ret))))) : both (L1 :|: L2 :|: fset [cast_vote_state_ret_loc;prod1_loc;prod2_loc]  :|: f_group_one_loc :|: f_field_one_loc :|: f_g_pow_loc :|: f_field_zero_loc :|: f_div_loc :|: f_prod_loc :|: f_pow_loc) (I1 :|: I2) (t_Result ((v_A × t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *))) (t_ParseError)).
-Next Obligation.
-  (intros ; simpl ; autounfold with * ; destruct H4 , H5).
-  normalize_fset ; split_fsubset_lhs.
-  now solve_single_fset_fsubset.
-Defined.
-Next Obligation.
-  (intros ; simpl ; autounfold with * ; destruct H4 , H5).
-  solve_is_true.
-Defined.
-Next Obligation.
-  (intros ; simpl ; autounfold with * ; destruct H4 , H5).
-  solve_is_true.
-  normalize_fset ; split_fsubset_lhs.
-  
-  all: now solve_single_fset_fsubset.
-Defined.
-Next Obligation.
-  (intros ; simpl ; autounfold with * ; destruct H4 , H5).
-  normalize_fset ; split_fsubset_lhs.
-  all: now solve_single_fset_fsubset.
-Defined.
+Next Obligation. intros ; now solve_in_fset. Defined.
+Next Obligation. intros ; now solve_in_fset. Defined.
+Next Obligation. solve_ssprove_obligations. Defined.
+Next Obligation. solve_ssprove_obligations. Defined.
+Next Obligation. solve_ssprove_obligations. Defined.
+Next Obligation. solve_ssprove_obligations. Defined.
 Fail Next Obligation.
-Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
 Definition commit_to_vote_state_ret_loc {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} : Location :=
   (t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *);3%nat).
