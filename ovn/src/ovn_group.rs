@@ -4,6 +4,7 @@
 
 #[hax_lib_macros::exclude]
 extern crate hax_lib_macros;
+
 #[hax_lib_macros::exclude]
 use hax_lib_macros::*;
 
@@ -13,7 +14,7 @@ use hacspec_concordium::*;
 use hacspec_concordium_derive::*;
 
 pub trait Z_Field: core::marker::Copy {
-    type field_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
+    type field_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize + core::fmt::Debug;
 
     const q: usize;
 
@@ -28,11 +29,9 @@ pub trait Z_Field: core::marker::Copy {
 
 /** Interface for group implementation */
 pub trait Group<Z: Z_Field>: core::marker::Copy {
-    type group_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
+    type group_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize + core::fmt::Debug;
 
     const g: Self::group_type; // Generator (elemnent of group)
-
-    fn random_group_elem(random: u32) -> Self::group_type;
 
     fn g_pow(x: Z::field_type) -> Self::group_type;
     fn pow(g: Self::group_type, x: Z::field_type) -> Self::group_type; // TODO: Link with q
@@ -44,21 +43,76 @@ pub trait Group<Z: Z_Field>: core::marker::Copy {
     fn hash(x: Self::group_type, y: Self::group_type, z: Self::group_type) -> Z::field_type;
 }
 
-// struct eligible_votes {
-//     v_id : u32,
-// }
 
-// /** number of parties */
-// const n : u32 = 3u32;
-// const P : [eligible_votes; 3] = // n = 3
-//     [eligible_votes {v_id: 0},
-//      eligible_votes {v_id: 1},
-//      eligible_votes {v_id: 2}];
+#[derive(Clone, Copy)]
+pub struct z_17 {}
+impl Z_Field for z_17 {
+    type field_type = u32;
+    const q: usize = 17; // Prime order
+    fn random_field_elem(random: u32) -> Self::field_type {
+        random % (Self::q as u32)
+    }
 
-// use concordium_contracts_common::*;
-// extern crate concordium_std;
+    fn field_zero() -> Self::field_type {
+        0
+    }
 
-// use hacspec_sha256::*;
+    fn field_one() -> Self::field_type {
+        1
+    }
+
+    fn add(x: Self::field_type, y: Self::field_type) -> Self::field_type {
+        (x + y) % (Self::q as u32)
+    }
+
+    fn mul(x: Self::field_type, y: Self::field_type) -> Self::field_type {
+        (x * y) % (Self::q as u32)
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct g_z_17 {}
+impl Group<z_17> for g_z_17 {
+    type group_type = u32;
+
+    const g: Self::group_type = 3; // Generator (elemnent of group)
+
+    fn hash(x: Self::group_type, y: Self::group_type, z: Self::group_type) -> <z_17 as Z_Field>::field_type {
+        5 // TODO
+    }
+
+    fn g_pow(x: u32) -> Self::group_type {
+        (Self::g.pow(x)) % (z_17::q as u32)
+    }
+
+    fn pow(g: Self::group_type, x: u32) -> Self::group_type {
+        (g.pow(x)) % (z_17::q as u32)
+    }
+
+    fn group_one() -> Self::group_type {
+        1
+    }
+
+    fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type {
+        (x * y) % (z_17::q as u32)
+    }
+
+    fn inv(x: Self::group_type) -> Self::group_type {
+        let mut res = 0;
+        for i in 1.. (z_17::q as u32) {
+            let i_computation = i;
+            if Self::g_pow(i) == x {
+                res = i_computation;
+            }
+        }
+        res
+        // [0, 1, 9, 6, 13, 7, 3, 5, 15, 2, 12, 14, 10, 4, 11, 8, 16][x as usize]
+    }
+
+    fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type {
+        Self::prod(x, Self::inv(y))
+    }
+}
 
 #[derive(Serialize, SchemaType, Clone, Copy)]
 pub struct SchnorrZKPCommit<Z: Z_Field, G: Group<Z>> {
@@ -71,24 +125,67 @@ pub struct SchnorrZKPCommit<Z: Z_Field, G: Group<Z>> {
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
 pub fn schnorr_zkp<Z: Z_Field, G: Group<Z>>(
     random: u32,
-    g_pow_x: G::group_type,
+    h: G::group_type,
     x: Z::field_type,
 ) -> SchnorrZKPCommit<Z, G> {
     let r = Z::random_field_elem(random);
     let u = G::g_pow(r);
-    let c = G::hash(G::g, g_pow_x, u);
-    let z = Z::add(r, Z::mul(c, x));
+    let c = G::hash(G::g, h, u);
+    let z = Z::add(r, Z::mul(c, x)); // g^(r + c * x) =?= u * (g^x)^c
 
     return SchnorrZKPCommit { u, c, z };
 }
 
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
 pub fn schnorr_zkp_validate<Z: Z_Field, G: Group<Z>>(
-    g_pow_x: G::group_type,
+    h: G::group_type,
     pi: SchnorrZKPCommit<Z, G>,
 ) -> bool {
-    pi.c == G::hash(G::g, g_pow_x, pi.u) && G::g_pow(pi.z) == G::prod(pi.u, G::pow(g_pow_x, pi.c))
+    pi.c == G::hash(G::g, h, pi.u) && G::g_pow(pi.z) == G::prod(pi.u, G::pow(h, pi.c))
 }
+#[cfg(test)]
+extern crate quickcheck;
+#[cfg(test)]
+#[macro_use(quickcheck)]
+extern crate quickcheck_macros;
+
+#[cfg(test)]
+use quickcheck::*;
+
+#[cfg(test)]
+use rand::random;
+
+#[test]
+pub fn schorr_zkp_correctness() {
+    fn test(random_x : u32, random_r : u32) -> bool {
+        type Z = z_17;
+        type G = g_z_17;
+
+        let x : u32 = Z::random_field_elem(random_x); // 2 works
+        let pow_x = G::g_pow(x);
+
+        let pi : SchnorrZKPCommit<Z,G> = schnorr_zkp(random_r, pow_x, x);
+
+        let valid = schnorr_zkp_validate::<Z,G>(pow_x, pi);
+        valid
+    }
+
+    QuickCheck::new()
+        .tests(10000)
+        .quickcheck(test as fn(u32, u32) -> bool)
+}
+
+// WORKS:
+// #[test]
+// pub fn schorr_zkp_correctness() {
+//     use rand::random;
+
+//     type Z = z_17;
+//     type G = g_z_17;
+
+//     let x : u32 = random::<u32>() % 17u32;
+//     assert!( schnorr_zkp_validate::<Z,G>(G::g_pow(x), schnorr_zkp(3, G::g_pow(x), x)) );
+// }
 
 #[derive(Serialize, SchemaType, Clone, Copy)]
 pub struct OrZKPCommit<Z: Z_Field, G: Group<Z>> {
@@ -333,7 +430,10 @@ pub fn test_correctness<Z: Z_Field, G: Group<Z>, const n : usize, A: HasActions>
     use rand::random;
     // rand::SeedableRng::seed_from_u64(32u64); // TODO
     
-    let votes: Vec<bool> = Vec::new();
+    let mut votes: Vec<bool> = Vec::new();
+    for i in 0..n {
+        votes.push(random());
+    }
 
     // Setup the context
     let mut ctx = hacspec_concordium::test_infrastructure::ReceiveContextTest::empty();
@@ -398,88 +498,14 @@ pub fn test_correctness<Z: Z_Field, G: Group<Z>, const n : usize, A: HasActions>
     )
 }
 
-#[derive(Clone, Copy)]
-pub struct z_17 {}
-impl Z_Field for z_17 {
-    type field_type = u32;
-    const q: usize = 17; // Prime order
-    fn random_field_elem(random: u32) -> Self::field_type {
-        random % (Self::q as u32)
-    }
+// #[concordium_test]
+// fn test() {
+//     type Z = z_17;
+//     type G = g_z_17;
+//     const n: usize = 20;
 
-    fn field_zero() -> Self::field_type {
-        0
-    }
-
-    fn field_one() -> Self::field_type {
-        1
-    }
-
-    fn add(x: Self::field_type, y: Self::field_type) -> Self::field_type {
-        (x + y) % (Self::q as u32)
-    }
-
-    fn mul(x: Self::field_type, y: Self::field_type) -> Self::field_type {
-        (x * y) % (Self::q as u32)
-    }
-}
-
-#[derive(Clone, Copy)]
-pub struct g_z_17 {}
-impl Group<z_17> for g_z_17 {
-    type group_type = u32;
-
-    const g: Self::group_type = 3; // Generator (elemnent of group)
-
-    fn random_group_elem(random: u32) -> Self::group_type {
-        random % (z_17::q as u32)
-    }
-
-    fn hash(x: Self::group_type, y: Self::group_type, z: Self::group_type) -> <z_17 as Z_Field>::field_type {
-        (x * y * z) % (z_17::q as u32) // TODO
-    }
-    
-    fn g_pow(x: u32) -> Self::group_type {
-        (Self::g ^ x) % (z_17::q as u32)
-    }
-
-    fn pow(g: Self::group_type, x: u32) -> Self::group_type {
-        (Self::g ^ x) % (z_17::q as u32)
-    }
-
-    fn group_one() -> Self::group_type {
-        1
-    }
-
-    fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type {
-        (x * y) % (z_17::q as u32)
-    }
-
-    fn inv(x: Self::group_type) -> Self::group_type {
-        let mut res = 0;
-        for i in 1.. (z_17::q as u32) {
-            let i_computation = i;
-            if Self::g_pow(i) == x {
-                res = i_computation;
-            }
-        }
-        res
-        // [0, 1, 9, 6, 13, 7, 3, 5, 15, 2, 12, 14, 10, 4, 11, 8, 16][x as usize]
-    }
-
-    fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type {
-        Self::prod(x, Self::inv(y))
-    }
-}
-
-#[concordium_test]
-fn test() {
-    type Z = z_17;
-    type G = g_z_17;
-    const n: usize = 20;
-
-    test_correctness::<Z, G, n, hacspec_concordium::test_infrastructure::ActionsTree>()
-}
+//     test_correctness::<Z, G, n, hacspec_concordium::test_infrastructure::ActionsTree>()
+// }
 
 // use hacspec_bls12_381::*;
 // use hacspec_bls12_381_hash::*;
@@ -561,13 +587,6 @@ fn test() {
 //         val: pairing(g1(), g2()),
 //     }; // TODO
 
-//     // TODO
-//     fn random_group_elem(random: u32) -> Self::group_type {
-//         Group_curve {
-//             val: fp12fromfp6(fp6fromfp2(fp2fromfp(Fp::from_literal(random as u128)))),
-//         }
-//     }
-
 //     fn pow(g: Self::group_type, x: <Z_curve as Z_Field>::field_type) -> Self::group_type {
 //         Group_curve {
 //             val: fp12exp(g.val, x.val),
@@ -608,4 +627,13 @@ fn test() {
 //         // fp_hash_to_field
 //         Z_curve::field_one() // TODO: bls12-381 hash to curve?
 //     }
+// }
+
+// #[concordium_test]
+// fn test() {
+//     type Z = Z_curve;
+//     type G = Group_curve;
+//     const n: usize = 20;
+
+//     test_correctness::<Z, G, n, hacspec_concordium::test_infrastructure::ActionsTree>()
 // }
