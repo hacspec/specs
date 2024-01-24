@@ -12,8 +12,6 @@ use hacspec_concordium::*;
 #[exclude]
 use hacspec_concordium_derive::*;
 
-use hacspec_bls12_381::*;
-
 pub trait Z_Field: core::marker::Copy {
     type field_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
 
@@ -403,3 +401,62 @@ pub fn test_correctness<Z: Z_Field, G: Group<Z>>() {
         "The tally should equal the number of positive votes"
     );
 }
+
+use hacspec_bls12_381::*;
+use hacspec_bls12_381_hash::*;
+
+#[derive(core::marker::Copy, Clone, PartialEq, Eq)]
+struct Z_curve {
+    val : Scalar
+}
+
+impl hacspec_concordium::Deserial for Z_curve {
+    // TODO:
+    fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
+        Err(ParseError {  })
+    }
+}
+
+impl hacspec_concordium::Serial for Z_curve {
+    // TODO:
+    fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
+        Ok(())
+    }
+}
+
+// impl hacspec_concordium::Serialize for Z_curve {
+
+// }
+
+impl Z_Field for Z_curve {
+    type field_type = Z_curve;
+
+    const q: usize = 11; // TODO: Scalar::modulo_value;
+
+    fn random_field_elem(random: u32) -> Self::field_type {
+        Z_curve { val: Scalar::from_literal(random as u128) }
+    }
+
+    fn field_zero() -> Self::field_type {
+        Z_curve { val: Scalar::from_literal(0u128) } // Scalar::ZERO()
+    }
+
+    fn field_one() -> Self::field_type {
+        Z_curve { val: Scalar::from_literal(1u128) } // Scalar::ONE()
+    }
+
+    fn add(x: Self::field_type, y: Self::field_type) -> Self::field_type {
+        Z_curve { val: x.val + y.val }
+    }
+
+    fn mul(x: Self::field_type, y: Self::field_type) -> Self::field_type {
+        Z_curve { val: x.val * y.val }
+    }
+}
+
+
+type Group_curve = Fp12;
+
+// impl Group<Scalar> for Fp12 {
+//     group_type = Fp12;
+// }
