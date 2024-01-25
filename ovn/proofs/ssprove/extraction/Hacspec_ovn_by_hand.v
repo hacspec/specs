@@ -324,6 +324,10 @@ Next Obligation. solve_ssprove_obligations. Defined.
 Next Obligation. solve_ssprove_obligations. Defined.
 Next Obligation. solve_ssprove_obligations. Defined.
 Next Obligation. solve_ssprove_obligations. Defined.
+Next Obligation. solve_ssprove_obligations. Defined.
+Next Obligation. solve_ssprove_obligations. Defined.
+Next Obligation. solve_ssprove_obligations. Defined.
+Next Obligation. solve_ssprove_obligations. Defined.
 Fail Next Obligation.
 
 Definition commit_to_vote_state_ret_loc {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} : Location :=
