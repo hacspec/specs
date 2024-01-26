@@ -30,8 +30,7 @@ pub trait Z_Field: core::marker::Copy {
         + Eq
         + Clone
         + Copy
-        + hacspec_concordium::Serialize
-        + core::fmt::Debug;
+        + hacspec_concordium::Serialize;
 
     fn q() -> Self::field_type;
 
@@ -51,8 +50,7 @@ pub trait Group<Z: Z_Field>: core::marker::Copy {
         + Eq
         + Clone
         + Copy
-        + hacspec_concordium::Serialize
-        + core::fmt::Debug;
+        + hacspec_concordium::Serialize;
 
     fn g() -> Self::group_type; // Generator (elemnent of group)
 
@@ -108,7 +106,11 @@ impl Group<z_89> for g_z_89 {
     } // Generator (elemnent of group)
 
     fn hash(x: Vec<Self::group_type>) -> <z_89 as Z_Field>::field_type {
-        5 // TODO
+        let mut res = z_89::field_one();
+        for y in x {
+            res = z_89::mul(y, res);
+        }
+        res // TODO
     }
 
     fn g_pow(x: <z_89 as Z_Field>::field_type) -> Self::group_type {
@@ -283,7 +285,8 @@ pub struct SchnorrZKPCommit<Z: Z_Field, G: Group<Z>> {
     z: Z::field_type,
 }
 
-/** Non-interactive Schnorr proof using Fiat-Shamir heuristics */
+/** Non-interactive Schnorr proof using Fiat-Shamir heuristics (RFC 8235) */
+// https://www.rfc-editor.org/rfc/rfc8235
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
 pub fn schnorr_zkp<Z: Z_Field, G: Group<Z>>(
     random: u32,
@@ -864,3 +867,5 @@ fn test_full_z89() {
         .tests(10000)
         .quickcheck(test as fn() -> bool)
 }
+
+// https://github.com/stonecoldpat/anonymousvoting

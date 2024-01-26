@@ -321,7 +321,9 @@ Result_Ok (prod_b (f_accept (* (ret_both (tt : 'unit)) *),cast_vote_state_ret)))
 Next Obligation. intros ; now solve_in_fset. Defined.
 Next Obligation. intros ; now solve_in_fset. Defined.
 Next Obligation. solve_ssprove_obligations. Defined.
-Next Obligation. solve_ssprove_obligations. Defined.
+Next Obligation.
+  
+  solve_ssprove_obligations. Defined.
 Next Obligation. solve_ssprove_obligations. Defined.
 Next Obligation. solve_ssprove_obligations. Defined.
 Next Obligation. solve_ssprove_obligations. Defined.
