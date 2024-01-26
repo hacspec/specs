@@ -25,12 +25,12 @@ use quickcheck::*;
 #[cfg(test)]
 use rand::random;
 
+////////////
+// Traits //
+////////////
+
 pub trait Z_Field: core::marker::Copy {
-    type field_type: PartialEq
-        + Eq
-        + Clone
-        + Copy
-        + hacspec_concordium::Serialize;
+    type field_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
 
     fn q() -> Self::field_type;
 
@@ -46,11 +46,7 @@ pub trait Z_Field: core::marker::Copy {
 
 /** Interface for group implementation */
 pub trait Group<Z: Z_Field>: core::marker::Copy {
-    type group_type: PartialEq
-        + Eq
-        + Clone
-        + Copy
-        + hacspec_concordium::Serialize;
+    type group_type: PartialEq + Eq + Clone + Copy + hacspec_concordium::Serialize;
 
     fn g() -> Self::group_type; // Generator (elemnent of group)
 
@@ -63,6 +59,10 @@ pub trait Group<Z: Z_Field>: core::marker::Copy {
 
     fn hash(x: Vec<Self::group_type>) -> Z::field_type;
 }
+
+////////////////////
+// Impl for Z/89Z //
+////////////////////
 
 #[derive(Clone, Copy)]
 pub struct z_89 {}
@@ -137,7 +137,7 @@ impl Group<z_89> for g_z_89 {
     fn inv(x: Self::group_type) -> Self::group_type {
         for j in 0..89 {
             if Self::prod(x, j) == Self::group_one() {
-                return j
+                return j;
             }
         }
         assert!(false);
@@ -149,134 +149,160 @@ impl Group<z_89> for g_z_89 {
     }
 }
 
-// use hacspec_bls12_381::*;
-// use hacspec_bls12_381_hash::*;
+////////////////////////
+// Impl for Secp256k1 //
+////////////////////////
 
-// #[derive(core::marker::Copy, Clone, PartialEq, Eq)]
-// struct Z_curve {
-//     val: Scalar,
-// }
+use hacspec_bip_340::*;
 
-// impl hacspec_concordium::Deserial for Z_curve {
-//     // TODO:
-//     fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
-//         Err(ParseError {})
-//     }
-// }
+#[derive(core::marker::Copy, Clone, PartialEq, Eq)]
+struct Z_curve {
+    val: Scalar,
+}
 
-// impl hacspec_concordium::Serial for Z_curve {
-//     // TODO:
-//     fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
-//         Ok(())
-//     }
-// }
+impl hacspec_concordium::Deserial for Z_curve {
+    // TODO:
+    fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
+        Err(ParseError {})
+    }
+}
 
-// impl Z_Field for Z_curve {
-//     type field_type = Z_curve;
+impl hacspec_concordium::Serial for Z_curve {
+    // TODO:
+    fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
+        Ok(())
+    }
+}
 
-//     fn q() -> Self::field_type {
-//         Z_curve {
-//             val: Scalar::from_hex("1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab"),
-//         } // TODO: Scalar::modulo_value;
-//     }
+impl Z_Field for Z_curve {
+    type field_type = Z_curve;
 
-//     fn random_field_elem(random: u32) -> Self::field_type {
-//         Z_curve {
-//             val: Scalar::from_literal(random as u128),
-//         }
-//     }
+    fn q() -> Self::field_type {
+        Z_curve {
+            val: Scalar::from_hex(
+                "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141",
+            ),
+        } // TODO: Scalar::modulo_value;
+    }
 
-//     fn field_zero() -> Self::field_type {
-//         Z_curve {
-//             val: Scalar::from_literal(0u128),
-//         } // Scalar::ZERO()
-//     }
+    fn random_field_elem(random: u32) -> Self::field_type {
+        Z_curve {
+            val: Scalar::from_literal(random as u128),
+        }
+    }
 
-//     fn field_one() -> Self::field_type {
-//         Z_curve {
-//             val: Scalar::from_literal(1u128),
-//         } // Scalar::ONE()
-//     }
+    fn field_zero() -> Self::field_type {
+        Z_curve {
+            val: Scalar::from_literal(0u128),
+        } // Scalar::ZERO()
+    }
 
-//     fn add(x: Self::field_type, y: Self::field_type) -> Self::field_type {
-//         Z_curve { val: x.val + y.val }
-//     }
+    fn field_one() -> Self::field_type {
+        Z_curve {
+            val: Scalar::from_literal(1u128),
+        } // Scalar::ONE()
+    }
 
-//     fn mul(x: Self::field_type, y: Self::field_type) -> Self::field_type {
-//         Z_curve { val: x.val * y.val }
-//     }
-// }
+    fn add(x: Self::field_type, y: Self::field_type) -> Self::field_type {
+        Z_curve { val: x.val + y.val }
+    }
 
-// #[derive(core::marker::Copy, Clone, PartialEq, Eq)]
-// struct Group_curve {
-//     val: Fp12,
-// }
+    fn sub(x: Self::field_type, y: Self::field_type) -> Self::field_type {
+        Z_curve { val: x.val - y.val }
+    }
 
-// impl hacspec_concordium::Deserial for Group_curve {
-//     // TODO:
-//     fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
-//         Err(ParseError {})
-//     }
-// }
+    fn mul(x: Self::field_type, y: Self::field_type) -> Self::field_type {
+        Z_curve { val: x.val * y.val }
+    }
+}
 
-// impl hacspec_concordium::Serial for Group_curve {
-//     // TODO:
-//     fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
-//         Ok(())
-//     }
-// }
+#[derive(core::marker::Copy, Clone, PartialEq, Eq)]
+struct Group_curve {
+    val: Point,
+}
 
-// impl Group<Z_curve> for Group_curve {
-//     type group_type = Group_curve;
+impl hacspec_concordium::Deserial for Group_curve {
+    // TODO:
+    fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
+        Err(ParseError {})
+    }
+}
 
-//     // https://eips.ethereum.org/EIPS/eip-2333
-//     fn g() -> Self::group_type {
-//         Group_curve {
-//             val: pairing(g1(), g2()),
-//         }
-//     } // TODO
+impl hacspec_concordium::Serial for Group_curve {
+    // TODO:
+    fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
+        Ok(())
+    }
+}
 
-//     fn pow(g: Self::group_type, x: <Z_curve as Z_Field>::field_type) -> Self::group_type {
-//         Group_curve {
-//             val: fp12exp(g.val, x.val),
-//         }
-//     }
+impl Group<Z_curve> for Group_curve {
+    type group_type = Group_curve;
 
-//     fn g_pow(x: <Z_curve as Z_Field>::field_type) -> Self::group_type {
-//         Self::pow(Self::g(), x)
-//     }
+    // https://eips.ethereum.org/EIPS/eip-2333
+    fn g() -> Self::group_type {
+        #[rustfmt::skip]
+        let gx = PBytes32([
+            0x79u8, 0xBEu8, 0x66u8, 0x7Eu8, 0xF9u8, 0xDCu8, 0xBBu8, 0xACu8,
+            0x55u8, 0xA0u8, 0x62u8, 0x95u8, 0xCEu8, 0x87u8, 0x0Bu8, 0x07u8,
+            0x02u8, 0x9Bu8, 0xFCu8, 0xDBu8, 0x2Du8, 0xCEu8, 0x28u8, 0xD9u8,
+            0x59u8, 0xF2u8, 0x81u8, 0x5Bu8, 0x16u8, 0xF8u8, 0x17u8, 0x98u8
+        ]);
+        #[rustfmt::skip]
+        let gy = PBytes32([
+            0x48u8, 0x3Au8, 0xDAu8, 0x77u8, 0x26u8, 0xA3u8, 0xC4u8, 0x65u8,
+            0x5Du8, 0xA4u8, 0xFBu8, 0xFCu8, 0x0Eu8, 0x11u8, 0x08u8, 0xA8u8,
+            0xFDu8, 0x17u8, 0xB4u8, 0x48u8, 0xA6u8, 0x85u8, 0x54u8, 0x19u8,
+            0x9Cu8, 0x47u8, 0xD0u8, 0x8Fu8, 0xFBu8, 0x10u8, 0xD4u8, 0xB8u8
+        ]);
+        Group_curve {
+            val: Point::Affine((
+                FieldElement::from_public_byte_seq_be(gx),
+                FieldElement::from_public_byte_seq_be(gy),
+            )),
+        }
+    } // TODO
 
-//     fn group_one() -> Self::group_type {
-//         Group_curve {
-//             val: fp12fromfp6(fp6fromfp2(fp2fromfp(Fp::from_literal(1u128)))),
-//         } // ONE
-//     }
+    fn pow(g: Self::group_type, x: <Z_curve as Z_Field>::field_type) -> Self::group_type {
+        Group_curve {
+            val: point_mul(x.val, g.val),
+        }
+    }
 
-//     fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type {
-//         Group_curve {
-//             val: fp12mul(x.val, y.val),
-//         }
-//     }
+    fn g_pow(x: <Z_curve as Z_Field>::field_type) -> Self::group_type {
+        Group_curve {
+            val: point_mul_base(x.val),
+        }
+        // Self::pow(Self::g(), x)
+    }
 
-//     fn inv(x: Self::group_type) -> Self::group_type {
-//         Group_curve {
-//             val: fp12inv(x.val),
-//         }
-//     }
+    fn group_one() -> Self::group_type {
+        Self::g_pow(<Z_curve as Z_Field>::field_zero())
+    }
 
-//     fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type {
-//         Self::prod(x, Self::inv(y))
-//     }
+    fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type {
+        Group_curve {
+            val: point_add(x.val, y.val),
+        }
+    }
 
-//     fn hash(
-//         x: Self::group_type,
-//         y: Self::group_type,
-//         z: Self::group_type,
-//     ) -> <Z_curve as Z_Field>::field_type {
-//         // fp_hash_to_field
-//         Z_curve::field_one() // TODO: bls12-381 hash to curve?
-//     }
-// }
+    fn inv(x: Self::group_type) -> Self::group_type {
+        // TODO:
+        x
+    }
+
+    fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type {
+        Self::prod(x, Self::inv(y))
+    }
+
+    fn hash(x: Vec<Self::group_type>) -> <Z_curve as Z_Field>::field_type {
+        // fp_hash_to_field
+        Z_curve::field_one() // TODO: bls12-381 hash to curve?
+    }
+}
+
+////////////////////
+// Implementation //
+////////////////////
 
 #[derive(Serialize, SchemaType, Clone, Copy)]
 pub struct SchnorrZKPCommit<Z: Z_Field, G: Group<Z>> {
@@ -296,7 +322,7 @@ pub fn schnorr_zkp<Z: Z_Field, G: Group<Z>>(
     let r = Z::random_field_elem(random);
     let u = G::g_pow(r);
     let c = G::hash(vec![G::g(), h, u]);
-    let z = Z::add(r, Z::mul(c, x)); // g^(r + c * x) =?= u * (g^x)^c
+    let z = Z::add(r, Z::mul(c, x));
 
     return SchnorrZKPCommit { u, c, z };
 }
@@ -329,26 +355,25 @@ pub fn schorr_zkp_correctness() {
         .quickcheck(test as fn(u32, u32) -> bool)
 }
 
-// #[test]
-// pub fn schorr_zkp_correctness_bls() {
-//     fn test(random_x: u32, random_r: u32) -> bool {
-//         type Z = Z_curve;
-//         type G = Group_curve;
+#[test]
+pub fn schorr_zkp_secp256k1_correctness() {
+    fn test(random_x: u32, random_r: u32) -> bool {
+        type Z = Z_curve;
+        type G = Group_curve;
 
-//         let x = Z::random_field_elem(random_x); // 2 works
-//         // let _ = G::g();
-//         let pow_x = G::g_pow(x);
+        let x: Z_curve = Z::random_field_elem(random_x);
+        let pow_x = G::g_pow(x);
 
-//         let pi: SchnorrZKPCommit<Z, G> = schnorr_zkp(random_r, pow_x, x);
+        let pi: SchnorrZKPCommit<Z, G> = schnorr_zkp(random_r, pow_x, x);
 
-//         let valid = schnorr_zkp_validate::<Z, G>(pow_x, pi);
-//         valid
-//     }
+        let valid = schnorr_zkp_validate::<Z, G>(pow_x, pi);
+        valid
+    }
 
-//     QuickCheck::new()
-//         .tests(10)
-//         .quickcheck(test as fn(u32, u32) -> bool)
-// }
+    QuickCheck::new()
+        .tests(10)
+        .quickcheck(test as fn(u32, u32) -> bool)
+}
 
 #[derive(Serialize, SchemaType, Clone, Copy)]
 pub struct OrZKPCommit<Z: Z_Field, G: Group<Z>> {
@@ -458,36 +483,45 @@ pub fn zkp_one_out_of_two_validate<Z: Z_Field, G: Group<Z>>(
         && zkp.b2 == G::prod(G::pow(h, zkp.r2), G::pow(G::div(zkp.y, G::g()), zkp.d2)))
 }
 
-#[test]
-pub fn or_zkp_correctness() {
-    fn test(
+#[cfg(test)]
+pub fn or_zkp_correctness<Z : Z_Field, G : Group<Z>>(
         random_w: u32,
         random_r: u32,
         random_d: u32,
         random_h: u32,
         random_x: u32,
         v: bool,
-    ) -> bool {
-        type Z = z_89;
-        type G = g_z_89;
+) -> bool {
+    let mut h = G::g_pow(Z::random_field_elem(random_h));
+    let x = Z::random_field_elem(random_x);
+    let pi: OrZKPCommit<Z, G> = zkp_one_out_of_two(random_w, random_r, random_d, h, x, v);
+    let valid = zkp_one_out_of_two_validate::<Z, G>(h, pi);
+    valid
+}
 
-        let mut h = G::g_pow(Z::random_field_elem(random_h));
-        let x = Z::random_field_elem(random_x);
-        let pi: OrZKPCommit<Z, G> = zkp_one_out_of_two(random_w, random_r, random_d, h, x, v);
-        let valid = zkp_one_out_of_two_validate::<Z, G>(h, pi);
-        valid
-    }
-
+#[test]
+pub fn or_zkp_correctness_z89(){
     QuickCheck::new()
         .tests(10000)
-        .quickcheck(test as fn(u32, u32, u32, u32, u32, bool) -> bool)
+        .quickcheck(or_zkp_correctness::<z_89, g_z_89> as fn(u32, u32, u32, u32, u32, bool) -> bool)
+}
+
+#[test]
+// TODO: Fix inverse opeation, should make this test parse
+pub fn or_zkp_secp256k1_correctness() {
+    QuickCheck::new()
+        .tests(10)
+        .quickcheck(or_zkp_correctness::<Z_curve, Group_curve> as fn(u32, u32, u32, u32, u32, bool) -> bool)
 }
 
 pub fn commit_to<Z: Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type) -> Z::field_type {
     G::hash(vec![g_pow_xi_yi_vi])
 }
 
-pub fn check_commitment<Z: Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type, commitment: Z::field_type) -> bool {
+pub fn check_commitment<Z: Z_Field, G: Group<Z>>(
+    g_pow_xi_yi_vi: G::group_type,
+    commitment: Z::field_type,
+) -> bool {
     G::hash(vec![g_pow_xi_yi_vi]) == commitment
 }
 
@@ -544,7 +578,7 @@ pub fn init_ovn_contract<Z: Z_Field, G: Group<Z>, const n: usize>(// _: &impl Ha
 
 /** Currently randomness needs to be injected */
 pub fn select_private_voting_key<Z: Z_Field>(random: u32) -> Z::field_type {
-    Z::random_field_elem(random) // x_i \in_R Z_q;
+    Z::random_field_elem(random)
 }
 
 #[derive(Serialize, SchemaType)]
@@ -602,13 +636,10 @@ pub fn compute_g_pow_yi<Z: Z_Field, G: Group<Z>, const n: usize>(
     g_pow_yi
 }
 
-#[test]
-pub fn sum_to_zero() {
-    type Z = z_89;
-    type G = g_z_89;
-    const n: usize = 55;
-    let mut xis: [<z_89 as Z_Field>::field_type; n] = [0; n];
-    let mut g_pow_xis: [<g_z_89 as Group<Z>>::group_type; n] = [0; n];
+#[cfg(test)]
+pub fn sum_to_zero<Z: Z_Field, G: Group<Z>, const n: usize>() {
+    let mut xis: [Z::field_type; n] = [Z::field_zero(); n];
+    let mut g_pow_xis: [G::group_type; n] = [G::group_one(); n];
     use rand::random;
     for i in 0..n {
         xis[i] = Z::random_field_elem(random());
@@ -620,7 +651,18 @@ pub fn sum_to_zero() {
         let g_pow_yi = compute_g_pow_yi::<Z, G, n>(i, g_pow_xis);
         res = G::prod(res, G::pow(g_pow_yi, xis[i]));
     }
-    assert_eq!(res, G::group_one());
+
+    assert!(res == G::group_one());
+}
+
+#[test]
+pub fn sum_to_zero_z89() {
+    sum_to_zero::<z_89, g_z_89, 55>()
+}
+
+#[test]
+pub fn sum_to_zero_secp256k1() {
+    sum_to_zero::<Z_curve, Group_curve, 55>()
 }
 
 pub fn compute_group_element_for_vote<Z: Z_Field, G: Group<Z>>(
@@ -733,8 +775,6 @@ pub fn tally_votes<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     Ok((A::accept(), tally_votes_state_ret))
 }
 
-// use crate::test_infrastructure::*;
-
 #[cfg(test)]
 pub fn test_correctness<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     votes: [bool; n],
@@ -749,7 +789,6 @@ pub fn test_correctness<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
 ) -> bool {
     // Setup the context
     let mut ctx = hacspec_concordium::test_infrastructure::ReceiveContextTest::empty();
-    // ctx.set_sender(ADDRESS_0);
 
     let mut state: OvnContractState<Z, G, n> = init_ovn_contract().unwrap();
 
@@ -757,7 +796,7 @@ pub fn test_correctness<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
         let parameter = RegisterParam::<Z> {
             rp_i: i as u32,
             rp_xi: xis[i],
-            rp_zkp_random: rp_zkp_randoms[i], // TODO
+            rp_zkp_random: rp_zkp_randoms[i],
         };
         let parameter_bytes = to_bytes(&parameter);
         (_, state) =
@@ -811,61 +850,59 @@ pub fn test_correctness<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     state.tally == count
 }
 
+#[cfg(test)]
+fn randomized_full_test<Z: Z_Field, G: Group<Z>, const n: usize> () -> bool {
+    use rand::random;
+    let mut votes: [bool; n] = [false; n];
+    let mut xis: [Z::field_type; n] = [Z::field_zero(); n];
+    let mut rp_zkp_randoms: [u32; n] = [0; n];
+    let mut cvp_zkp_random_ws1: [u32; n] = [0; n];
+    let mut cvp_zkp_random_rs1: [u32; n] = [0; n];
+    let mut cvp_zkp_random_ds1: [u32; n] = [0; n];
+
+    let mut cvp_zkp_random_ws2: [u32; n] = [0; n];
+    let mut cvp_zkp_random_rs2: [u32; n] = [0; n];
+    let mut cvp_zkp_random_ds2: [u32; n] = [0; n];
+
+    for i in 0..n {
+        votes[i] = random();
+        xis[i] = Z::random_field_elem(random());
+        rp_zkp_randoms[i] = random();
+        cvp_zkp_random_ws1[i] = random();
+        cvp_zkp_random_rs1[i] = random();
+        cvp_zkp_random_ds1[i] = random();
+        cvp_zkp_random_ws2[i] = random();
+        cvp_zkp_random_rs2[i] = random();
+        cvp_zkp_random_ds2[i] = random();
+    }
+
+    test_correctness::<Z, G, n, hacspec_concordium::test_infrastructure::ActionsTree>(
+        votes,
+        xis,
+        rp_zkp_randoms,
+        cvp_zkp_random_ws1,
+        cvp_zkp_random_rs1,
+        cvp_zkp_random_ds1,
+        cvp_zkp_random_ws2,
+        cvp_zkp_random_rs2,
+        cvp_zkp_random_ds2,
+    )
+}
+
 // #[concordium_test]
 #[test]
 fn test_full_z89() {
-    type Z = z_89;
-    type G = g_z_89;
-    const n: usize = 55;
-
-    use rand::random;
-    // rand::SeedableRng::seed_from_u64(32u64); // TODO
-
-    fn test() -> bool {
-        let mut votes: [bool; n] = [false; n];
-        let mut xis: [<z_89 as Z_Field>::field_type; n] = [0; n];
-        let mut rp_zkp_randoms: [u32; n] = [0; n];
-        let mut cvp_zkp_random_ws1: [u32; n] = [0; n];
-        let mut cvp_zkp_random_rs1: [u32; n] = [0; n];
-        let mut cvp_zkp_random_ds1: [u32; n] = [0; n];
-
-        let mut cvp_zkp_random_ws2: [u32; n] = [0; n];
-        let mut cvp_zkp_random_rs2: [u32; n] = [0; n];
-        let mut cvp_zkp_random_ds2: [u32; n] = [0; n];
-
-        for i in 0..n {
-            votes[i] = false; // random();
-            xis[i] = Z::random_field_elem(random());
-            rp_zkp_randoms[i] = random();
-            cvp_zkp_random_ws1[i] = random();
-            cvp_zkp_random_rs1[i] = random();
-            cvp_zkp_random_ds1[i] = random();
-            cvp_zkp_random_ws2[i] = random();
-            cvp_zkp_random_rs2[i] = random();
-            cvp_zkp_random_ds2[i] = random();
-        }
-
-        test_correctness::<
-                Z,
-            G,
-            n,
-            hacspec_concordium::test_infrastructure::ActionsTree,
-            >(
-            votes,
-            xis,
-            rp_zkp_randoms,
-            cvp_zkp_random_ws1,
-            cvp_zkp_random_rs1,
-            cvp_zkp_random_ds1,
-            cvp_zkp_random_ws2,
-            cvp_zkp_random_rs2,
-            cvp_zkp_random_ds2,
-        )
-    };
-
     QuickCheck::new()
-        .tests(10000)
-        .quickcheck(test as fn() -> bool)
+        .tests(100)
+        .quickcheck(randomized_full_test::<z_89, g_z_89, 55> as fn() -> bool)
+}
+
+// #[concordium_test]
+#[test]
+fn test_full_secp256k1() {
+    QuickCheck::new()
+        .tests(100)
+        .quickcheck(randomized_full_test::<Z_Field, Group_curve, 55> as fn() -> bool)
 }
 
 // https://github.com/stonecoldpat/anonymousvoting

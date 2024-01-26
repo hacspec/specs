@@ -8,16 +8,8 @@ edition = "2018"
 path = "src/ovn_group.rs"
 
 [dependencies]
-# hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
 hax-lib-macros = { path = "../../hacspec-v2/hax-lib-macros/" }
-hacspec-bls12-381 = { path = "../bls12-381/" }
-hacspec-bls12-381-hash = { path = "../bls12-381-hash/" }
-# hax-lib-macros = { git = "https://github.com/hacspec/hacspec-v2.git" }
-# creusot-contracts = { git = "https://github.com/xldenis/creusot", rev = "1cca2320e262b2ec9d28b3c84cba759c96829898" } # branch = master
-# concordium-contracts-common = { git = "https://github.com/Concordium/concordium-contracts-common", rev = "84ff7db509ca1fbf958b47e5e5903b7662295850" ,  version = "=2.0.0" , default-features = false } # 0cffb859f736ff6726fa38600428a415d800d7b6
-
-# concordium-std = { git = "https://github.com/Concordium/concordium-rust-smart-contracts", rev = "4d4b024b547a1f120f6d6951cbc409c94f8f146a" ,  version = "*" , default-features = false } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
-# concordium-std-derive = { git = "https://github.com/Concordium/concordium-rust-smart-contracts", rev = "4d4b024b547a1f120f6d6951cbc409c94f8f146a" ,  version = "*" , default-features = false } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
+hacspec-bip-340 = { path = "../bip-340/" }
 
 hacspec-concordium = { path = "../concordium" } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
 hacspec-concordium-derive = { path = "../concordium-derive" } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
