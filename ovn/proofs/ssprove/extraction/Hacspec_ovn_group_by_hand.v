@@ -130,6 +130,14 @@ Equations compute_g_pow_yi {L1 : {fset Location}} {L2 : {fset Location}} {I1 : I
 Solve All Obligations with ( solve_ssprove_obligations ; ((now (rewrite !fset0E ; apply (ret_both 0))) || (now destruct from_uint_size))).
 Fail Next Obligation.
 
+Equations impl__into_vec {L I A n} : both L I (nseq A n) -> both L I (t_Vec A t_Global) :=
+  impl__into_vec X := bind_both X (fun x : nseq A n => solve_lift (ret_both (Hacspec_Lib_Pre.array_to_list x : chList _))).
+Fail Next Obligation.
+
+Definition unsize {A} := @id A.
+Definition box_new {A} := @id A.
+
+
 Equations check_commitment {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) (commitment : both L2 I2 (f_field_type)) : both (L1 :|: L2) (I1 :|: I2) ('bool) :=
   check_commitment g_pow_xi_yi_vi commitment  :=
     solve_lift ((f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) =.? commitment) : both (L1 :|: L2) (I1 :|: I2) ('bool).
