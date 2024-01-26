@@ -24,6 +24,9 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
+Require Import Hacspec_bip_340.
+Export Hacspec_bip_340.
+
 Class t_Z_Field (Self : choice_type) := {
   f_field_type : choice_type ;
   f_field_type_t_Serialize :> t_Serialize (f_field_type) ;
@@ -185,6 +188,36 @@ Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_zkp_random_r' ':=' y ')'"
 Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_zkp_random_d' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := f_cvp_i x) (f_cvp_xi := f_cvp_xi x) (f_cvp_zkp_random_w := f_cvp_zkp_random_w x) (f_cvp_zkp_random_r := f_cvp_zkp_random_r x) (f_cvp_zkp_random_d := y) (f_cvp_vote := f_cvp_vote x)).
 Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_vote' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := f_cvp_i x) (f_cvp_xi := f_cvp_xi x) (f_cvp_zkp_random_w := f_cvp_zkp_random_w x) (f_cvp_zkp_random_r := f_cvp_zkp_random_r x) (f_cvp_zkp_random_d := f_cvp_zkp_random_d x) (f_cvp_vote := y)).
 
+Definition t_Group_curve : choice_type :=
+  (t_Point).
+Equations f_val {L : {fset Location}} {I : Interface} (s : both L I (t_Group_curve)) : both L I (t_Point) :=
+  f_val s  :=
+    bind_both s (fun x =>
+      solve_lift (ret_both (x : t_Point))) : both L I (t_Point).
+Fail Next Obligation.
+Equations Build_t_Group_curve {L0 : {fset Location}} {I0 : Interface} {f_val : both L0 I0 (t_Point)} : both L0 I0 (t_Group_curve) :=
+  Build_t_Group_curve  :=
+    bind_both f_val (fun f_val =>
+      solve_lift (ret_both ((f_val) : (t_Group_curve)))) : both L0 I0 (t_Group_curve).
+Fail Next Obligation.
+Notation "'Build_t_Group_curve' '[' x ']' '(' 'f_val' ':=' y ')'" := (Build_t_Group_curve (f_val := y)).
+
+#[global] Program Instance t_Group_curve_t_Deserial : t_Deserial t_Group_curve :=
+  let f_deserial := fun  {L1 : {fset Location}} {I1 : Interface} (v__source : both L1 I1 (v_R)) => letb hax_temp_output := Result_Err ParseError in
+  solve_lift (prod_b (v__source,hax_temp_output)) : both (L1 :|: fset []) I1 ((v_R × t_Result (t_Group_curve) (t_ParseError))) in
+  {| f_deserial_loc := (fset [] : {fset Location});
+  f_deserial := (@f_deserial)|}.
+Fail Next Obligation.
+Hint Unfold t_Group_curve_t_Deserial.
+
+#[global] Program Instance t_Group_curve_t_Serial : t_Serial t_Group_curve :=
+  let f_serial := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (self : both L1 I1 (t_Group_curve)) (v__out : both L2 I2 (v_W)) => letb hax_temp_output := Result_Ok (ret_both (tt : 'unit)) in
+  solve_lift (prod_b (v__out,hax_temp_output)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) ((v_W × t_Result ('unit) (f_Err))) in
+  {| f_serial_loc := (fset [] : {fset Location});
+  f_serial := (@f_serial)|}.
+Fail Next Obligation.
+Hint Unfold t_Group_curve_t_Serial.
+
 Definition t_OrZKPCommit {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : choice_type :=
   (f_group_type × f_group_type × f_group_type × f_group_type × f_group_type × f_group_type × f_field_type × f_field_type × f_field_type × f_field_type × f_field_type).
 Equations f_x {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
@@ -332,6 +365,63 @@ Equations Build_t_TallyParameter : both (fset []) (fset []) (t_TallyParameter) :
     solve_lift (ret_both (tt (* Empty tuple *) : (t_TallyParameter))) : both (fset []) (fset []) (t_TallyParameter).
 Fail Next Obligation.
 
+Definition t_Z_curve : choice_type :=
+  (t_Scalar).
+Equations f_val {L : {fset Location}} {I : Interface} (s : both L I (t_Z_curve)) : both L I (t_Scalar) :=
+  f_val s  :=
+    bind_both s (fun x =>
+      solve_lift (ret_both (x : t_Scalar))) : both L I (t_Scalar).
+Fail Next Obligation.
+Equations Build_t_Z_curve {L0 : {fset Location}} {I0 : Interface} {f_val : both L0 I0 (t_Scalar)} : both L0 I0 (t_Z_curve) :=
+  Build_t_Z_curve  :=
+    bind_both f_val (fun f_val =>
+      solve_lift (ret_both ((f_val) : (t_Z_curve)))) : both L0 I0 (t_Z_curve).
+Fail Next Obligation.
+Notation "'Build_t_Z_curve' '[' x ']' '(' 'f_val' ':=' y ')'" := (Build_t_Z_curve (f_val := y)).
+
+#[global] Program Instance t_Z_curve_t_Deserial : t_Deserial t_Z_curve :=
+  let f_deserial := fun  {L1 : {fset Location}} {I1 : Interface} (v__source : both L1 I1 (v_R)) => letb hax_temp_output := Result_Err ParseError in
+  solve_lift (prod_b (v__source,hax_temp_output)) : both (L1 :|: fset []) I1 ((v_R × t_Result (t_Z_curve) (t_ParseError))) in
+  {| f_deserial_loc := (fset [] : {fset Location});
+  f_deserial := (@f_deserial)|}.
+Fail Next Obligation.
+Hint Unfold t_Z_curve_t_Deserial.
+
+#[global] Program Instance t_Z_curve_t_Serial : t_Serial t_Z_curve :=
+  let f_serial := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (self : both L1 I1 (t_Z_curve)) (v__out : both L2 I2 (v_W)) => letb hax_temp_output := Result_Ok (ret_both (tt : 'unit)) in
+  solve_lift (prod_b (v__out,hax_temp_output)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) ((v_W × t_Result ('unit) (f_Err))) in
+  {| f_serial_loc := (fset [] : {fset Location});
+  f_serial := (@f_serial)|}.
+Fail Next Obligation.
+Hint Unfold t_Z_curve_t_Serial.
+
+#[global] Program Instance t_Z_curve_t_Z_Field : t_Z_Field t_Z_curve :=
+  let f_field_type := t_Z_curve : choice_type in
+  let f_q := fun  {L : {fset Location}} {I : Interface} => solve_lift (Build_t_Z_curve (f_val := impl__Scalar__from_hex (ret_both (0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 : chString)))) : both (L :|: fset []) I (t_Z_curve) in
+  let f_random_field_elem := fun  {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (int32)) => solve_lift (Build_t_Z_curve (f_val := impl__Scalar__from_literal (cast_int (WS2 := _) random))) : both (L1 :|: fset []) I1 (t_Z_curve) in
+  let f_field_zero := fun  {L : {fset Location}} {I : Interface} => solve_lift (Build_t_Z_curve (f_val := impl__Scalar__from_literal (ret_both (0 : int128)))) : both (L :|: fset []) I (t_Z_curve) in
+  let f_field_one := fun  {L : {fset Location}} {I : Interface} => solve_lift (Build_t_Z_curve (f_val := impl__Scalar__from_literal (ret_both (1 : int128)))) : both (L :|: fset []) I (t_Z_curve) in
+  let f_add := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Z_curve)) (y : both L2 I2 (t_Z_curve)) => solve_lift (Build_t_Z_curve (f_val := (f_val x) .+ (f_val y))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Z_curve) in
+  let f_sub := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Z_curve)) (y : both L2 I2 (t_Z_curve)) => solve_lift (Build_t_Z_curve (f_val := (f_val x) .- (f_val y))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Z_curve) in
+  let f_mul := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Z_curve)) (y : both L2 I2 (t_Z_curve)) => solve_lift (Build_t_Z_curve (f_val := (f_val x) .* (f_val y))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Z_curve) in
+  {| f_field_type := (@f_field_type);
+  f_q_loc := (fset [] : {fset Location});
+  f_q := (@f_q);
+  f_random_field_elem_loc := (fset [] : {fset Location});
+  f_random_field_elem := (@f_random_field_elem);
+  f_field_zero_loc := (fset [] : {fset Location});
+  f_field_zero := (@f_field_zero);
+  f_field_one_loc := (fset [] : {fset Location});
+  f_field_one := (@f_field_one);
+  f_add_loc := (fset [] : {fset Location});
+  f_add := (@f_add);
+  f_sub_loc := (fset [] : {fset Location});
+  f_sub := (@f_sub);
+  f_mul_loc := (fset [] : {fset Location});
+  f_mul := (@f_mul)|}.
+Fail Next Obligation.
+Hint Unfold t_Z_curve_t_Z_Field.
+
 Definition t_g_z_89_ : choice_type :=
   'unit.
 Equations Build_t_g_z_89_ : both (fset []) (fset []) (t_g_z_89_) :=
@@ -442,6 +532,104 @@ Fail Next Obligation.
   f_mul := (@f_mul)|}.
 Fail Next Obligation.
 Hint Unfold t_z_89__t_Z_Field.
+
+Definition result_loc : Location :=
+  (int32;10%nat).
+Definition res_loc : Location :=
+  (int32;9%nat).
+#[global] Program Instance t_Group_curve_t_Group : t_Group t_Group_curve t_Z_curve :=
+  let f_group_type := t_Group_curve : choice_type in
+  let f_g := fun  {L : {fset Location}} {I : Interface} => letb gx := PBytes32 (array_from_list [ret_both (121 : int8);
+    ret_both (190 : int8);
+    ret_both (102 : int8);
+    ret_both (126 : int8);
+    ret_both (249 : int8);
+    ret_both (220 : int8);
+    ret_both (187 : int8);
+    ret_both (172 : int8);
+    ret_both (85 : int8);
+    ret_both (160 : int8);
+    ret_both (98 : int8);
+    ret_both (149 : int8);
+    ret_both (206 : int8);
+    ret_both (135 : int8);
+    ret_both (11 : int8);
+    ret_both (7 : int8);
+    ret_both (2 : int8);
+    ret_both (155 : int8);
+    ret_both (252 : int8);
+    ret_both (219 : int8);
+    ret_both (45 : int8);
+    ret_both (206 : int8);
+    ret_both (40 : int8);
+    ret_both (217 : int8);
+    ret_both (89 : int8);
+    ret_both (242 : int8);
+    ret_both (129 : int8);
+    ret_both (91 : int8);
+    ret_both (22 : int8);
+    ret_both (248 : int8);
+    ret_both (23 : int8);
+    ret_both (152 : int8)]) in
+  letb gy := PBytes32 (array_from_list [ret_both (72 : int8);
+    ret_both (58 : int8);
+    ret_both (218 : int8);
+    ret_both (119 : int8);
+    ret_both (38 : int8);
+    ret_both (163 : int8);
+    ret_both (196 : int8);
+    ret_both (101 : int8);
+    ret_both (93 : int8);
+    ret_both (164 : int8);
+    ret_both (251 : int8);
+    ret_both (252 : int8);
+    ret_both (14 : int8);
+    ret_both (17 : int8);
+    ret_both (8 : int8);
+    ret_both (168 : int8);
+    ret_both (253 : int8);
+    ret_both (23 : int8);
+    ret_both (180 : int8);
+    ret_both (72 : int8);
+    ret_both (166 : int8);
+    ret_both (133 : int8);
+    ret_both (84 : int8);
+    ret_both (25 : int8);
+    ret_both (156 : int8);
+    ret_both (71 : int8);
+    ret_both (208 : int8);
+    ret_both (143 : int8);
+    ret_both (251 : int8);
+    ret_both (16 : int8);
+    ret_both (212 : int8);
+    ret_both (184 : int8)]) in
+  solve_lift (Build_t_Group_curve (f_val := Point_Affine (prod_b (impl__FieldElement__from_public_byte_seq_be gx,impl__FieldElement__from_public_byte_seq_be gy)))) : both (L :|: fset []) I (t_Group_curve) in
+  let f_pow := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (g : both L1 I1 (t_Group_curve)) (x : both L2 I2 (t_Z_curve)) => solve_lift (Build_t_Group_curve (f_val := point_mul (f_val x) (f_val g))) : both (L1 :|: L2 :|: fset [result_loc]) (I1 :|: I2) (t_Group_curve) in
+  let f_g_pow := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (t_Z_curve)) => solve_lift (Build_t_Group_curve (f_val := point_mul_base (f_val x))) : both (L1 :|: fset []) I1 (t_Group_curve) in
+  let f_group_one := fun  {L : {fset Location}} {I : Interface} => solve_lift (f_g_pow (f_field_zero (ret_both (tt : 'unit)))) : both (L :|: fset []) I (t_Group_curve) in
+  let f_prod := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Group_curve)) (y : both L2 I2 (t_Group_curve)) => solve_lift (Build_t_Group_curve (f_val := point_add (f_val x) (f_val y))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Group_curve) in
+  let f_inv := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (t_Group_curve)) => solve_lift x : both (L1 :|: fset []) I1 (t_Group_curve) in
+  let f_div := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Group_curve)) (y : both L2 I2 (t_Group_curve)) => solve_lift (f_prod x (f_inv y)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Group_curve) in
+  let f_hash := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (t_Vec (t_Group_curve) (t_Global))) => solve_lift (f_field_one (ret_both (tt : 'unit))) : both (L1 :|: fset [res_loc]) I1 (t_Z_curve) in
+  {| f_group_type := (@f_group_type);
+  f_g_loc := (fset [] : {fset Location});
+  f_g := (@f_g);
+  f_pow_loc := (fset [result_loc] : {fset Location});
+  f_pow := (@f_pow);
+  f_g_pow_loc := (fset [] : {fset Location});
+  f_g_pow := (@f_g_pow);
+  f_group_one_loc := (fset [] : {fset Location});
+  f_group_one := (@f_group_one);
+  f_prod_loc := (fset [] : {fset Location});
+  f_prod := (@f_prod);
+  f_inv_loc := (fset [] : {fset Location});
+  f_inv := (@f_inv);
+  f_div_loc := (fset [] : {fset Location});
+  f_div := (@f_div);
+  f_hash_loc := (fset [res_loc] : {fset Location});
+  f_hash := (@f_hash)|}.
+Fail Next Obligation.
+Hint Unfold t_Group_curve_t_Group.
 
 Definition t_OvnContractState {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : choice_type :=
   (nseq f_group_type (is_pure (n)) × nseq t_SchnorrZKPCommit (v_Z) (v_G) (is_pure (n)) × nseq f_field_type (is_pure (n)) × nseq f_group_type (is_pure (n)) × nseq t_OrZKPCommit (v_Z) (v_G) (is_pure (n)) × int32).
