@@ -67,11 +67,11 @@ pub trait Group<Z: Z_Field>: core::marker::Copy {
 }
 
 #[derive(Clone, Copy)]
-pub struct z_17 {}
-impl Z_Field for z_17 {
+pub struct z_89 {}
+impl Z_Field for z_89 {
     type field_type = u32;
     fn q() -> Self::field_type {
-        17u32
+        89u32
     } // Prime order
     fn random_field_elem(random: u32) -> Self::field_type {
         random % (Self::q() - 1)
@@ -99,26 +99,26 @@ impl Z_Field for z_17 {
 }
 
 #[derive(Clone, Copy)]
-pub struct g_z_17 {}
-impl Group<z_17> for g_z_17 {
+pub struct g_z_89 {}
+impl Group<z_89> for g_z_89 {
     type group_type = u32;
 
     fn g() -> Self::group_type {
         3u32
     } // Generator (elemnent of group)
 
-    fn hash(x: Vec<Self::group_type>) -> <z_17 as Z_Field>::field_type {
+    fn hash(x: Vec<Self::group_type>) -> <z_89 as Z_Field>::field_type {
         5 // TODO
     }
 
-    fn g_pow(x: <z_17 as Z_Field>::field_type) -> Self::group_type {
+    fn g_pow(x: <z_89 as Z_Field>::field_type) -> Self::group_type {
         Self::pow(Self::g(), x)
     }
 
     // TODO: use repeated squaring instead!
-    fn pow(g: Self::group_type, x: <z_17 as Z_Field>::field_type) -> Self::group_type {
+    fn pow(g: Self::group_type, x: <z_89 as Z_Field>::field_type) -> Self::group_type {
         let mut result = Self::group_one();
-        for i in 0..(x % (z_17::q() - 1)) {
+        for i in 0..(x % (z_89::q() - 1)) {
             result = Self::prod(result, g);
         }
         result
@@ -129,74 +129,22 @@ impl Group<z_17> for g_z_17 {
     }
 
     fn prod(x: Self::group_type, y: Self::group_type) -> Self::group_type {
-        ((x % z_17::q()) * (y % z_17::q())) % z_17::q()
+        ((x % z_89::q()) * (y % z_89::q())) % z_89::q()
     }
 
     fn inv(x: Self::group_type) -> Self::group_type {
-        // let mut res = 0;
-        // for i in 1..z_17::q() {
-        //     if Self::prod(Self::g_pow(i), x) == Self::group_one() {
-        //         res = i;
-        //     }
-        // }
-        // res
-        [0, 1, 9, 6, 13, 7, 3, 5, 15, 2, 12, 14, 10, 4, 11, 8, 16][x as usize]
+        for j in 0..89 {
+            if Self::prod(x, j) == Self::group_one() {
+                return j
+            }
+        }
+        assert!(false);
+        return x;
     }
 
     fn div(x: Self::group_type, y: Self::group_type) -> Self::group_type {
         Self::prod(x, Self::inv(y))
     }
-}
-
-#[test]
-pub fn z_17_correctness() {
-    type Z = z_17;
-    type G = g_z_17;
-
-    assert!(
-        G::g_pow(0) == 1
-            && G::g_pow(1) == 3
-            && G::g_pow(2) == 9
-            && G::g_pow(3) == 10
-            && G::g_pow(4) == 13
-            && G::g_pow(5) == 5
-            && G::g_pow(6) == 15
-            && G::g_pow(7) == 11
-            && G::g_pow(8) == 16
-            && G::g_pow(9) == 14
-            && G::g_pow(10) == 8
-            && G::g_pow(11) == 7
-            && G::g_pow(12) == 4
-            && G::g_pow(13) == 12
-            && G::g_pow(14) == 2
-            && G::g_pow(15) == 6
-            && G::g_pow(16) == 1
-    )
-}
-
-#[test]
-pub fn z_17_inv_correctness() {
-    type Z = z_17;
-    type G = g_z_17;
-
-    // [0, 1, 9, 6, 13, 7, 3, 5, 15, 2, 12, 14, 10, 4, 11, 8, 16]
-    assert_eq!(G::inv(0), 0);
-    assert_eq!(G::inv(1), 1);
-    assert_eq!(G::inv(2), 9);
-    assert_eq!(G::inv(3), 6);
-    assert_eq!(G::inv(4), 13);
-    assert_eq!(G::inv(5), 7);
-    assert_eq!(G::inv(6), 3);
-    assert_eq!(G::inv(7), 5);
-    assert_eq!(G::inv(8), 15);
-    assert_eq!(G::inv(9), 2);
-    assert_eq!(G::inv(10), 12);
-    assert_eq!(G::inv(11), 14);
-    assert_eq!(G::inv(12), 10);
-    assert_eq!(G::inv(13), 4);
-    assert_eq!(G::inv(14), 11);
-    assert_eq!(G::inv(15), 8);
-    assert_eq!(G::inv(16), 16);
 }
 
 // use hacspec_bls12_381::*;
@@ -361,8 +309,8 @@ pub fn schnorr_zkp_validate<Z: Z_Field, G: Group<Z>>(
 #[test]
 pub fn schorr_zkp_correctness() {
     fn test(random_x: u32, random_r: u32) -> bool {
-        type Z = z_17;
-        type G = g_z_17;
+        type Z = z_89;
+        type G = g_z_89;
 
         let x: u32 = Z::random_field_elem(random_x);
         let pow_x = G::g_pow(x);
@@ -517,8 +465,8 @@ pub fn or_zkp_correctness() {
         random_x: u32,
         v: bool,
     ) -> bool {
-        type Z = z_17;
-        type G = g_z_17;
+        type Z = z_89;
+        type G = g_z_89;
 
         let mut h = G::g_pow(Z::random_field_elem(random_h));
         let x = Z::random_field_elem(random_x);
@@ -532,6 +480,14 @@ pub fn or_zkp_correctness() {
         .quickcheck(test as fn(u32, u32, u32, u32, u32, bool) -> bool)
 }
 
+pub fn commit_to<Z: Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type) -> Z::field_type {
+    G::hash(vec![g_pow_xi_yi_vi])
+}
+
+pub fn check_commitment<Z: Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type, commitment: Z::field_type) -> bool {
+    G::hash(vec![g_pow_xi_yi_vi]) == commitment
+}
+
 #[hax::contract_state(contract = "OVN")]
 // #[cfg_attr(not(feature = "hax_compilation"), contract_state(contract = "OVN"))]
 #[derive(Serialize, SchemaType, Clone, Copy)]
@@ -539,7 +495,7 @@ pub struct OvnContractState<Z: Z_Field, G: Group<Z>, const n: usize> {
     g_pow_xis: [G::group_type; n],
     zkp_xis: [SchnorrZKPCommit<Z, G>; n],
 
-    commit_vis: [u32; n],
+    commit_vis: [Z::field_type; n],
 
     g_pow_xi_yi_vis: [G::group_type; n],
     zkp_vis: [OrZKPCommit<Z, G>; n],
@@ -559,7 +515,7 @@ pub fn init_ovn_contract<Z: Z_Field, G: Group<Z>, const n: usize>(// _: &impl Ha
             c: Z::field_zero(),
         }; n],
 
-        commit_vis: [0; n],
+        commit_vis: [Z::field_zero(); n],
 
         g_pow_xi_yi_vis: [G::group_one(); n],
         zkp_vis: [OrZKPCommit::<Z, G> {
@@ -645,11 +601,11 @@ pub fn compute_g_pow_yi<Z: Z_Field, G: Group<Z>, const n: usize>(
 
 #[test]
 pub fn sum_to_zero() {
-    type Z = z_17;
-    type G = g_z_17;
-    const n: usize = 15;
-    let mut xis: [<z_17 as Z_Field>::field_type; n] = [0; n];
-    let mut g_pow_xis: [<g_z_17 as Group<Z>>::group_type; n] = [0; n];
+    type Z = z_89;
+    type G = g_z_89;
+    const n: usize = 55;
+    let mut xis: [<z_89 as Z_Field>::field_type; n] = [0; n];
+    let mut g_pow_xis: [<g_z_89 as Group<Z>>::group_type; n] = [0; n];
     use rand::random;
     for i in 0..n {
         xis[i] = Z::random_field_elem(random());
@@ -677,10 +633,6 @@ pub fn compute_group_element_for_vote<Z: Z_Field, G: Group<Z>>(
             Z::field_zero()
         }),
     )
-}
-
-pub fn commit_to<Z: Z_Field, G: Group<Z>>(x: G::group_type) -> u32 {
-    0
 }
 
 /** Commitment before round 2 */
@@ -734,10 +686,6 @@ pub fn cast_vote<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     cast_vote_state_ret.zkp_vis[params.cvp_i as usize] = zkp_vi;
 
     Ok((A::accept(), cast_vote_state_ret))
-}
-
-pub fn check_commitment<Z: Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type, zkp: u32) -> bool {
-    true
 }
 
 #[derive(Serialize, SchemaType)]
@@ -856,30 +804,23 @@ pub fn test_correctness<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
         }
     }
 
-    // claim_eq!(
-    //     state.tally,
-    //     count,
-    //     "The tally should equal the number of positive votes"
-    // );
-
     assert_eq!(state.tally, count);
     state.tally == count
-    // true
 }
 
 // #[concordium_test]
 #[test]
-fn test_full_z17() {
-    type Z = z_17;
-    type G = g_z_17;
-    const n: usize = 15;
+fn test_full_z89() {
+    type Z = z_89;
+    type G = g_z_89;
+    const n: usize = 55;
 
     use rand::random;
     // rand::SeedableRng::seed_from_u64(32u64); // TODO
 
     fn test() -> bool {
         let mut votes: [bool; n] = [false; n];
-        let mut xis: [<z_17 as Z_Field>::field_type; n] = [0; n];
+        let mut xis: [<z_89 as Z_Field>::field_type; n] = [0; n];
         let mut rp_zkp_randoms: [u32; n] = [0; n];
         let mut cvp_zkp_random_ws1: [u32; n] = [0; n];
         let mut cvp_zkp_random_rs1: [u32; n] = [0; n];
@@ -900,7 +841,7 @@ fn test_full_z17() {
             cvp_zkp_random_rs2[i] = random();
             cvp_zkp_random_ds2[i] = random();
         }
-        
+
         test_correctness::<
                 Z,
             G,
@@ -918,20 +859,8 @@ fn test_full_z17() {
             cvp_zkp_random_ds2,
         )
     };
-    
+
     QuickCheck::new()
         .tests(10000)
         .quickcheck(test as fn() -> bool)
 }
-
-// #[concordium_test]
-// fn test_bls12_381() {
-//     type Z = Z_curve;
-//     type G = Group_curve;
-//     const n: usize = 15;
-
-//     use rand::random;
-//     // rand::SeedableRng::seed_from_u64(32u64); // TODO
-
-//     test_correctness::<Z, G, n, hacspec_concordium::test_infrastructure::ActionsTree>()
-// }
