@@ -130,22 +130,22 @@ Equations compute_g_pow_yi {L1 : {fset Location}} {L2 : {fset Location}} {I1 : I
 Solve All Obligations with ( solve_ssprove_obligations ; ((now (rewrite !fset0E ; apply (ret_both 0))) || (now destruct from_uint_size))).
 Fail Next Obligation.
 
-Equations impl__into_vec {L I A n} : both L I (nseq A n) -> both L I (t_Vec A t_Global) :=
-  impl__into_vec X := bind_both X (fun x : nseq A n => solve_lift (ret_both (Hacspec_Lib_Pre.array_to_list x : chList _))).
+Equations impl__into_vec {L I A n} : both L I (nseq_ A n) -> both L I (t_Vec A t_Global) :=
+  impl__into_vec X := bind_both X (fun x : nseq_ A n => solve_lift (ret_both (Hacspec_Lib_Pre.array_to_list x : chList _))).
 Fail Next Obligation.
 
 Definition unsize {A} := @id A.
 Definition box_new {A} := @id A.
 
 
-Equations check_commitment {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) (commitment : both L2 I2 (f_field_type)) : both (L1 :|: L2) (I1 :|: I2) ('bool) :=
+Equations check_commitment {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) (commitment : both L2 I2 (f_field_type)) : both (L1 :|: L2 :|: f_hash_loc) (I1 :|: I2) ('bool) :=
   check_commitment g_pow_xi_yi_vi commitment  :=
-    solve_lift ((f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) =.? commitment) : both (L1 :|: L2) (I1 :|: I2) ('bool).
+    solve_lift ((f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) =.? commitment) : both (L1 :|: L2 :|: f_hash_loc) (I1 :|: I2) ('bool).
 Fail Next Obligation.
 
-Equations commit_to {L1 : {fset Location}} {I1 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) : both L1 I1 (f_field_type) :=
+Equations commit_to {L1 : {fset Location}} {I1 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) : both (L1 :|: f_hash_loc) I1 (f_field_type) :=
   commit_to g_pow_xi_yi_vi  :=
-    solve_lift (f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) : both L1 I1 (f_field_type).
+    solve_lift (f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) : both (L1 :|: f_hash_loc) I1 (f_field_type).
 Fail Next Obligation.
 
 Definition t_CastVoteParam {v_Z : _} `{ t_Sized (v_Z)} `{ t_Z_Field (v_Z)} : choice_type :=
@@ -197,35 +197,35 @@ Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_zkp_random_r' ':=' y ')'"
 Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_zkp_random_d' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := f_cvp_i x) (f_cvp_xi := f_cvp_xi x) (f_cvp_zkp_random_w := f_cvp_zkp_random_w x) (f_cvp_zkp_random_r := f_cvp_zkp_random_r x) (f_cvp_zkp_random_d := y) (f_cvp_vote := f_cvp_vote x)).
 Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_vote' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := f_cvp_i x) (f_cvp_xi := f_cvp_xi x) (f_cvp_zkp_random_w := f_cvp_zkp_random_w x) (f_cvp_zkp_random_r := f_cvp_zkp_random_r x) (f_cvp_zkp_random_d := f_cvp_zkp_random_d x) (f_cvp_vote := y)).
 
-Definition t_Group_curve : choice_type :=
-  (t_Point).
-Equations f_val {L : {fset Location}} {I : Interface} (s : both L I (t_Group_curve)) : both L I (t_Point) :=
-  f_val s  :=
-    bind_both s (fun x =>
-      solve_lift (ret_both (x : t_Point))) : both L I (t_Point).
-Fail Next Obligation.
-Equations Build_t_Group_curve {L0 : {fset Location}} {I0 : Interface} {f_val : both L0 I0 (t_Point)} : both L0 I0 (t_Group_curve) :=
-  Build_t_Group_curve  :=
-    bind_both f_val (fun f_val =>
-      solve_lift (ret_both ((f_val) : (t_Group_curve)))) : both L0 I0 (t_Group_curve).
-Fail Next Obligation.
-Notation "'Build_t_Group_curve' '[' x ']' '(' 'f_val' ':=' y ')'" := (Build_t_Group_curve (f_val := y)).
+(* Definition t_Group_curve : choice_type := *)
+(*   (t_Point). *)
+(* Equations f_val {L : {fset Location}} {I : Interface} (s : both L I (t_Group_curve)) : both L I (t_Point) := *)
+(*   f_val s  := *)
+(*     bind_both s (fun x => *)
+(*       solve_lift (ret_both (x : t_Point))) : both L I (t_Point). *)
+(* Fail Next Obligation. *)
+(* Equations Build_t_Group_curve {L0 : {fset Location}} {I0 : Interface} {f_val : both L0 I0 (t_Point)} : both L0 I0 (t_Group_curve) := *)
+(*   Build_t_Group_curve  := *)
+(*     bind_both f_val (fun f_val => *)
+(*       solve_lift (ret_both ((f_val) : (t_Group_curve)))) : both L0 I0 (t_Group_curve). *)
+(* Fail Next Obligation. *)
+(* Notation "'Build_t_Group_curve' '[' x ']' '(' 'f_val' ':=' y ')'" := (Build_t_Group_curve (f_val := y)). *)
 
-#[global] Program Instance t_Group_curve_t_Deserial : t_Deserial t_Group_curve :=
-  let f_deserial := fun  {L1 : {fset Location}} {I1 : Interface} (v__source : both L1 I1 (v_R)) => letb hax_temp_output := Result_Err ParseError in
-  solve_lift (prod_b (v__source,hax_temp_output)) : both (L1 :|: fset []) I1 ((v_R × t_Result (t_Group_curve) (t_ParseError))) in
-  {| f_deserial_loc := (fset [] : {fset Location});
-  f_deserial := (@f_deserial)|}.
-Fail Next Obligation.
-Hint Unfold t_Group_curve_t_Deserial.
+(* #[global] Program Instance t_Group_curve_t_Deserial : t_Deserial t_Group_curve := *)
+(*   let f_deserial := fun  {L1 : {fset Location}} {I1 : Interface} (v__source : both L1 I1 (v_R)) => letb hax_temp_output := Result_Err ParseError in *)
+(*   solve_lift (prod_b (v__source,hax_temp_output)) : both (L1 :|: fset []) I1 ((v_R × t_Result (t_Group_curve) (t_ParseError))) in *)
+(*   {| f_deserial_loc := (fset [] : {fset Location}); *)
+(*   f_deserial := (@f_deserial)|}. *)
+(* Fail Next Obligation. *)
+(* Hint Unfold t_Group_curve_t_Deserial. *)
 
-#[global] Program Instance t_Group_curve_t_Serial : t_Serial t_Group_curve :=
-  let f_serial := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (self : both L1 I1 (t_Group_curve)) (v__out : both L2 I2 (v_W)) => letb hax_temp_output := Result_Ok (ret_both (tt : 'unit)) in
-  solve_lift (prod_b (v__out,hax_temp_output)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) ((v_W × t_Result ('unit) (f_Err))) in
-  {| f_serial_loc := (fset [] : {fset Location});
-  f_serial := (@f_serial)|}.
-Fail Next Obligation.
-Hint Unfold t_Group_curve_t_Serial.
+(* #[global] Program Instance t_Group_curve_t_Serial : t_Serial t_Group_curve := *)
+(*   let f_serial := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (self : both L1 I1 (t_Group_curve)) (v__out : both L2 I2 (v_W)) => letb hax_temp_output := Result_Ok (ret_both (tt : 'unit)) in *)
+(*   solve_lift (prod_b (v__out,hax_temp_output)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) ((v_W × t_Result ('unit) (f_Err))) in *)
+(*   {| f_serial_loc := (fset [] : {fset Location}); *)
+(*   f_serial := (@f_serial)|}. *)
+(* Fail Next Obligation. *)
+(* Hint Unfold t_Group_curve_t_Serial. *)
 
 Definition t_OrZKPCommit {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : choice_type :=
   (f_group_type × f_group_type × f_group_type × f_group_type × f_group_type × f_group_type × f_field_type × f_field_type × f_field_type × f_field_type × f_field_type).

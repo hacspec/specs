@@ -24,119 +24,60 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Require Import Hacspec_bip_340.
-Export Hacspec_bip_340.
-
-Class t_Z_Field (Self : choice_type) := {
-  f_field_type : choice_type ;
-  f_field_type_t_Serialize :> t_Serialize (f_field_type) ;
-  f_field_type_t_Deserial :> t_Deserial (f_field_type) ;
-  f_field_type_t_Serial :> t_Serial (f_field_type) ;
-  f_field_type_t_Copy :> t_Copy (f_field_type) ;
-  f_field_type_t_Clone :> t_Clone (f_field_type) ;
-  f_field_type_t_Eq :> t_Eq (f_field_type) ;
-  f_field_type_t_PartialEq :> t_PartialEq (f_field_type) ;
-  f_field_type_t_Sized :> t_Sized (f_field_type) ;
-  f_q_loc : {fset Location} ;
-  f_q : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_q_loc) I1 (f_field_type) ;
-  f_random_field_elem_loc : {fset Location} ;
-  f_random_field_elem : forall {L1 I1}, both L1 I1 (int32) -> both (L1 :|: f_random_field_elem_loc) I1 (f_field_type) ;
-  f_field_zero_loc : {fset Location} ;
-  f_field_zero : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_field_zero_loc) I1 (f_field_type) ;
-  f_field_one_loc : {fset Location} ;
-  f_field_one : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_field_one_loc) I1 (f_field_type) ;
-  f_add_loc : {fset Location} ;
-  f_add : forall {L1 L2 I1 I2}, both L1 I1 (f_field_type) -> both L2 I2 (f_field_type) -> both (L1 :|: L2 :|: f_add_loc) (I1 :|: I2) (f_field_type) ;
-  f_sub_loc : {fset Location} ;
-  f_sub : forall {L1 L2 I1 I2}, both L1 I1 (f_field_type) -> both L2 I2 (f_field_type) -> both (L1 :|: L2 :|: f_sub_loc) (I1 :|: I2) (f_field_type) ;
-  f_mul_loc : {fset Location} ;
-  f_mul : forall {L1 L2 I1 I2}, both L1 I1 (f_field_type) -> both L2 I2 (f_field_type) -> both (L1 :|: L2 :|: f_mul_loc) (I1 :|: I2) (f_field_type) ;
-}.
-Hint Unfold f_q_loc.
-Hint Unfold f_random_field_elem_loc.
-Hint Unfold f_field_zero_loc.
-Hint Unfold f_field_one_loc.
-Hint Unfold f_add_loc.
-Hint Unfold f_sub_loc.
-Hint Unfold f_mul_loc.
-
-Class t_Group (Self : choice_type) := {
-  f_group_type : choice_type ;
-  f_group_type_t_Serialize :> t_Serialize (f_group_type) ;
-  f_group_type_t_Deserial :> t_Deserial (f_group_type) ;
-  f_group_type_t_Serial :> t_Serial (f_group_type) ;
-  f_group_type_t_Copy :> t_Copy (f_group_type) ;
-  f_group_type_t_Clone :> t_Clone (f_group_type) ;
-  f_group_type_t_Eq :> t_Eq (f_group_type) ;
-  f_group_type_t_PartialEq :> t_PartialEq (f_group_type) ;
-  f_group_type_t_Sized :> t_Sized (f_group_type) ;
-  f_g_loc : {fset Location} ;
-  f_g : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_g_loc) I1 (f_group_type) ;
-  f_g_pow_loc : {fset Location} ;
-  f_g_pow : forall {L1 I1}, both L1 I1 (f_field_type) -> both (L1 :|: f_g_pow_loc) I1 (f_group_type) ;
-  f_pow_loc : {fset Location} ;
-  f_pow : forall {L1 L2 I1 I2}, both L1 I1 (f_group_type) -> both L2 I2 (f_field_type) -> both (L1 :|: L2 :|: f_pow_loc) (I1 :|: I2) (f_group_type) ;
-  f_group_one_loc : {fset Location} ;
-  f_group_one : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_group_one_loc) I1 (f_group_type) ;
-  f_prod_loc : {fset Location} ;
-  f_prod : forall {L1 L2 I1 I2}, both L1 I1 (f_group_type) -> both L2 I2 (f_group_type) -> both (L1 :|: L2 :|: f_prod_loc) (I1 :|: I2) (f_group_type) ;
-  f_inv_loc : {fset Location} ;
-  f_inv : forall {L1 I1}, both L1 I1 (f_group_type) -> both (L1 :|: f_inv_loc) I1 (f_group_type) ;
-  f_div_loc : {fset Location} ;
-  f_div : forall {L1 L2 I1 I2}, both L1 I1 (f_group_type) -> both L2 I2 (f_group_type) -> both (L1 :|: L2 :|: f_div_loc) (I1 :|: I2) (f_group_type) ;
-  f_hash_loc : {fset Location} ;
-  f_hash : forall {L1 I1}, both L1 I1 (t_Vec (f_group_type) (t_Global)) -> both (L1 :|: f_hash_loc) I1 (f_field_type) ;
-}.
-Hint Unfold f_g_loc.
-Hint Unfold f_g_pow_loc.
-Hint Unfold f_pow_loc.
-Hint Unfold f_group_one_loc.
-Hint Unfold f_prod_loc.
-Hint Unfold f_inv_loc.
-Hint Unfold f_div_loc.
-Hint Unfold f_hash_loc.
+Require Import Hacspec_ovn_Ovn_traits.
+Export Hacspec_ovn_Ovn_traits.
 
 (*Not implemented yet? todo(item)*)
 
 (*Not implemented yet? todo(item)*)
 
-Equations compute_group_element_for_vote {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (xi : both L1 I1 (f_field_type)) (vote : both L2 I2 ('bool)) (g_pow_yi : both L3 I3 (f_group_type)) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (f_group_type) :=
+(*Not implemented yet? todo(item)*)
+
+Equations compute_group_element_for_vote {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (xi : both L1 I1 (f_field_type)) (vote : both L2 I2 ('bool)) (g_pow_yi : both L3 I3 (f_group_type)) : both (L1 :|: L2 :|: L3 :|: (f_pow_loc :|: f_field_zero_loc :|: f_field_one_loc :|: f_g_pow_loc :|: f_prod_loc)) (I1 :|: I2 :|: I3) (f_group_type) :=
   compute_group_element_for_vote xi vote g_pow_yi  :=
     solve_lift (f_prod (f_pow g_pow_yi xi) (f_g_pow (ifb vote
     then f_field_one (ret_both (tt : 'unit))
-    else f_field_zero (ret_both (tt : 'unit))))) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (f_group_type).
+    else f_field_zero (ret_both (tt : 'unit))))) : both (L1 :|: L2 :|: L3 :|: (f_pow_loc :|: f_field_zero_loc :|: f_field_one_loc :|: f_g_pow_loc :|: f_prod_loc)) (I1 :|: I2 :|: I3) (f_group_type).
 Fail Next Obligation.
 
-Equations select_private_voting_key {L1 : {fset Location}} {I1 : Interface} {v_Z : _} `{ t_Sized (v_Z)} `{ t_Z_Field (v_Z)} (random : both L1 I1 (int32)) : both L1 I1 (f_field_type) :=
+Equations select_private_voting_key {L1 : {fset Location}} {I1 : Interface} {v_Z : _} `{ t_Sized (v_Z)} `{ t_Z_Field (v_Z)} (random : both L1 I1 (int32)) : both (L1 :|: f_random_field_elem_loc) I1 (f_field_type) :=
   select_private_voting_key random  :=
-    solve_lift (f_random_field_elem random) : both L1 I1 (f_field_type).
+    solve_lift (f_random_field_elem random) : both (L1 :|: f_random_field_elem_loc) I1 (f_field_type).
 Fail Next Obligation.
 
 Definition prod1_loc {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : Location :=
   (f_group_type;0%nat).
 Definition prod2_loc {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : Location :=
   (f_group_type;1%nat).
-Equations compute_g_pow_yi {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (i : both L1 I1 (uint_size)) (xis : both L2 I2 (nseq f_group_type (is_pure (n)))) : both (L1 :|: L2 :|: fset [prod1_loc;prod2_loc]) (I1 :|: I2) (f_group_type) :=
+Equations compute_g_pow_yi {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (i : both L1 I1 (uint_size)) (xis : both L2 I2 (nseq f_group_type (is_pure (n)))) : both (L1 :|: L2 :|: f_group_one_loc :|: f_field_one_loc:|: f_g_pow_loc :|: f_field_zero_loc :|: f_div_loc :|: f_prod_loc :|: f_pow_loc :|: fset [prod1_loc (n := n);prod2_loc (n := n)]) (I1 :|: I2) (f_group_type) :=
   compute_g_pow_yi i xis  :=
     letb prod1 loc(prod1_loc) := f_group_one (ret_both (tt : 'unit)) in
     letb prod1 := foldi_both_list (f_into_iter (Build_t_Range (f_start := ret_both (0 : uint_size)) (f_end := i))) (fun j =>
       ssp (fun prod1 =>
-        solve_lift (f_prod prod1 (xis.a[j])) : both (*2*)(L1:|:L2:|:L1:|:fset [prod1_loc;prod1_loc]) (I1:|:I2:|:I1) (f_group_type))) prod1 in
+        solve_lift (f_prod prod1 (xis.a[j])) : both (*2*)(L1:|:L2:|:L1 :|: f_group_one_loc :|: f_field_one_loc:|: f_g_pow_loc :|: f_field_zero_loc :|: f_div_loc :|: f_prod_loc :|: f_pow_loc:|:fset [prod1_loc;prod1_loc]) (I1:|:I2:|:I1) (f_group_type))) prod1 in
     letb prod2 loc(prod2_loc) := f_group_one (ret_both (tt : 'unit)) in
     letb prod2 := foldi_both_list (f_into_iter (Build_t_Range (f_start := i .+ (ret_both (1 : uint_size))) (f_end := n))) (fun j =>
       ssp (fun prod2 =>
-        solve_lift (f_prod prod2 (xis.a[j])) : both (*2*)(L1:|:L2:|:L1:|:fset [prod2_loc;prod2_loc]) (I1:|:I2:|:I1) (f_group_type))) prod2 in
-    solve_lift (f_div prod1 prod2) : both (L1 :|: L2 :|: fset [prod1_loc;prod2_loc]) (I1 :|: I2) (f_group_type).
+        solve_lift (f_prod prod2 (xis.a[j])) : both (*2*)(L1:|:L2:|:L1:|: f_group_one_loc :|: f_field_one_loc:|: f_g_pow_loc :|: f_field_zero_loc :|: f_div_loc :|: f_prod_loc :|: f_pow_loc :|: fset [prod2_loc;prod2_loc]) (I1:|:I2:|:I1) (f_group_type))) prod2 in
+    solve_lift (f_div prod1 prod2) : both (L1 :|: L2 :|: f_group_one_loc :|: f_field_one_loc:|: f_g_pow_loc :|: f_field_zero_loc :|: f_div_loc :|: f_prod_loc :|: f_pow_loc :|: fset [prod1_loc;prod2_loc]) (I1 :|: I2) (f_group_type).
+Solve All Obligations with ( solve_ssprove_obligations ; ((now (rewrite !fset0E ; apply (ret_both 0))) || (now destruct from_uint_size))).
 Fail Next Obligation.
 
-Equations check_commitment {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) (commitment : both L2 I2 (f_field_type)) : both (L1 :|: L2) (I1 :|: I2) ('bool) :=
+Equations impl__into_vec {L I A n} : both L I (nseq_ A n) -> both L I (t_Vec A t_Global) :=
+  impl__into_vec X := bind_both X (fun x : nseq_ A n => solve_lift (ret_both (Hacspec_Lib_Pre.array_to_list x : chList _))).
+Fail Next Obligation.
+
+Definition unsize {A} := @id A.
+Definition box_new {A} := @id A.
+
+Equations check_commitment {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) (commitment : both L2 I2 (f_field_type)) : both (L1 :|: L2 :|: f_hash_loc) (I1 :|: I2) ('bool) :=
   check_commitment g_pow_xi_yi_vi commitment  :=
-    solve_lift ((f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) =.? commitment) : both (L1 :|: L2) (I1 :|: I2) ('bool).
+    solve_lift ((f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) =.? commitment) : both (L1 :|: L2 :|: f_hash_loc) (I1 :|: I2) ('bool).
 Fail Next Obligation.
 
-Equations commit_to {L1 : {fset Location}} {I1 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) : both L1 I1 (f_field_type) :=
+Equations commit_to {L1 : {fset Location}} {I1 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (g_pow_xi_yi_vi : both L1 I1 (f_group_type)) : both (L1 :|: f_hash_loc) I1 (f_field_type) :=
   commit_to g_pow_xi_yi_vi  :=
-    solve_lift (f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) : both L1 I1 (f_field_type).
+    solve_lift (f_hash (impl__into_vec (unsize (box_new (array_from_list [g_pow_xi_yi_vi]))))) : both (L1 :|: f_hash_loc) I1 (f_field_type).
 Fail Next Obligation.
 
 Definition t_CastVoteParam {v_Z : _} `{ t_Sized (v_Z)} `{ t_Z_Field (v_Z)} : choice_type :=
@@ -188,119 +129,89 @@ Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_zkp_random_r' ':=' y ')'"
 Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_zkp_random_d' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := f_cvp_i x) (f_cvp_xi := f_cvp_xi x) (f_cvp_zkp_random_w := f_cvp_zkp_random_w x) (f_cvp_zkp_random_r := f_cvp_zkp_random_r x) (f_cvp_zkp_random_d := y) (f_cvp_vote := f_cvp_vote x)).
 Notation "'Build_t_CastVoteParam' '[' x ']' '(' 'f_cvp_vote' ':=' y ')'" := (Build_t_CastVoteParam (f_cvp_i := f_cvp_i x) (f_cvp_xi := f_cvp_xi x) (f_cvp_zkp_random_w := f_cvp_zkp_random_w x) (f_cvp_zkp_random_r := f_cvp_zkp_random_r x) (f_cvp_zkp_random_d := f_cvp_zkp_random_d x) (f_cvp_vote := y)).
 
-Definition t_Group_curve : choice_type :=
-  (t_Point).
-Equations f_val {L : {fset Location}} {I : Interface} (s : both L I (t_Group_curve)) : both L I (t_Point) :=
-  f_val s  :=
-    bind_both s (fun x =>
-      solve_lift (ret_both (x : t_Point))) : both L I (t_Point).
-Fail Next Obligation.
-Equations Build_t_Group_curve {L0 : {fset Location}} {I0 : Interface} {f_val : both L0 I0 (t_Point)} : both L0 I0 (t_Group_curve) :=
-  Build_t_Group_curve  :=
-    bind_both f_val (fun f_val =>
-      solve_lift (ret_both ((f_val) : (t_Group_curve)))) : both L0 I0 (t_Group_curve).
-Fail Next Obligation.
-Notation "'Build_t_Group_curve' '[' x ']' '(' 'f_val' ':=' y ')'" := (Build_t_Group_curve (f_val := y)).
-
-#[global] Program Instance t_Group_curve_t_Deserial : t_Deserial t_Group_curve :=
-  let f_deserial := fun  {L1 : {fset Location}} {I1 : Interface} (v__source : both L1 I1 (v_R)) => letb hax_temp_output := Result_Err ParseError in
-  solve_lift (prod_b (v__source,hax_temp_output)) : both (L1 :|: fset []) I1 ((v_R × t_Result (t_Group_curve) (t_ParseError))) in
-  {| f_deserial_loc := (fset [] : {fset Location});
-  f_deserial := (@f_deserial)|}.
-Fail Next Obligation.
-Hint Unfold t_Group_curve_t_Deserial.
-
-#[global] Program Instance t_Group_curve_t_Serial : t_Serial t_Group_curve :=
-  let f_serial := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (self : both L1 I1 (t_Group_curve)) (v__out : both L2 I2 (v_W)) => letb hax_temp_output := Result_Ok (ret_both (tt : 'unit)) in
-  solve_lift (prod_b (v__out,hax_temp_output)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) ((v_W × t_Result ('unit) (f_Err))) in
-  {| f_serial_loc := (fset [] : {fset Location});
-  f_serial := (@f_serial)|}.
-Fail Next Obligation.
-Hint Unfold t_Group_curve_t_Serial.
-
 Definition t_OrZKPCommit {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : choice_type :=
   (f_group_type × f_group_type × f_group_type × f_group_type × f_group_type × f_group_type × f_field_type × f_field_type × f_field_type × f_field_type × f_field_type).
-Equations f_x {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
-  f_x s  :=
+Equations f_or_zkp_x {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
+  f_or_zkp_x s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (fst (fst (fst (fst (fst (fst (fst (fst (fst (fst x))))))))) : f_group_type))) : both L I (f_group_type).
 Fail Next Obligation.
-Equations f_y {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
-  f_y s  :=
+Equations f_or_zkp_y {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
+  f_or_zkp_y s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst (fst (fst (fst (fst (fst (fst (fst x))))))))) : f_group_type))) : both L I (f_group_type).
 Fail Next Obligation.
-Equations f_a1 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
-  f_a1 s  :=
+Equations f_or_zkp_a1 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
+  f_or_zkp_a1 s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst (fst (fst (fst (fst (fst (fst x)))))))) : f_group_type))) : both L I (f_group_type).
 Fail Next Obligation.
-Equations f_b1 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
-  f_b1 s  :=
+Equations f_or_zkp_b1 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
+  f_or_zkp_b1 s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst (fst (fst (fst (fst (fst x))))))) : f_group_type))) : both L I (f_group_type).
 Fail Next Obligation.
-Equations f_a2 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
-  f_a2 s  :=
+Equations f_or_zkp_a2 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
+  f_or_zkp_a2 s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst (fst (fst (fst (fst x)))))) : f_group_type))) : both L I (f_group_type).
 Fail Next Obligation.
-Equations f_b2 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
-  f_b2 s  :=
+Equations f_or_zkp_b2 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_group_type) :=
+  f_or_zkp_b2 s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst (fst (fst (fst x))))) : f_group_type))) : both L I (f_group_type).
 Fail Next Obligation.
-Equations f_c {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
-  f_c s  :=
+Equations f_or_zkp_c {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
+  f_or_zkp_c s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst (fst (fst x)))) : f_field_type))) : both L I (f_field_type).
 Fail Next Obligation.
-Equations f_d1 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
-  f_d1 s  :=
+Equations f_or_zkp_d1 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
+  f_or_zkp_d1 s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst (fst x))) : f_field_type))) : both L I (f_field_type).
 Fail Next Obligation.
-Equations f_d2 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
-  f_d2 s  :=
+Equations f_or_zkp_d2 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
+  f_or_zkp_d2 s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst x)) : f_field_type))) : both L I (f_field_type).
 Fail Next Obligation.
-Equations f_r1 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
-  f_r1 s  :=
+Equations f_or_zkp_r1 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
+  f_or_zkp_r1 s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst x) : f_field_type))) : both L I (f_field_type).
 Fail Next Obligation.
-Equations f_r2 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
-  f_r2 s  :=
+Equations f_or_zkp_r2 {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OrZKPCommit)) : both L I (f_field_type) :=
+  f_or_zkp_r2 s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd x : f_field_type))) : both L I (f_field_type).
 Fail Next Obligation.
-Equations Build_t_OrZKPCommit {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {L5 : {fset Location}} {L6 : {fset Location}} {L7 : {fset Location}} {L8 : {fset Location}} {L9 : {fset Location}} {L10 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} {I5 : Interface} {I6 : Interface} {I7 : Interface} {I8 : Interface} {I9 : Interface} {I10 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} {f_x : both L0 I0 (f_group_type)} {f_y : both L1 I1 (f_group_type)} {f_a1 : both L2 I2 (f_group_type)} {f_b1 : both L3 I3 (f_group_type)} {f_a2 : both L4 I4 (f_group_type)} {f_b2 : both L5 I5 (f_group_type)} {f_c : both L6 I6 (f_field_type)} {f_d1 : both L7 I7 (f_field_type)} {f_d2 : both L8 I8 (f_field_type)} {f_r1 : both L9 I9 (f_field_type)} {f_r2 : both L10 I10 (f_field_type)} : both (L0:|:L1:|:L2:|:L3:|:L4:|:L5:|:L6:|:L7:|:L8:|:L9:|:L10) (I0:|:I1:|:I2:|:I3:|:I4:|:I5:|:I6:|:I7:|:I8:|:I9:|:I10) (t_OrZKPCommit) :=
+Equations Build_t_OrZKPCommit {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {L5 : {fset Location}} {L6 : {fset Location}} {L7 : {fset Location}} {L8 : {fset Location}} {L9 : {fset Location}} {L10 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} {I5 : Interface} {I6 : Interface} {I7 : Interface} {I8 : Interface} {I9 : Interface} {I10 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} {f_or_zkp_x : both L0 I0 (f_group_type)} {f_or_zkp_y : both L1 I1 (f_group_type)} {f_or_zkp_a1 : both L2 I2 (f_group_type)} {f_or_zkp_b1 : both L3 I3 (f_group_type)} {f_or_zkp_a2 : both L4 I4 (f_group_type)} {f_or_zkp_b2 : both L5 I5 (f_group_type)} {f_or_zkp_c : both L6 I6 (f_field_type)} {f_or_zkp_d1 : both L7 I7 (f_field_type)} {f_or_zkp_d2 : both L8 I8 (f_field_type)} {f_or_zkp_r1 : both L9 I9 (f_field_type)} {f_or_zkp_r2 : both L10 I10 (f_field_type)} : both (L0:|:L1:|:L2:|:L3:|:L4:|:L5:|:L6:|:L7:|:L8:|:L9:|:L10) (I0:|:I1:|:I2:|:I3:|:I4:|:I5:|:I6:|:I7:|:I8:|:I9:|:I10) (t_OrZKPCommit) :=
   Build_t_OrZKPCommit  :=
-    bind_both f_r2 (fun f_r2 =>
-      bind_both f_r1 (fun f_r1 =>
-        bind_both f_d2 (fun f_d2 =>
-          bind_both f_d1 (fun f_d1 =>
-            bind_both f_c (fun f_c =>
-              bind_both f_b2 (fun f_b2 =>
-                bind_both f_a2 (fun f_a2 =>
-                  bind_both f_b1 (fun f_b1 =>
-                    bind_both f_a1 (fun f_a1 =>
-                      bind_both f_y (fun f_y =>
-                        bind_both f_x (fun f_x =>
-                          solve_lift (ret_both ((f_x,f_y,f_a1,f_b1,f_a2,f_b2,f_c,f_d1,f_d2,f_r1,f_r2) : (t_OrZKPCommit)))))))))))))) : both (L0:|:L1:|:L2:|:L3:|:L4:|:L5:|:L6:|:L7:|:L8:|:L9:|:L10) (I0:|:I1:|:I2:|:I3:|:I4:|:I5:|:I6:|:I7:|:I8:|:I9:|:I10) (t_OrZKPCommit).
+    bind_both f_or_zkp_r2 (fun f_or_zkp_r2 =>
+      bind_both f_or_zkp_r1 (fun f_or_zkp_r1 =>
+        bind_both f_or_zkp_d2 (fun f_or_zkp_d2 =>
+          bind_both f_or_zkp_d1 (fun f_or_zkp_d1 =>
+            bind_both f_or_zkp_c (fun f_or_zkp_c =>
+              bind_both f_or_zkp_b2 (fun f_or_zkp_b2 =>
+                bind_both f_or_zkp_a2 (fun f_or_zkp_a2 =>
+                  bind_both f_or_zkp_b1 (fun f_or_zkp_b1 =>
+                    bind_both f_or_zkp_a1 (fun f_or_zkp_a1 =>
+                      bind_both f_or_zkp_y (fun f_or_zkp_y =>
+                        bind_both f_or_zkp_x (fun f_or_zkp_x =>
+                          solve_lift (ret_both ((f_or_zkp_x,f_or_zkp_y,f_or_zkp_a1,f_or_zkp_b1,f_or_zkp_a2,f_or_zkp_b2,f_or_zkp_c,f_or_zkp_d1,f_or_zkp_d2,f_or_zkp_r1,f_or_zkp_r2) : (t_OrZKPCommit)))))))))))))) : both (L0:|:L1:|:L2:|:L3:|:L4:|:L5:|:L6:|:L7:|:L8:|:L9:|:L10) (I0:|:I1:|:I2:|:I3:|:I4:|:I5:|:I6:|:I7:|:I8:|:I9:|:I10) (t_OrZKPCommit).
 Fail Next Obligation.
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_x' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := y) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_y' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := y) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_a1' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := y) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_b1' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := y) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_a2' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := y) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_b2' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := y) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_c' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := y) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_d1' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := y) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_d2' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := y) (f_r1 := f_r1 x) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_r1' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := y) (f_r2 := f_r2 x)).
-Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_r2' ':=' y ')'" := (Build_t_OrZKPCommit (f_x := f_x x) (f_y := f_y x) (f_a1 := f_a1 x) (f_b1 := f_b1 x) (f_a2 := f_a2 x) (f_b2 := f_b2 x) (f_c := f_c x) (f_d1 := f_d1 x) (f_d2 := f_d2 x) (f_r1 := f_r1 x) (f_r2 := y)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_x' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := y) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_y' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := y) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_a1' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := y) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_b1' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := y) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_a2' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := y) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_b2' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := y) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_c' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := y) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_d1' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := y) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_d2' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := y) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_r1' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := y) (f_or_zkp_r2 := f_or_zkp_r2 x)).
+Notation "'Build_t_OrZKPCommit' '[' x ']' '(' 'f_or_zkp_r2' ':=' y ')'" := (Build_t_OrZKPCommit (f_or_zkp_x := f_or_zkp_x x) (f_or_zkp_y := f_or_zkp_y x) (f_or_zkp_a1 := f_or_zkp_a1 x) (f_or_zkp_b1 := f_or_zkp_b1 x) (f_or_zkp_a2 := f_or_zkp_a2 x) (f_or_zkp_b2 := f_or_zkp_b2 x) (f_or_zkp_c := f_or_zkp_c x) (f_or_zkp_d1 := f_or_zkp_d1 x) (f_or_zkp_d2 := f_or_zkp_d2 x) (f_or_zkp_r1 := f_or_zkp_r1 x) (f_or_zkp_r2 := y)).
 
 Definition t_RegisterParam {v_Z : _} `{ t_Sized (v_Z)} `{ t_Z_Field (v_Z)} : choice_type :=
   (int32 × f_field_type × int32).
@@ -332,31 +243,31 @@ Notation "'Build_t_RegisterParam' '[' x ']' '(' 'f_rp_zkp_random' ':=' y ')'" :=
 
 Definition t_SchnorrZKPCommit {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : choice_type :=
   (f_group_type × f_field_type × f_field_type).
-Equations f_u {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_SchnorrZKPCommit)) : both L I (f_group_type) :=
-  f_u s  :=
+Equations f_schnorr_zkp_u {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_SchnorrZKPCommit)) : both L I (f_group_type) :=
+  f_schnorr_zkp_u s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (fst (fst x) : f_group_type))) : both L I (f_group_type).
 Fail Next Obligation.
-Equations f_c {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_SchnorrZKPCommit)) : both L I (f_field_type) :=
-  f_c s  :=
+Equations f_schnorr_zkp_c {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_SchnorrZKPCommit)) : both L I (f_field_type) :=
+  f_schnorr_zkp_c s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst x) : f_field_type))) : both L I (f_field_type).
 Fail Next Obligation.
-Equations f_z {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_SchnorrZKPCommit)) : both L I (f_field_type) :=
-  f_z s  :=
+Equations f_schnorr_zkp_z {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_SchnorrZKPCommit)) : both L I (f_field_type) :=
+  f_schnorr_zkp_z s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd x : f_field_type))) : both L I (f_field_type).
 Fail Next Obligation.
-Equations Build_t_SchnorrZKPCommit {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} {f_u : both L0 I0 (f_group_type)} {f_c : both L1 I1 (f_field_type)} {f_z : both L2 I2 (f_field_type)} : both (L0:|:L1:|:L2) (I0:|:I1:|:I2) (t_SchnorrZKPCommit) :=
+Equations Build_t_SchnorrZKPCommit {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} {f_schnorr_zkp_u : both L0 I0 (f_group_type)} {f_schnorr_zkp_c : both L1 I1 (f_field_type)} {f_schnorr_zkp_z : both L2 I2 (f_field_type)} : both (L0:|:L1:|:L2) (I0:|:I1:|:I2) (t_SchnorrZKPCommit) :=
   Build_t_SchnorrZKPCommit  :=
-    bind_both f_z (fun f_z =>
-      bind_both f_c (fun f_c =>
-        bind_both f_u (fun f_u =>
-          solve_lift (ret_both ((f_u,f_c,f_z) : (t_SchnorrZKPCommit)))))) : both (L0:|:L1:|:L2) (I0:|:I1:|:I2) (t_SchnorrZKPCommit).
+    bind_both f_schnorr_zkp_z (fun f_schnorr_zkp_z =>
+      bind_both f_schnorr_zkp_c (fun f_schnorr_zkp_c =>
+        bind_both f_schnorr_zkp_u (fun f_schnorr_zkp_u =>
+          solve_lift (ret_both ((f_schnorr_zkp_u,f_schnorr_zkp_c,f_schnorr_zkp_z) : (t_SchnorrZKPCommit)))))) : both (L0:|:L1:|:L2) (I0:|:I1:|:I2) (t_SchnorrZKPCommit).
 Fail Next Obligation.
-Notation "'Build_t_SchnorrZKPCommit' '[' x ']' '(' 'f_u' ':=' y ')'" := (Build_t_SchnorrZKPCommit (f_u := y) (f_c := f_c x) (f_z := f_z x)).
-Notation "'Build_t_SchnorrZKPCommit' '[' x ']' '(' 'f_c' ':=' y ')'" := (Build_t_SchnorrZKPCommit (f_u := f_u x) (f_c := y) (f_z := f_z x)).
-Notation "'Build_t_SchnorrZKPCommit' '[' x ']' '(' 'f_z' ':=' y ')'" := (Build_t_SchnorrZKPCommit (f_u := f_u x) (f_c := f_c x) (f_z := y)).
+Notation "'Build_t_SchnorrZKPCommit' '[' x ']' '(' 'f_schnorr_zkp_u' ':=' y ')'" := (Build_t_SchnorrZKPCommit (f_schnorr_zkp_u := y) (f_schnorr_zkp_c := f_schnorr_zkp_c x) (f_schnorr_zkp_z := f_schnorr_zkp_z x)).
+Notation "'Build_t_SchnorrZKPCommit' '[' x ']' '(' 'f_schnorr_zkp_c' ':=' y ')'" := (Build_t_SchnorrZKPCommit (f_schnorr_zkp_u := f_schnorr_zkp_u x) (f_schnorr_zkp_c := y) (f_schnorr_zkp_z := f_schnorr_zkp_z x)).
+Notation "'Build_t_SchnorrZKPCommit' '[' x ']' '(' 'f_schnorr_zkp_z' ':=' y ')'" := (Build_t_SchnorrZKPCommit (f_schnorr_zkp_u := f_schnorr_zkp_u x) (f_schnorr_zkp_c := f_schnorr_zkp_c x) (f_schnorr_zkp_z := y)).
 
 Definition t_TallyParameter : choice_type :=
   'unit.
@@ -365,97 +276,26 @@ Equations Build_t_TallyParameter : both (fset []) (fset []) (t_TallyParameter) :
     solve_lift (ret_both (tt (* Empty tuple *) : (t_TallyParameter))) : both (fset []) (fset []) (t_TallyParameter).
 Fail Next Obligation.
 
-Definition t_Z_curve : choice_type :=
-  (t_Scalar).
-Equations f_val {L : {fset Location}} {I : Interface} (s : both L I (t_Z_curve)) : both L I (t_Scalar) :=
-  f_val s  :=
-    bind_both s (fun x =>
-      solve_lift (ret_both (x : t_Scalar))) : both L I (t_Scalar).
-Fail Next Obligation.
-Equations Build_t_Z_curve {L0 : {fset Location}} {I0 : Interface} {f_val : both L0 I0 (t_Scalar)} : both L0 I0 (t_Z_curve) :=
-  Build_t_Z_curve  :=
-    bind_both f_val (fun f_val =>
-      solve_lift (ret_both ((f_val) : (t_Z_curve)))) : both L0 I0 (t_Z_curve).
-Fail Next Obligation.
-Notation "'Build_t_Z_curve' '[' x ']' '(' 'f_val' ':=' y ')'" := (Build_t_Z_curve (f_val := y)).
-
-#[global] Program Instance t_Z_curve_t_Deserial : t_Deserial t_Z_curve :=
-  let f_deserial := fun  {L1 : {fset Location}} {I1 : Interface} (v__source : both L1 I1 (v_R)) => letb hax_temp_output := Result_Err ParseError in
-  solve_lift (prod_b (v__source,hax_temp_output)) : both (L1 :|: fset []) I1 ((v_R × t_Result (t_Z_curve) (t_ParseError))) in
-  {| f_deserial_loc := (fset [] : {fset Location});
-  f_deserial := (@f_deserial)|}.
-Fail Next Obligation.
-Hint Unfold t_Z_curve_t_Deserial.
-
-#[global] Program Instance t_Z_curve_t_Serial : t_Serial t_Z_curve :=
-  let f_serial := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (self : both L1 I1 (t_Z_curve)) (v__out : both L2 I2 (v_W)) => letb hax_temp_output := Result_Ok (ret_both (tt : 'unit)) in
-  solve_lift (prod_b (v__out,hax_temp_output)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) ((v_W × t_Result ('unit) (f_Err))) in
-  {| f_serial_loc := (fset [] : {fset Location});
-  f_serial := (@f_serial)|}.
-Fail Next Obligation.
-Hint Unfold t_Z_curve_t_Serial.
-
-#[global] Program Instance t_Z_curve_t_Z_Field : t_Z_Field t_Z_curve :=
-  let f_field_type := t_Z_curve : choice_type in
-  let f_q := fun  {L : {fset Location}} {I : Interface} => solve_lift (Build_t_Z_curve (f_val := impl__Scalar__from_hex (ret_both (0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 : chString)))) : both (L :|: fset []) I (t_Z_curve) in
-  let f_random_field_elem := fun  {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (int32)) => solve_lift (Build_t_Z_curve (f_val := impl__Scalar__from_literal (cast_int (WS2 := _) random))) : both (L1 :|: fset []) I1 (t_Z_curve) in
-  let f_field_zero := fun  {L : {fset Location}} {I : Interface} => solve_lift (Build_t_Z_curve (f_val := impl__Scalar__from_literal (ret_both (0 : int128)))) : both (L :|: fset []) I (t_Z_curve) in
-  let f_field_one := fun  {L : {fset Location}} {I : Interface} => solve_lift (Build_t_Z_curve (f_val := impl__Scalar__from_literal (ret_both (1 : int128)))) : both (L :|: fset []) I (t_Z_curve) in
-  let f_add := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Z_curve)) (y : both L2 I2 (t_Z_curve)) => solve_lift (Build_t_Z_curve (f_val := (f_val x) .+ (f_val y))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Z_curve) in
-  let f_sub := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Z_curve)) (y : both L2 I2 (t_Z_curve)) => solve_lift (Build_t_Z_curve (f_val := (f_val x) .- (f_val y))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Z_curve) in
-  let f_mul := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Z_curve)) (y : both L2 I2 (t_Z_curve)) => solve_lift (Build_t_Z_curve (f_val := (f_val x) .* (f_val y))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Z_curve) in
-  {| f_field_type := (@f_field_type);
-  f_q_loc := (fset [] : {fset Location});
-  f_q := (@f_q);
-  f_random_field_elem_loc := (fset [] : {fset Location});
-  f_random_field_elem := (@f_random_field_elem);
-  f_field_zero_loc := (fset [] : {fset Location});
-  f_field_zero := (@f_field_zero);
-  f_field_one_loc := (fset [] : {fset Location});
-  f_field_one := (@f_field_one);
-  f_add_loc := (fset [] : {fset Location});
-  f_add := (@f_add);
-  f_sub_loc := (fset [] : {fset Location});
-  f_sub := (@f_sub);
-  f_mul_loc := (fset [] : {fset Location});
-  f_mul := (@f_mul)|}.
-Fail Next Obligation.
-Hint Unfold t_Z_curve_t_Z_Field.
-
-Definition t_g_z_89_ : choice_type :=
-  'unit.
-Equations Build_t_g_z_89_ : both (fset []) (fset []) (t_g_z_89_) :=
-  Build_t_g_z_89_  :=
-    solve_lift (ret_both (tt (* Empty tuple *) : (t_g_z_89_))) : both (fset []) (fset []) (t_g_z_89_).
-Fail Next Obligation.
-
-Definition t_z_89_ : choice_type :=
-  'unit.
-Equations Build_t_z_89_ : both (fset []) (fset []) (t_z_89_) :=
-  Build_t_z_89_  :=
-    solve_lift (ret_both (tt (* Empty tuple *) : (t_z_89_))) : both (fset []) (fset []) (t_z_89_).
-Fail Next Obligation.
-
-Equations schnorr_zkp {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (random : both L1 I1 (int32)) (h : both L2 I2 (f_group_type)) (x : both L3 I3 (f_field_type)) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (t_SchnorrZKPCommit (v_Z) (v_G)) :=
+Equations schnorr_zkp {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (random : both L1 I1 (int32)) (h : both L2 I2 (f_group_type)) (x : both L3 I3 (f_field_type)) : both (L1 :|: L2 :|: L3 :|: f_random_field_elem_loc :|: f_g_loc :|: f_g_pow_loc :|: f_hash_loc :|: f_field_one_loc :|: f_mul_loc :|: f_add_loc) (I1 :|: I2 :|: I3) (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)) :=
   schnorr_zkp random h x  :=
     solve_lift (run (letb r := f_random_field_elem random in
     letb u := f_g_pow r in
-    letb c := f_hash (impl__into_vec (unsize (box_new (array_from_list [f_g (ret_both (tt : 'unit));
-      h;
-      u])))) in
+    letb c := f_hash (impl__into_vec (unsize (box_new (array_from_list [solve_lift f_g (ret_both (tt : 'unit)) : both (L1 :|: L2 :|: f_random_field_elem_loc :|: f_g_pow_loc :|: f_g_loc) (I1 :|: I2) _;
+      solve_lift h : both (L1 :|: L2 :|: f_random_field_elem_loc :|: f_g_pow_loc :|: f_g_loc) (I1 :|: I2) _;
+      solve_lift u : both (L1 :|: L2 :|: f_random_field_elem_loc :|: f_g_pow_loc :|: f_g_loc) (I1 :|: I2) _])))) in
     letb z := f_add r (f_mul c x) in
-    letm[choice_typeMonad.result_bind_code (t_SchnorrZKPCommit (v_Z) (v_G))] hoist1 := v_Break (Build_t_SchnorrZKPCommit (f_u := u) (f_c := c) (f_z := z)) in
-    ControlFlow_Continue (never_to_any hoist1))) : both (L1 :|: L2 :|: L3) (I1 :|: I2 :|: I3) (t_SchnorrZKPCommit (v_Z) (v_G)).
+    letm[choice_typeMonad.result_bind_code (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G))] hoist1 := v_Break (Build_t_SchnorrZKPCommit (f_schnorr_zkp_u := u) (f_schnorr_zkp_c := c) (f_schnorr_zkp_z := z)) in
+    ControlFlow_Continue (never_to_any hoist1))) : both (L1 :|: L2 :|: L3 :|: f_random_field_elem_loc :|: f_g_loc :|: f_g_pow_loc :|: f_hash_loc :|: f_field_one_loc :|: f_mul_loc :|: f_add_loc) (I1 :|: I2 :|: I3) (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)).
 Fail Next Obligation.
 
-Equations schnorr_zkp_validate {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (h : both L1 I1 (f_group_type)) (pi : both L2 I2 (t_SchnorrZKPCommit (v_Z) (v_G))) : both (L1 :|: L2) (I1 :|: I2) ('bool) :=
+Equations schnorr_zkp_validate {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (h : both L1 I1 (f_group_type)) (pi : both L2 I2 (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G))) : both (L1 :|: L2 :|: f_random_field_elem_loc :|: f_g_loc :|: f_g_pow_loc :|: f_hash_loc :|: f_field_one_loc :|: f_pow_loc :|: f_prod_loc :|: f_mul_loc :|: f_add_loc) (I1 :|: I2) ('bool) :=
   schnorr_zkp_validate h pi  :=
-    solve_lift (andb ((f_c pi) =.? (f_hash (impl__into_vec (unsize (box_new (array_from_list [f_g (ret_both (tt : 'unit));
-      h;
-      f_u pi])))))) ((f_g_pow (f_z pi)) =.? (f_prod (f_u pi) (f_pow h (f_c pi))))) : both (L1 :|: L2) (I1 :|: I2) ('bool).
+    solve_lift (andb ((f_schnorr_zkp_c pi) =.? (f_hash (impl__into_vec (unsize (box_new (array_from_list [solve_lift f_g (ret_both (tt : 'unit)) : both (L1 :|: L2 :|: f_random_field_elem_loc :|: f_g_pow_loc :|: f_g_loc) (I1 :|: I2) _;
+      solve_lift h : both (L1 :|: L2 :|: f_random_field_elem_loc :|: f_g_pow_loc :|: f_g_loc) (I1 :|: I2) _;
+      solve_lift f_schnorr_zkp_u pi : both (L1 :|: L2 :|: f_random_field_elem_loc :|: f_g_pow_loc :|: f_g_loc) (I1 :|: I2) _])))))) ((f_g_pow (f_schnorr_zkp_z pi)) =.? (f_prod (f_schnorr_zkp_u pi) (f_pow h (f_schnorr_zkp_c pi))))) : both (L1 :|: L2 :|: f_random_field_elem_loc :|: f_g_loc :|: f_g_pow_loc :|: f_hash_loc :|: f_field_one_loc :|: f_pow_loc :|: f_prod_loc :|: f_mul_loc :|: f_add_loc) (I1 :|: I2) ('bool).
 Fail Next Obligation.
 
-Equations zkp_one_out_of_two {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {L5 : {fset Location}} {L6 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} {I5 : Interface} {I6 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (random_w : both L1 I1 (int32)) (random_r : both L2 I2 (int32)) (random_d : both L3 I3 (int32)) (h : both L4 I4 (f_group_type)) (xi : both L5 I5 (f_field_type)) (vi : both L6 I6 ('bool)) : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: L6) (I1 :|: I2 :|: I3 :|: I4 :|: I5 :|: I6) (t_OrZKPCommit (v_Z) (v_G)) :=
+Equations zkp_one_out_of_two {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {L5 : {fset Location}} {L6 : {fset Location}} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} {I5 : Interface} {I6 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (random_w : both L1 I1 (int32)) (random_r : both L2 I2 (int32)) (random_d : both L3 I3 (int32)) (h : both L4 I4 (f_group_type)) (xi : both L5 I5 (f_field_type)) (vi : both L6 I6 ('bool)) : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: L6 :|: f_prod_loc :|: f_div_loc :|: f_pow_loc :|: f_g_loc :|: f_g_pow_loc :|: f_random_field_elem_loc :|: f_hash_loc :|: f_sub_loc :|: f_mul_loc) (I1 :|: I2 :|: I3 :|: I4 :|: I5 :|: I6) (t_OrZKPCommit (v_Z := v_Z) (v_G := v_G)) :=
   zkp_one_out_of_two random_w random_r random_d h xi vi  :=
     letb w := f_random_field_elem random_w in
     solve_lift (ifb vi
@@ -467,15 +307,16 @@ Equations zkp_one_out_of_two {L1 : {fset Location}} {L2 : {fset Location}} {L3 :
     letb b1 := f_prod (f_pow h r1) (f_pow y d1) in
     letb a2 := f_g_pow w in
     letb b2 := f_pow h w in
-    letb c := f_hash (impl__into_vec (unsize (box_new (array_from_list [x;
-      y;
-      a1;
-      b1;
-      a2;
-      b2])))) in
+    letb c := f_hash (impl__into_vec (unsize (box_new (array_from_list [
+      solve_lift x : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: (f_random_field_elem_loc :|: f_pow_loc :|: f_g_pow_loc :|: f_g_loc :|: f_prod_loc)) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _;
+      solve_lift y : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: (f_random_field_elem_loc :|: f_pow_loc :|: f_g_pow_loc :|: f_g_loc :|: f_prod_loc)) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _;
+      solve_lift a1 : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: (f_random_field_elem_loc :|: f_pow_loc :|: f_g_pow_loc :|: f_g_loc :|: f_prod_loc)) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _;
+      solve_lift b1 : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: (f_random_field_elem_loc :|: f_pow_loc :|: f_g_pow_loc :|: f_g_loc :|: f_prod_loc)) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _;
+      solve_lift a2 : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: (f_random_field_elem_loc :|: f_pow_loc :|: f_g_pow_loc :|: f_g_loc :|: f_prod_loc)) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _;
+      solve_lift b2 : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: (f_random_field_elem_loc :|: f_pow_loc :|: f_g_pow_loc :|: f_g_loc :|: f_prod_loc)) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _])))) in
     letb d2 := f_sub c d1 in
     letb r2 := f_sub w (f_mul xi d2) in
-    Build_t_OrZKPCommit (f_x := x) (f_y := y) (f_a1 := a1) (f_b1 := b1) (f_a2 := a2) (f_b2 := b2) (f_c := c) (f_d1 := d1) (f_d2 := d2) (f_r1 := r1) (f_r2 := r2)
+    Build_t_OrZKPCommit (f_or_zkp_x := x) (f_or_zkp_y := y) (f_or_zkp_a1 := a1) (f_or_zkp_b1 := b1) (f_or_zkp_a2 := a2) (f_or_zkp_b2 := b2) (f_or_zkp_c := c) (f_or_zkp_d1 := d1) (f_or_zkp_d2 := d2) (f_or_zkp_r1 := r1) (f_or_zkp_r2 := r2)
     else letb r2 := f_random_field_elem random_r in
     letb d2 := f_random_field_elem random_d in
     letb x := f_g_pow xi in
@@ -484,186 +325,62 @@ Equations zkp_one_out_of_two {L1 : {fset Location}} {L2 : {fset Location}} {L3 :
     letb b1 := f_pow h w in
     letb a2 := f_prod (f_g_pow r2) (f_pow x d2) in
     letb b2 := f_prod (f_pow h r2) (f_pow (f_div y (f_g (ret_both (tt : 'unit)))) d2) in
-    letb c := f_hash (impl__into_vec (unsize (box_new (array_from_list [x;
-      y;
-      a1;
-      b1;
-      a2;
-      b2])))) in
+    letb c := f_hash (impl__into_vec (unsize (box_new (array_from_list [
+      solve_lift x : (both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: f_random_field_elem_loc :|: f_pow_loc :|: f_g_loc :|: f_div_loc  :|: f_prod_loc :|: f_g_pow_loc) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _);
+      solve_lift y : (both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: f_random_field_elem_loc :|: f_pow_loc :|: f_g_loc :|: f_div_loc  :|: f_prod_loc :|: f_g_pow_loc) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _);
+      solve_lift a1 : (both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: f_random_field_elem_loc :|: f_pow_loc :|: f_g_loc :|: f_div_loc  :|: f_prod_loc :|: f_g_pow_loc) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _);
+      solve_lift b1 : (both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: f_random_field_elem_loc :|: f_pow_loc :|: f_g_loc :|: f_div_loc  :|: f_prod_loc :|: f_g_pow_loc) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _);
+      solve_lift a2 : (both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: f_random_field_elem_loc :|: f_pow_loc :|: f_g_loc :|: f_div_loc  :|: f_prod_loc :|: f_g_pow_loc) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _);
+      solve_lift b2 : (both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: f_random_field_elem_loc :|: f_pow_loc :|: f_g_loc :|: f_div_loc  :|: f_prod_loc :|: f_g_pow_loc) (I1 :|: I2 :|: I3 :|: I4 :|: I5) _)])))) in
     letb d1 := f_sub c d2 in
     letb r1 := f_sub w (f_mul xi d1) in
-    Build_t_OrZKPCommit (f_x := x) (f_y := y) (f_a1 := a1) (f_b1 := b1) (f_a2 := a2) (f_b2 := b2) (f_c := c) (f_d1 := d1) (f_d2 := d2) (f_r1 := r1) (f_r2 := r2)) : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: L6) (I1 :|: I2 :|: I3 :|: I4 :|: I5 :|: I6) (t_OrZKPCommit (v_Z) (v_G)).
+    Build_t_OrZKPCommit (f_or_zkp_x := x) (f_or_zkp_y := y) (f_or_zkp_a1 := a1) (f_or_zkp_b1 := b1) (f_or_zkp_a2 := a2) (f_or_zkp_b2 := b2) (f_or_zkp_c := c) (f_or_zkp_d1 := d1) (f_or_zkp_d2 := d2) (f_or_zkp_r1 := r1) (f_or_zkp_r2 := r2)) : both (L1 :|: L2 :|: L3 :|: L4 :|: L5 :|: L6 :|: f_prod_loc :|: f_div_loc :|: f_pow_loc :|: f_g_loc :|: f_g_pow_loc :|: f_random_field_elem_loc :|: f_hash_loc :|: f_sub_loc :|: f_mul_loc) (I1 :|: I2 :|: I3 :|: I4 :|: I5 :|: I6) (t_OrZKPCommit (v_Z := v_Z) (v_G := v_G)).
 Fail Next Obligation.
 
-Equations zkp_one_out_of_two_validate {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (h : both L1 I1 (f_group_type)) (zkp : both L2 I2 (t_OrZKPCommit (v_Z) (v_G))) : both (L1 :|: L2) (I1 :|: I2) ('bool) :=
+Equations zkp_one_out_of_two_validate {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (h : both L1 I1 (f_group_type)) (zkp : both L2 I2 (t_OrZKPCommit (v_Z := v_Z) (v_G := v_G))) : both (L1 :|: L2 :|: f_hash_loc :|: f_add_loc :|: f_prod_loc :|: f_g_pow_loc :|: f_pow_loc :|: f_g_loc :|: f_div_loc) (I1 :|: I2) ('bool) :=
   zkp_one_out_of_two_validate h zkp  :=
-    letb c := f_hash (impl__into_vec (unsize (box_new (array_from_list [f_x zkp;
-      f_y zkp;
-      f_a1 zkp;
-      f_b1 zkp;
-      f_a2 zkp;
-      f_b2 zkp])))) in
-    solve_lift (andb (andb (andb (andb (c =.? (f_add (f_d1 zkp) (f_d2 zkp))) ((f_a1 zkp) =.? (f_prod (f_g_pow (f_r1 zkp)) (f_pow (f_x zkp) (f_d1 zkp))))) ((f_b1 zkp) =.? (f_prod (f_pow h (f_r1 zkp)) (f_pow (f_y zkp) (f_d1 zkp))))) ((f_a2 zkp) =.? (f_prod (f_g_pow (f_r2 zkp)) (f_pow (f_x zkp) (f_d2 zkp))))) ((f_b2 zkp) =.? (f_prod (f_pow h (f_r2 zkp)) (f_pow (f_div (f_y zkp) (f_g (ret_both (tt : 'unit)))) (f_d2 zkp))))) : both (L1 :|: L2) (I1 :|: I2) ('bool).
+    letb c := f_hash (impl__into_vec (unsize (box_new (array_from_list [f_or_zkp_x zkp;
+      f_or_zkp_y zkp;
+      f_or_zkp_a1 zkp;
+      f_or_zkp_b1 zkp;
+      f_or_zkp_a2 zkp;
+      f_or_zkp_b2 zkp])))) in
+    solve_lift (andb (andb (andb (andb (c =.? (f_add (f_or_zkp_d1 zkp) (f_or_zkp_d2 zkp))) ((f_or_zkp_a1 zkp) =.? (f_prod (f_g_pow (f_or_zkp_r1 zkp)) (f_pow (f_or_zkp_x zkp) (f_or_zkp_d1 zkp))))) ((f_or_zkp_b1 zkp) =.? (f_prod (f_pow h (f_or_zkp_r1 zkp)) (f_pow (f_or_zkp_y zkp) (f_or_zkp_d1 zkp))))) ((f_or_zkp_a2 zkp) =.? (f_prod (f_g_pow (f_or_zkp_r2 zkp)) (f_pow (f_or_zkp_x zkp) (f_or_zkp_d2 zkp))))) ((f_or_zkp_b2 zkp) =.? (f_prod (f_pow h (f_or_zkp_r2 zkp)) (f_pow (f_div (f_or_zkp_y zkp) (f_g (ret_both (tt : 'unit)))) (f_or_zkp_d2 zkp))))) : both (L1 :|: L2 :|: f_hash_loc :|: f_add_loc :|: f_prod_loc :|: f_g_pow_loc :|: f_pow_loc :|: f_g_loc :|: f_div_loc) (I1 :|: I2) ('bool).
 Fail Next Obligation.
-
-#[global] Program Instance t_z_89__t_Z_Field : t_Z_Field t_z_89_ :=
-  let f_field_type := int32 : choice_type in
-  let f_q := fun  {L : {fset Location}} {I : Interface} => solve_lift (ret_both (89 : int32)) : both (L :|: fset []) I (int32) in
-  let f_random_field_elem := fun  {L1 : {fset Location}} {I1 : Interface} (random : both L1 I1 (int32)) => solve_lift (random .% ((f_q (ret_both (tt : 'unit))) .- (ret_both (1 : int32)))) : both (L1 :|: fset []) I1 (int32) in
-  let f_field_zero := fun  {L : {fset Location}} {I : Interface} => solve_lift (ret_both (0 : int32)) : both (L :|: fset []) I (int32) in
-  let f_field_one := fun  {L : {fset Location}} {I : Interface} => solve_lift (ret_both (1 : int32)) : both (L :|: fset []) I (int32) in
-  let f_add := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (int32)) (y : both L2 I2 (int32)) => solve_lift ((x .+ y) .% ((f_q (ret_both (tt : 'unit))) .- (ret_both (1 : int32)))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (int32) in
-  let f_sub := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (int32)) (y : both L2 I2 (int32)) => solve_lift (((x .+ ((f_q (ret_both (tt : 'unit))) .- (ret_both (1 : int32)))) .- y) .% ((f_q (ret_both (tt : 'unit))) .- (ret_both (1 : int32)))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (int32) in
-  let f_mul := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (int32)) (y : both L2 I2 (int32)) => solve_lift ((x .* y) .% ((f_q (ret_both (tt : 'unit))) .- (ret_both (1 : int32)))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (int32) in
-  {| f_field_type := (@f_field_type);
-  f_q_loc := (fset [] : {fset Location});
-  f_q := (@f_q);
-  f_random_field_elem_loc := (fset [] : {fset Location});
-  f_random_field_elem := (@f_random_field_elem);
-  f_field_zero_loc := (fset [] : {fset Location});
-  f_field_zero := (@f_field_zero);
-  f_field_one_loc := (fset [] : {fset Location});
-  f_field_one := (@f_field_one);
-  f_add_loc := (fset [] : {fset Location});
-  f_add := (@f_add);
-  f_sub_loc := (fset [] : {fset Location});
-  f_sub := (@f_sub);
-  f_mul_loc := (fset [] : {fset Location});
-  f_mul := (@f_mul)|}.
-Fail Next Obligation.
-Hint Unfold t_z_89__t_Z_Field.
-
-Definition result_loc : Location :=
-  (int32;10%nat).
-Definition res_loc : Location :=
-  (int32;9%nat).
-#[global] Program Instance t_Group_curve_t_Group : t_Group t_Group_curve t_Z_curve :=
-  let f_group_type := t_Group_curve : choice_type in
-  let f_g := fun  {L : {fset Location}} {I : Interface} => letb gx := PBytes32 (array_from_list [ret_both (121 : int8);
-    ret_both (190 : int8);
-    ret_both (102 : int8);
-    ret_both (126 : int8);
-    ret_both (249 : int8);
-    ret_both (220 : int8);
-    ret_both (187 : int8);
-    ret_both (172 : int8);
-    ret_both (85 : int8);
-    ret_both (160 : int8);
-    ret_both (98 : int8);
-    ret_both (149 : int8);
-    ret_both (206 : int8);
-    ret_both (135 : int8);
-    ret_both (11 : int8);
-    ret_both (7 : int8);
-    ret_both (2 : int8);
-    ret_both (155 : int8);
-    ret_both (252 : int8);
-    ret_both (219 : int8);
-    ret_both (45 : int8);
-    ret_both (206 : int8);
-    ret_both (40 : int8);
-    ret_both (217 : int8);
-    ret_both (89 : int8);
-    ret_both (242 : int8);
-    ret_both (129 : int8);
-    ret_both (91 : int8);
-    ret_both (22 : int8);
-    ret_both (248 : int8);
-    ret_both (23 : int8);
-    ret_both (152 : int8)]) in
-  letb gy := PBytes32 (array_from_list [ret_both (72 : int8);
-    ret_both (58 : int8);
-    ret_both (218 : int8);
-    ret_both (119 : int8);
-    ret_both (38 : int8);
-    ret_both (163 : int8);
-    ret_both (196 : int8);
-    ret_both (101 : int8);
-    ret_both (93 : int8);
-    ret_both (164 : int8);
-    ret_both (251 : int8);
-    ret_both (252 : int8);
-    ret_both (14 : int8);
-    ret_both (17 : int8);
-    ret_both (8 : int8);
-    ret_both (168 : int8);
-    ret_both (253 : int8);
-    ret_both (23 : int8);
-    ret_both (180 : int8);
-    ret_both (72 : int8);
-    ret_both (166 : int8);
-    ret_both (133 : int8);
-    ret_both (84 : int8);
-    ret_both (25 : int8);
-    ret_both (156 : int8);
-    ret_both (71 : int8);
-    ret_both (208 : int8);
-    ret_both (143 : int8);
-    ret_both (251 : int8);
-    ret_both (16 : int8);
-    ret_both (212 : int8);
-    ret_both (184 : int8)]) in
-  solve_lift (Build_t_Group_curve (f_val := Point_Affine (prod_b (impl__FieldElement__from_public_byte_seq_be gx,impl__FieldElement__from_public_byte_seq_be gy)))) : both (L :|: fset []) I (t_Group_curve) in
-  let f_pow := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (g : both L1 I1 (t_Group_curve)) (x : both L2 I2 (t_Z_curve)) => solve_lift (Build_t_Group_curve (f_val := point_mul (f_val x) (f_val g))) : both (L1 :|: L2 :|: fset [result_loc]) (I1 :|: I2) (t_Group_curve) in
-  let f_g_pow := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (t_Z_curve)) => solve_lift (Build_t_Group_curve (f_val := point_mul_base (f_val x))) : both (L1 :|: fset []) I1 (t_Group_curve) in
-  let f_group_one := fun  {L : {fset Location}} {I : Interface} => solve_lift (f_g_pow (f_field_zero (ret_both (tt : 'unit)))) : both (L :|: fset []) I (t_Group_curve) in
-  let f_prod := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Group_curve)) (y : both L2 I2 (t_Group_curve)) => solve_lift (Build_t_Group_curve (f_val := point_add (f_val x) (f_val y))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Group_curve) in
-  let f_inv := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (t_Group_curve)) => solve_lift x : both (L1 :|: fset []) I1 (t_Group_curve) in
-  let f_div := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (t_Group_curve)) (y : both L2 I2 (t_Group_curve)) => solve_lift (f_prod x (f_inv y)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (t_Group_curve) in
-  let f_hash := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (t_Vec (t_Group_curve) (t_Global))) => solve_lift (f_field_one (ret_both (tt : 'unit))) : both (L1 :|: fset [res_loc]) I1 (t_Z_curve) in
-  {| f_group_type := (@f_group_type);
-  f_g_loc := (fset [] : {fset Location});
-  f_g := (@f_g);
-  f_pow_loc := (fset [result_loc] : {fset Location});
-  f_pow := (@f_pow);
-  f_g_pow_loc := (fset [] : {fset Location});
-  f_g_pow := (@f_g_pow);
-  f_group_one_loc := (fset [] : {fset Location});
-  f_group_one := (@f_group_one);
-  f_prod_loc := (fset [] : {fset Location});
-  f_prod := (@f_prod);
-  f_inv_loc := (fset [] : {fset Location});
-  f_inv := (@f_inv);
-  f_div_loc := (fset [] : {fset Location});
-  f_div := (@f_div);
-  f_hash_loc := (fset [res_loc] : {fset Location});
-  f_hash := (@f_hash)|}.
-Fail Next Obligation.
-Hint Unfold t_Group_curve_t_Group.
 
 Definition t_OvnContractState {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : choice_type :=
-  (nseq f_group_type (is_pure (n)) × nseq t_SchnorrZKPCommit (v_Z) (v_G) (is_pure (n)) × nseq f_field_type (is_pure (n)) × nseq f_group_type (is_pure (n)) × nseq t_OrZKPCommit (v_Z) (v_G) (is_pure (n)) × int32).
-Equations f_g_pow_xis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState)) : both L I (nseq f_group_type (is_pure (n))) :=
+  (nseq f_group_type (is_pure (n)) × nseq (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n)) × nseq f_field_type (is_pure (n)) × nseq f_group_type (is_pure (n)) × nseq (t_OrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n)) × int32).
+Equations f_g_pow_xis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState (n := n))) : both L I (nseq f_group_type (is_pure (n))) :=
   f_g_pow_xis s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (fst (fst (fst (fst (fst x)))) : nseq f_group_type (is_pure (n))))) : both L I (nseq f_group_type (is_pure (n))).
 Fail Next Obligation.
-Equations f_zkp_xis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState)) : both L I (nseq t_SchnorrZKPCommit (v_Z) (v_G) (is_pure (n))) :=
+Equations f_zkp_xis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState (n := n))) : both L I (nseq (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n))) :=
   f_zkp_xis s  :=
     bind_both s (fun x =>
-      solve_lift (ret_both (snd (fst (fst (fst (fst x)))) : nseq t_SchnorrZKPCommit (v_Z) (v_G) (is_pure (n))))) : both L I (nseq t_SchnorrZKPCommit (v_Z) (v_G) (is_pure (n))).
+      solve_lift (ret_both (snd (fst (fst (fst (fst x)))) : nseq (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n))))) : both L I (nseq (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n))).
 Fail Next Obligation.
-Equations f_commit_vis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState)) : both L I (nseq f_field_type (is_pure (n))) :=
+Equations f_commit_vis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState (n := n))) : both L I (nseq f_field_type (is_pure (n))) :=
   f_commit_vis s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst (fst x))) : nseq f_field_type (is_pure (n))))) : both L I (nseq f_field_type (is_pure (n))).
 Fail Next Obligation.
-Equations f_g_pow_xi_yi_vis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState)) : both L I (nseq f_group_type (is_pure (n))) :=
+Equations f_g_pow_xi_yi_vis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState (n := n))) : both L I (nseq f_group_type (is_pure (n))) :=
   f_g_pow_xi_yi_vis s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd (fst (fst x)) : nseq f_group_type (is_pure (n))))) : both L I (nseq f_group_type (is_pure (n))).
 Fail Next Obligation.
-Equations f_zkp_vis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState)) : both L I (nseq t_OrZKPCommit (v_Z) (v_G) (is_pure (n))) :=
+Equations f_zkp_vis {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState (n := n))) : both L I (nseq (t_OrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n))) :=
   f_zkp_vis s  :=
     bind_both s (fun x =>
-      solve_lift (ret_both (snd (fst x) : nseq t_OrZKPCommit (v_Z) (v_G) (is_pure (n))))) : both L I (nseq t_OrZKPCommit (v_Z) (v_G) (is_pure (n))).
+      solve_lift (ret_both (snd (fst x) : nseq (t_OrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n))))) : both L I (nseq (t_OrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n))).
 Fail Next Obligation.
-Equations f_tally {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState)) : both L I (int32) :=
+Equations f_tally {L : {fset Location}} {I : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (s : both L I (t_OvnContractState (n := n))) : both L I (int32) :=
   f_tally s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (snd x : int32))) : both L I (int32).
 Fail Next Obligation.
-Equations Build_t_OvnContractState {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {L5 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} {I5 : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} {f_g_pow_xis : both L0 I0 (nseq f_group_type (is_pure (n)))} {f_zkp_xis : both L1 I1 (nseq t_SchnorrZKPCommit (v_Z) (v_G) (is_pure (n)))} {f_commit_vis : both L2 I2 (nseq f_field_type (is_pure (n)))} {f_g_pow_xi_yi_vis : both L3 I3 (nseq f_group_type (is_pure (n)))} {f_zkp_vis : both L4 I4 (nseq t_OrZKPCommit (v_Z) (v_G) (is_pure (n)))} {f_tally : both L5 I5 (int32)} : both (L0:|:L1:|:L2:|:L3:|:L4:|:L5) (I0:|:I1:|:I2:|:I3:|:I4:|:I5) (t_OvnContractState) :=
+Equations Build_t_OvnContractState {L0 : {fset Location}} {L1 : {fset Location}} {L2 : {fset Location}} {L3 : {fset Location}} {L4 : {fset Location}} {L5 : {fset Location}} {I0 : Interface} {I1 : Interface} {I2 : Interface} {I3 : Interface} {I4 : Interface} {I5 : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} {f_g_pow_xis : both L0 I0 (nseq f_group_type (is_pure (n)))} {f_zkp_xis : both L1 I1 (nseq (t_SchnorrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n)))} {f_commit_vis : both L2 I2 (nseq f_field_type (is_pure (n)))} {f_g_pow_xi_yi_vis : both L3 I3 (nseq f_group_type (is_pure (n)))} {f_zkp_vis : both L4 I4 (nseq (t_OrZKPCommit (v_Z := v_Z) (v_G := v_G)) (is_pure (n)))} {f_tally : both L5 I5 (int32)} : both (L0:|:L1:|:L2:|:L3:|:L4:|:L5) (I0:|:I1:|:I2:|:I3:|:I4:|:I5) (t_OvnContractState (n := n)) :=
   Build_t_OvnContractState  :=
     bind_both f_tally (fun f_tally =>
       bind_both f_zkp_vis (fun f_zkp_vis =>
@@ -680,19 +397,39 @@ Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_g_pow_xi_yi_vis' ':=' y ')
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_zkp_vis' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := f_g_pow_xi_yi_vis x) (f_zkp_vis := y) (f_tally := f_tally x)).
 Notation "'Build_t_OvnContractState' '[' x ']' '(' 'f_tally' ':=' y ')'" := (Build_t_OvnContractState (f_g_pow_xis := f_g_pow_xis x) (f_zkp_xis := f_zkp_xis x) (f_commit_vis := f_commit_vis x) (f_g_pow_xi_yi_vis := f_g_pow_xi_yi_vis x) (f_zkp_vis := f_zkp_vis x) (f_tally := y)).
 
+Equations f_from {L I} : both L I 'nat :=
+  f_from := solve_lift (ret_both (0%nat : 'nat)).
+Fail Next Obligation.
+Equations impl__map_err {L1 I1}  {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} (out : both L1 I1 (t_Result t_CastVoteParam t_ParseError)) (f_from : both L1 I1 'nat) :
+  both L1 I1 (@choice_typeMonad.M (@choice_typeMonad.mnd
+          (choice_typeMonad.result_bind_code (Result_t (@t_CastVoteParam _ _ _) t_ParseError))) t_CastVoteParam) :=
+  impl__map_err out f_from :=
+    matchb out with
+    | inl s => solve_lift ret_both _
+    | inr s => solve_lift ret_both _
+end.
+Fail Next Obligation.
+
+(* Equations run {L I A} (x : both L I (choice_typeMonad.M (CEMonad := (@choice_typeMonad.mnd (choice_typeMonad.result_bind_code A))) A)) : both L I (t_Result A 'unit) := *)
+(*   run x := *)
+(*   bind_both x (fun y => match y with *)
+(*                              | inl r | inr r => solve_lift ret_both (inl r : t_Result A 'unit) *)
+(*                              end). *)
+(* Fail Next Obligation. *)
+
 Definition cast_vote_state_ret_loc {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} : Location :=
-  (t_OvnContractState (v_Z) (v_G) (both (fset []) (fset []) (uint_size));2%nat).
-Equations cast_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} (ctx : both L1 I1 (impl_574521470_)) (state : both L2 I2 (t_OvnContractState (v_Z) (v_G) (both (fset []) (fset []) (uint_size)))) : both (L1 :|: L2 :|: fset [cast_vote_state_ret_loc;prod1_loc;prod2_loc]) (I1 :|: I2) (t_Result ((v_A × t_OvnContractState (v_Z) (v_G) (both (fset []) (fset []) (uint_size)))) (t_ParseError)) :=
+  (t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *);2%nat).
+Equations cast_vote {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} (ctx : both L1 I1 (impl_574521470_)) (state : both L2 I2 (t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *))) : both (L1 :|: L2 :|: fset [cast_vote_state_ret_loc (n := n);prod1_loc (n := n);prod2_loc (n := n)]) (I1 :|: I2) (t_Result ((v_A × t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *))) (t_ParseError)) :=  
   cast_vote ctx state  :=
-    solve_lift (run (letb '(_,out) := f_get (f_parameter_cursor ctx) in
-    letm[choice_typeMonad.result_bind_code (t_ParseError)] (params:t_CastVoteParam (v_Z)) := impl__map_err out f_from in
-    Result_Ok (letb g_pow_yi := compute_g_pow_yi (cast_int (WS2 := _) (f_cvp_i params)) (f_g_pow_xis state) in
-    letb g_pow_xi_yi_vi := compute_group_element_for_vote (f_cvp_xi params) (f_cvp_vote params) g_pow_yi in
-    letb zkp_vi := zkp_one_out_of_two (f_cvp_zkp_random_w params) (f_cvp_zkp_random_r params) (f_cvp_zkp_random_d params) g_pow_yi (f_cvp_xi params) (f_cvp_vote params) in
+    solve_lift (run (letb '(_,out) := f_get (Ctx := t_CastVoteParam) (f_parameter_cursor ctx) in
+    letm[choice_typeMonad.result_bind_code (Result_t t_CastVoteParam t_ParseError)] (params:t_CastVoteParam (v_Z := v_Z)) := impl__map_err out f_from in
+    Result_Ok ((* letb g_pow_yi := compute_g_pow_yi (cast_int (WS2 := _) (f_cvp_i params)) (f_g_pow_xis state) in *)
+    (* letb g_pow_xi_yi_vi := compute_group_element_for_vote (f_cvp_xi params) (f_cvp_vote params) g_pow_yi in *)
+    (* letb zkp_vi := zkp_one_out_of_two (f_cvp_zkp_random_w params) (f_cvp_zkp_random_r params) (f_cvp_zkp_random_d params) g_pow_yi (f_cvp_xi params) (f_cvp_vote params) in *)
     letb cast_vote_state_ret loc(cast_vote_state_ret_loc) := f_clone state in
-    letb cast_vote_state_ret := Build_t_OvnContractState[cast_vote_state_ret] (f_g_pow_xi_yi_vis := update_at_usize (f_g_pow_xi_yi_vis cast_vote_state_ret) (cast_int (WS2 := _) (f_cvp_i params)) g_pow_xi_yi_vi) in
-    letb cast_vote_state_ret := Build_t_OvnContractState[cast_vote_state_ret] (f_zkp_vis := update_at_usize (f_zkp_vis cast_vote_state_ret) (cast_int (WS2 := _) (f_cvp_i params)) zkp_vi) in
-    Result_Ok (prod_b (f_accept (ret_both (tt : 'unit)),cast_vote_state_ret))))) : both (L1 :|: L2 :|: fset [cast_vote_state_ret_loc;prod1_loc;prod2_loc]) (I1 :|: I2) (t_Result ((v_A × t_OvnContractState (v_Z) (v_G) (both (fset []) (fset []) (uint_size)))) (t_ParseError)).
+    (* letb cast_vote_state_ret := Build_t_OvnContractState[cast_vote_state_ret] (f_g_pow_xi_yi_vis := update_at_usize (f_g_pow_xi_yi_vis cast_vote_state_ret) (cast_int (WS2 := _) (f_cvp_i params)) g_pow_xi_yi_vi) in *)
+    (* letb cast_vote_state_ret := Build_t_OvnContractState[cast_vote_state_ret] (f_zkp_vis := update_at_usize (f_zkp_vis cast_vote_state_ret) (cast_int (WS2 := _) (f_cvp_i params)) zkp_vi) in *)
+    Result_Ok (prod_b (f_accept (* (ret_both (tt : 'unit)) *),cast_vote_state_ret))))) : both (L1 :|: L2 :|: fset [cast_vote_state_ret_loc;prod1_loc;prod2_loc]) (I1 :|: I2) (t_Result ((v_A × t_OvnContractState (v_Z := v_Z) (v_G := v_G) (n := n) (* (both (fset []) (fset []) (uint_size)) *))) (t_ParseError)).
 Fail Next Obligation.
 
 Definition commit_to_vote_state_ret_loc {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} : Location :=
@@ -717,7 +454,7 @@ Fail Next Obligation.
 
 Equations init_ovn_contract {L1 : {fset Location}} {I1 : Interface} {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} (_ : both L1 I1 ('unit)) : both L1 I1 (t_Result (t_OvnContractState (v_Z) (v_G) (both (fset []) (fset []) (uint_size))) (t_Reject)) :=
   init_ovn_contract _  :=
-    Result_Ok (solve_lift (Build_t_OvnContractState (f_g_pow_xis := repeat (f_group_one (ret_both (tt : 'unit))) n) (f_zkp_xis := repeat (Build_t_SchnorrZKPCommit (f_u := f_group_one (ret_both (tt : 'unit))) (f_z := f_field_zero (ret_both (tt : 'unit))) (f_c := f_field_zero (ret_both (tt : 'unit)))) n) (f_commit_vis := repeat (f_field_zero (ret_both (tt : 'unit))) n) (f_g_pow_xi_yi_vis := repeat (f_group_one (ret_both (tt : 'unit))) n) (f_zkp_vis := repeat (Build_t_OrZKPCommit (f_x := f_group_one (ret_both (tt : 'unit))) (f_y := f_group_one (ret_both (tt : 'unit))) (f_a1 := f_group_one (ret_both (tt : 'unit))) (f_b1 := f_group_one (ret_both (tt : 'unit))) (f_a2 := f_group_one (ret_both (tt : 'unit))) (f_b2 := f_group_one (ret_both (tt : 'unit))) (f_c := f_field_zero (ret_both (tt : 'unit))) (f_d1 := f_field_zero (ret_both (tt : 'unit))) (f_d2 := f_field_zero (ret_both (tt : 'unit))) (f_r1 := f_field_zero (ret_both (tt : 'unit))) (f_r2 := f_field_zero (ret_both (tt : 'unit)))) n) (f_tally := ret_both (0 : int32)))) : both L1 I1 (t_Result (t_OvnContractState (v_Z) (v_G) (both (fset []) (fset []) (uint_size))) (t_Reject)).
+    Result_Ok (solve_lift (Build_t_OvnContractState (f_g_pow_xis := repeat (f_group_one (ret_both (tt : 'unit))) n) (f_zkp_xis := repeat (Build_t_SchnorrZKPCommit (f_schnorr_zkp_u := f_group_one (ret_both (tt : 'unit))) (f_schnorr_zkp_z := f_field_zero (ret_both (tt : 'unit))) (f_schnorr_zkp_c := f_field_zero (ret_both (tt : 'unit)))) n) (f_commit_vis := repeat (f_field_zero (ret_both (tt : 'unit))) n) (f_g_pow_xi_yi_vis := repeat (f_group_one (ret_both (tt : 'unit))) n) (f_zkp_vis := repeat (Build_t_OrZKPCommit (f_or_zkp_x := f_group_one (ret_both (tt : 'unit))) (f_or_zkp_y := f_group_one (ret_both (tt : 'unit))) (f_or_zkp_a1 := f_group_one (ret_both (tt : 'unit))) (f_or_zkp_b1 := f_group_one (ret_both (tt : 'unit))) (f_or_zkp_a2 := f_group_one (ret_both (tt : 'unit))) (f_or_zkp_b2 := f_group_one (ret_both (tt : 'unit))) (f_or_zkp_c := f_field_zero (ret_both (tt : 'unit))) (f_or_zkp_d1 := f_field_zero (ret_both (tt : 'unit))) (f_or_zkp_d2 := f_field_zero (ret_both (tt : 'unit))) (f_or_zkp_r1 := f_field_zero (ret_both (tt : 'unit))) (f_or_zkp_r2 := f_field_zero (ret_both (tt : 'unit)))) n) (f_tally := ret_both (0 : int32)))) : both L1 I1 (t_Result (t_OvnContractState (v_Z) (v_G) (both (fset []) (fset []) (uint_size))) (t_Reject)).
 Fail Next Obligation.
 
 Definition register_vote_state_ret_loc {v_Z : _} {v_G : _} {n : both (fset []) (fset []) (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} : Location :=
@@ -773,58 +510,6 @@ Equations tally_votes {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interf
     letb tally_votes_state_ret := Build_t_OvnContractState[tally_votes_state_ret] (f_tally := tally) in
     Result_Ok (solve_lift (prod_b (f_accept (ret_both (tt : 'unit)),tally_votes_state_ret))) : both (L1 :|: L2 :|: fset [curr_loc;tally_loc;tally_votes_state_ret_loc;vote_result_loc;prod1_loc;prod2_loc]) (I1 :|: I2) (t_Result ((v_A × t_OvnContractState (v_Z) (v_G) (both (fset []) (fset []) (uint_size)))) (t_ParseError)).
 Fail Next Obligation.
-
-Definition res_loc : Location :=
-  (int32;9%nat).
-Definition result_loc : Location :=
-  (int32;10%nat).
-#[global] Program Instance t_g_z_89__t_Group : t_Group t_g_z_89_ t_z_89_ :=
-  let f_group_type := int32 : choice_type in
-  let f_g := fun  {L : {fset Location}} {I : Interface} => solve_lift (ret_both (3 : int32)) : both (L :|: fset []) I (int32) in
-  let f_hash := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (t_Vec (int32) (t_Global))) => letb res loc(res_loc) := f_field_one (ret_both (tt : 'unit)) in
-  letb res := foldi_both_list (f_into_iter x) (fun y =>
-    ssp (fun res =>
-      solve_lift (f_mul y res) : both (*2*)(L1:|:L1:|:fset [res_loc;res_loc]) (I1:|:I1) (int32))) res in
-  solve_lift res : both (L1 :|: fset [res_loc]) I1 (int32) in
-  let f_g_pow := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (int32)) => solve_lift (f_pow (f_g (ret_both (tt : 'unit))) x) : both (L1 :|: fset []) I1 (int32) in
-  let f_pow := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (g : both L1 I1 (int32)) (x : both L2 I2 (int32)) => letb result loc(result_loc) := f_group_one (ret_both (tt : 'unit)) in
-  letb result := foldi_both_list (f_into_iter (Build_t_Range (f_start := ret_both (0 : int32)) (f_end := x .% ((f_q (ret_both (tt : 'unit))) .- (ret_both (1 : int32)))))) (fun i =>
-    ssp (fun result =>
-      solve_lift (f_prod result g) : both (*2*)(L1:|:L2:|:L2:|:fset [result_loc;result_loc]) (I1:|:I2:|:I2) (int32))) result in
-  solve_lift result : both (L1 :|: L2 :|: fset [result_loc]) (I1 :|: I2) (int32) in
-  let f_group_one := fun  {L : {fset Location}} {I : Interface} => solve_lift (ret_both (1 : int32)) : both (L :|: fset []) I (int32) in
-  let f_prod := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (int32)) (y : both L2 I2 (int32)) => solve_lift (((x .% (f_q (ret_both (tt : 'unit)))) .* (y .% (f_q (ret_both (tt : 'unit))))) .% (f_q (ret_both (tt : 'unit)))) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (int32) in
-  let f_inv := fun  {L1 : {fset Location}} {I1 : Interface} (x : both L1 I1 (int32)) => solve_lift (run (letb _ := foldi_both_list (f_into_iter (Build_t_Range (f_start := ret_both (0 : int32)) (f_end := ret_both (89 : int32)))) (fun j =>
-    ssp (fun _ =>
-      solve_lift (ifb (f_prod x j) =.? (f_group_one (ret_both (tt : 'unit)))
-      then letm[choice_typeMonad.result_bind_code (int32)] hoist5 := v_Break j in
-      ControlFlow_Continue (never_to_any hoist5)
-      else ControlFlow_Continue (ret_both (tt : 'unit))) : both (*0*)(L1:|:fset []) (I1) (t_ControlFlow (int32) ('unit)))) (ret_both (tt : 'unit)) in
-  letb _ := ifb not (ret_both (false : 'bool))
-  then never_to_any (panic (ret_both (assertion failed: false : chString)))
-  else ret_both (tt : 'unit) in
-  letm[choice_typeMonad.result_bind_code (int32)] hoist6 := v_Break x in
-  ControlFlow_Continue (never_to_any hoist6))) : both (L1 :|: fset []) I1 (int32) in
-  let f_div := fun  {L1 : {fset Location}} {L2 : {fset Location}} {I1 : Interface} {I2 : Interface} (x : both L1 I1 (int32)) (y : both L2 I2 (int32)) => solve_lift (f_prod x (f_inv y)) : both (L1 :|: L2 :|: fset []) (I1 :|: I2) (int32) in
-  {| f_group_type := (@f_group_type);
-  f_g_loc := (fset [] : {fset Location});
-  f_g := (@f_g);
-  f_hash_loc := (fset [res_loc] : {fset Location});
-  f_hash := (@f_hash);
-  f_g_pow_loc := (fset [] : {fset Location});
-  f_g_pow := (@f_g_pow);
-  f_pow_loc := (fset [result_loc] : {fset Location});
-  f_pow := (@f_pow);
-  f_group_one_loc := (fset [] : {fset Location});
-  f_group_one := (@f_group_one);
-  f_prod_loc := (fset [] : {fset Location});
-  f_prod := (@f_prod);
-  f_inv_loc := (fset [] : {fset Location});
-  f_inv := (@f_inv);
-  f_div_loc := (fset [] : {fset Location});
-  f_div := (@f_div)|}.
-Fail Next Obligation.
-Hint Unfold t_g_z_89__t_Group.
 
 (** Concert lib part **)
 From ConCert.Utils Require Import Extras.

@@ -2,7 +2,9 @@
 -arg -w
 -arg all
 
+Hacspec_ovn_Ovn_traits.v
 Hacspec_ovn.v
+
 
 # Taken from Crypt (as branches are not merged!)
 pkg_advantage.v
