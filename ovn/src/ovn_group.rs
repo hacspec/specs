@@ -240,7 +240,11 @@ pub fn register_vote<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<Z, G, n>,
 ) -> Result<(A, OvnContractState<Z, G, n>), ParseError> {
-    let params: RegisterParam<Z> = ctx.parameter_cursor().get()?;
+    let params: RegisterParam<Z> =
+        match ctx.parameter_cursor().get() {
+            Ok (x) => x,
+            Err (x) => return Err (ParseError{}),
+        };
     let g_pow_xi = G::g_pow(params.rp_xi);
 
     let zkp_xi = schnorr_zkp::<Z, G>(params.rp_zkp_random, g_pow_xi, params.rp_xi);
@@ -303,7 +307,11 @@ pub fn commit_to_vote<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<Z, G, n>,
 ) -> Result<(A, OvnContractState<Z, G, n>), ParseError> {
-    let params: CastVoteParam<Z> = ctx.parameter_cursor().get()?;
+    let params: CastVoteParam<Z> =
+        match ctx.parameter_cursor().get() {
+            Ok (x) => x,
+            Err (x) => return Err (ParseError{}),
+        };
 
     for i in 0..n {
         if !schnorr_zkp_validate(state.g_pow_xis[i], state.zkp_xis[i]) {
@@ -328,7 +336,11 @@ pub fn cast_vote<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<Z, G, n>,
 ) -> Result<(A, OvnContractState<Z, G, n>), ParseError> {
-    let params: CastVoteParam<Z> = ctx.parameter_cursor().get()?;
+    let params: CastVoteParam<Z> =
+        match ctx.parameter_cursor().get() {
+            Ok (x) => x,
+            Err (x) => return Err (ParseError{}),
+        };
 
     let g_pow_yi = compute_g_pow_yi::<Z, G, n>(params.cvp_i as usize, state.g_pow_xis);
     let g_pow_xi_yi_vi =

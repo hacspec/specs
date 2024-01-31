@@ -57,7 +57,7 @@ Hint Unfold f_add_loc.
 Hint Unfold f_sub_loc.
 Hint Unfold f_mul_loc.
 
-Class t_Group (Self : choice_type) `{_ : t_Z_Field} := {
+Class t_Group (Self : choice_type) := {
   f_group_type : choice_type ;
   f_group_type_t_Serialize :> t_Serialize (f_group_type) ;
   f_group_type_t_Deserial :> t_Deserial (f_group_type) ;
