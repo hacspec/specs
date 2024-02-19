@@ -34,28 +34,14 @@ Class t_Z_Field (Self : choice_type) := {
   f_field_type_t_Eq :> t_Eq (f_field_type) ;
   f_field_type_t_PartialEq :> t_PartialEq (f_field_type) ;
   f_field_type_t_Sized :> t_Sized (f_field_type) ;
-  f_q_loc : {fset Location} ;
-  f_q : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_q_loc) I1 (f_field_type) ;
-  f_random_field_elem_loc : {fset Location} ;
-  f_random_field_elem : forall {L1 I1}, both L1 I1 (int32) -> both (L1 :|: f_random_field_elem_loc) I1 (f_field_type) ;
-  f_field_zero_loc : {fset Location} ;
-  f_field_zero : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_field_zero_loc) I1 (f_field_type) ;
-  f_field_one_loc : {fset Location} ;
-  f_field_one : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_field_one_loc) I1 (f_field_type) ;
-  f_add_loc : {fset Location} ;
-  f_add : forall {L1 L2 I1 I2}, both L1 I1 (f_field_type) -> both L2 I2 (f_field_type) -> both (L1 :|: L2 :|: f_add_loc) (I1 :|: I2) (f_field_type) ;
-  f_sub_loc : {fset Location} ;
-  f_sub : forall {L1 L2 I1 I2}, both L1 I1 (f_field_type) -> both L2 I2 (f_field_type) -> both (L1 :|: L2 :|: f_sub_loc) (I1 :|: I2) (f_field_type) ;
-  f_mul_loc : {fset Location} ;
-  f_mul : forall {L1 L2 I1 I2}, both L1 I1 (f_field_type) -> both L2 I2 (f_field_type) -> both (L1 :|: L2 :|: f_mul_loc) (I1 :|: I2) (f_field_type) ;
+  f_q : both ('unit) -> both (f_field_type) ;
+  f_random_field_elem : both (int32) -> both (f_field_type) ;
+  f_field_zero : both ('unit) -> both (f_field_type) ;
+  f_field_one : both ('unit) -> both (f_field_type) ;
+  f_add : both (f_field_type) -> both (f_field_type) -> both (f_field_type) ;
+  f_sub : both (f_field_type) -> both (f_field_type) -> both (f_field_type) ;
+  f_mul : both (f_field_type) -> both (f_field_type) -> both (f_field_type) ;
 }.
-Hint Unfold f_q_loc.
-Hint Unfold f_random_field_elem_loc.
-Hint Unfold f_field_zero_loc.
-Hint Unfold f_field_one_loc.
-Hint Unfold f_add_loc.
-Hint Unfold f_sub_loc.
-Hint Unfold f_mul_loc.
 
 Class t_Group (Self : choice_type) `{t_Z_Field} := {
   f_group_type : choice_type ;
@@ -67,28 +53,12 @@ Class t_Group (Self : choice_type) `{t_Z_Field} := {
   f_group_type_t_Eq :> t_Eq (f_group_type) ;
   f_group_type_t_PartialEq :> t_PartialEq (f_group_type) ;
   f_group_type_t_Sized :> t_Sized (f_group_type) ;
-  f_g_loc : {fset Location} ;
-  f_g : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_g_loc) I1 (f_group_type) ;
-  f_g_pow_loc : {fset Location} ;
-  f_g_pow : forall {L1 I1}, both L1 I1 (f_field_type) -> both (L1 :|: f_g_pow_loc) I1 (f_group_type) ;
-  f_pow_loc : {fset Location} ;
-  f_pow : forall {L1 L2 I1 I2}, both L1 I1 (f_group_type) -> both L2 I2 (f_field_type) -> both (L1 :|: L2 :|: f_pow_loc) (I1 :|: I2) (f_group_type) ;
-  f_group_one_loc : {fset Location} ;
-  f_group_one : forall {L1 I1}, both L1 I1 ('unit) -> both (L1 :|: f_group_one_loc) I1 (f_group_type) ;
-  f_prod_loc : {fset Location} ;
-  f_prod : forall {L1 L2 I1 I2}, both L1 I1 (f_group_type) -> both L2 I2 (f_group_type) -> both (L1 :|: L2 :|: f_prod_loc) (I1 :|: I2) (f_group_type) ;
-  f_inv_loc : {fset Location} ;
-  f_inv : forall {L1 I1}, both L1 I1 (f_group_type) -> both (L1 :|: f_inv_loc) I1 (f_group_type) ;
-  f_div_loc : {fset Location} ;
-  f_div : forall {L1 L2 I1 I2}, both L1 I1 (f_group_type) -> both L2 I2 (f_group_type) -> both (L1 :|: L2 :|: f_div_loc) (I1 :|: I2) (f_group_type) ;
-  f_hash_loc : {fset Location} ;
-  f_hash : forall {L1 I1}, both L1 I1 (t_Vec (f_group_type) (t_Global)) -> both (L1 :|: f_hash_loc) I1 (f_field_type) ;
+  f_g : both ('unit) -> both (f_group_type) ;
+  f_g_pow : both (f_field_type) -> both (f_group_type) ;
+  f_pow : both (f_group_type) -> both (f_field_type) -> both (f_group_type) ;
+  f_group_one : both ('unit) -> both (f_group_type) ;
+  f_prod : both (f_group_type) -> both (f_group_type) -> both (f_group_type) ;
+  f_inv : both (f_group_type) -> both (f_group_type) ;
+  f_div : both (f_group_type) -> both (f_group_type) -> both (f_group_type) ;
+  f_hash : both (t_Vec (f_group_type) (t_Global)) -> both (f_field_type) ;
 }.
-Hint Unfold f_g_loc.
-Hint Unfold f_g_pow_loc.
-Hint Unfold f_pow_loc.
-Hint Unfold f_group_one_loc.
-Hint Unfold f_prod_loc.
-Hint Unfold f_inv_loc.
-Hint Unfold f_div_loc.
-Hint Unfold f_hash_loc.
