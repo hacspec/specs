@@ -516,8 +516,8 @@ Fail Next Obligation.
   fun x =>
     x.
 Fail Next Obligation.
-Definition receive_OVN_cast_vote {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} `{ temp : t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Sized (t_CastVoteParam (v_Z := v_Z) (H := temp))} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (t_CastVoteParam (v_Z := v_Z)) ('unit)} (ctx : both (t_CastVoteParam (v_Z := v_Z))) (st : both (state_OVN)) : both (t_Result ((v_A × state_OVN)) (t_ParseError)) :=
-  cast_vote (v_Z := v_Z) (v_G := v_G) (n := n) (v_A := v_A) (impl_574521470_ := t_CastVoteParam)  (H2 := t_CastVoteParam_t_Sized (v_Z := v_Z) (v_G := v_G) (n := n)) ctx st.
+Definition receive_OVN_cast_vote  {v_Z : _} {v_G : _} {n : both (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} {v_A : _} `{ t_Sized (v_A)} `{ t_HasActions (v_A)} (ctx : both (t_CastVoteParam (v_Z := v_Z))) (st : both (state_OVN)) : both (t_Result ((v_A × state_OVN)) (t_ParseError)) :=
+  cast_vote (v_Z := v_Z) (v_G := v_G) (n := n) (v_A := v_A)  (H2 := t_CastVoteParam_t_Sized (v_Z := v_Z) (v_G := v_G) (n := n))   (H7 := t_CastVoteParam_t_HasReceiveContext (v_Z := v_Z) (v_G := v_G) (n := n)) ctx st.
 
 (* #[global] Program Instance t_CastVoteParam_t_HasReceiveContext {v_Z : _} {v_G : _} {n : both (uint_size)} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} : t_HasReceiveContext t_CastVoteParam 'unit := *)
 (*   {| f_get := (fun  {Ctx : _} => (solve_lift (@ret_both (t_ParamType × t_Result Ctx t_ParseError)) (tt, inr tt)) : _)|}. *)
@@ -526,8 +526,8 @@ Definition receive_OVN_cast_vote {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A
 (*   fun x => *)
 (*     x. *)
 (* Fail Next Obligation. *)
-Definition receive_OVN_commit_to_vote {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)}  `{ t_Sized (t_CastVoteParam)} `{ t_HasReceiveContext (t_CastVoteParam) ('unit)} (ctx : both (t_CastVoteParam)) (st : both (state_OVN (n := n))) : both (t_Result ((v_A × state_OVN)) (t_ParseError)) :=
-  commit_to_vote ctx st.
+Definition receive_OVN_commit_to_vote {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} (ctx : both (t_CastVoteParam)) (st : both (state_OVN (n := n))) : both (t_Result ((v_A × state_OVN)) (t_ParseError)) :=
+  commit_to_vote (H2 := t_CastVoteParam_t_Sized (n := n)) (H7 := t_CastVoteParam_t_HasReceiveContext (n := n)) ctx st.
 
 Definition init_OVN {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} (chain : Chain) (ctx : ContractCallContext) (st : state_OVN) : ResultMonad.result (state_OVN (n := n)) (t_ParseError) :=
   ResultMonad.Ok st.
@@ -539,8 +539,8 @@ Fail Next Obligation.
   fun x =>
     x.
 Fail Next Obligation.
-Definition receive_OVN_register {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)}  `{ t_Sized (t_RegisterParam)} `{ t_HasReceiveContext (t_RegisterParam) ('unit)} (ctx : both (t_RegisterParam)) (st : both (state_OVN (n := n))) : both (t_Result ((v_A × state_OVN)) (t_ParseError)) :=
-  register_vote ctx st.
+Definition receive_OVN_register {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)}  (ctx : both (t_RegisterParam)) (st : both (state_OVN (n := n))) : both (t_Result ((v_A × state_OVN)) (t_ParseError)) :=
+  register_vote (H2 := t_RegisterParam_t_Sized (n := n)) (H7 := t_RegisterParam_t_HasReceiveContext (n := n)) ctx st.
 
 #[global] Program Instance t_TallyParameter_t_HasReceiveContext : t_HasReceiveContext t_TallyParameter 'unit :=
   {| f_get := (fun  {Ctx : _} => (solve_lift (@ret_both (t_ParamType × t_Result Ctx t_ParseError)) (tt, inr tt)) : _)|}.
@@ -549,56 +549,60 @@ Fail Next Obligation.
   fun x =>
     x.
 Fail Next Obligation.
-Definition receive_OVN_tally {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} {impl_574521470_ : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Sized (impl_574521470_)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} `{ t_HasReceiveContext (impl_574521470_) ('unit)} (ctx : both (t_TallyParameter)) (st : both (state_OVN)) : both (t_Result ((v_A × state_OVN (n := n))) (t_ParseError)) :=
+Definition receive_OVN_tally {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} (ctx : both (t_TallyParameter)) (st : both (state_OVN)) : both (t_Result ((v_A × state_OVN (n := n))) (t_ParseError)) :=
   tally_votes ctx st.
 
-Inductive Msg_OVN {v_Z : _} `{ t_Sized (v_Z)} `{ t_Z_Field (v_Z)} : Type :=
-| msg_OVN_cast_vote : t_CastVoteParam (v_Z := v_Z) -> Msg_OVN
-| msg_OVN_commit_to_vote : t_CastVoteParam (v_Z := v_Z) -> Msg_OVN
+Inductive Msg_OVN {v_Z : _} `{ t_Sized (v_Z)} `{ temp : t_Z_Field (v_Z)} : Type :=
+| msg_OVN_cast_vote : t_CastVoteParam (v_Z := v_Z) (H0 := temp) -> Msg_OVN
+| msg_OVN_commit_to_vote : t_CastVoteParam (v_Z := v_Z) (H0 := temp) -> Msg_OVN
 | msg_OVN_register : t_RegisterParam (v_Z := v_Z) -> Msg_OVN
 | msg_OVN_tally : t_TallyParameter -> Msg_OVN.
 #[global] Program Instance state_OVN_t_HasReceiveContext {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} : t_HasReceiveContext (state_OVN (n := n)) 'unit :=
   {| f_get := (fun  (Ctx : _) => (solve_lift (@ret_both (t_ParamType × t_Result Ctx t_ParseError)) (tt, inr tt)) : _)|}.
 Fail Next Obligation.
-#[global] Program Instance state_OVN_t_Sized {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} : t_Sized (state_OVN (n := n)) :=
+#[global] Program Instance state_OVN_t_Sized {v_Z : _} {v_G : _} {n : both (uint_size)} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)}  `{ t_Group (v_G) (v_Z)} : t_Sized (state_OVN (n := n)) :=
   fun x =>
     x.
 Fail Next Obligation.
-#[global] Program Instance state_OVN_t_HasActions {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} : t_HasActions (state_OVN (v_Z := v_Z) (n := n)).
+#[global] Program Instance state_OVN_t_HasActions {v_Z : _} {v_G : _} {n : both (uint_size)}`{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Group (v_G) (v_Z)} : t_HasActions (state_OVN (v_Z := v_Z) (n := n)).
 Admit Obligations.
 Fail Next Obligation.
-Equations receive_OVN {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)}  (chain : Chain) (ctx : ContractCallContext) (st : state_OVN (v_Z := v_Z) (v_G := v_G) (n := n)) (msg : Datatypes.option Msg_OVN) : ResultMonad.result (state_OVN * list ActionBody) t_ParseError :=
+Obligation Tactic := intros.
+
+(*  *)
+Equations receive_OVN  {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} `{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ temp1 : t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)} (chain : Chain) (ctx : ContractCallContext) (st : state_OVN (v_Z := v_Z) (n := n)) (msg : Datatypes.option (Msg_OVN  (v_Z := v_Z))) : ResultMonad.result (state_OVN (v_Z := v_Z) (n := n) * list ActionBody) t_ParseError :=
   receive_OVN chain ctx st msg  :=
     match msg with
     | Some (msg_OVN_cast_vote val) =>
-      match (is_pure (both_prog (receive_OVN_cast_vote (v_Z := v_Z) (v_G := v_G) (n := n) (ret_both val) (ret_both st)))) with
-         | inl x => ResultMonad.Ok ((fst x), [])
+      match is_pure (both_prog (@receive_OVN_cast_vote v_Z v_G n _ _ _ _ _ v_A _ _ (ret_both val) (ret_both st))) with
+         | inl x => ResultMonad.Ok ((snd x), [])
          | inr x => ResultMonad.Err x
          end
     | Some (msg_OVN_commit_to_vote val) =>
-      match (is_pure (both_prog (receive_OVN_commit_to_vote (v_Z := v_Z) (v_G := v_G) (n := n) (ret_both val) (ret_both st)))) with
-         | inl x => ResultMonad.Ok ((fst x), [])
+    match is_pure (both_prog (@receive_OVN_commit_to_vote v_Z v_G n _ _ _ _ _ _ _ _ (ret_both val) (ret_both st))) with
+         | inl x => ResultMonad.Ok ((snd x), [])
          | inr x => ResultMonad.Err x
          end
     | Some (msg_OVN_register val) =>
-      match (is_pure (both_prog (receive_OVN_register (v_Z := v_Z) (v_G := v_G) (n := n) (ret_both val) (ret_both st)))) with
-         | inl x => ResultMonad.Ok ((fst x), [])
+      match is_pure (both_prog (@receive_OVN_register v_Z v_G n _ _ _ _ _ _ _ _ (ret_both val) (ret_both st))) with
+         | inl x => ResultMonad.Ok ((snd x), [])
          | inr x => ResultMonad.Err x
          end
     | Some (msg_OVN_tally val) =>
-      match (is_pure (both_prog (receive_OVN_tally (v_Z := v_Z) (v_G := v_G) (n := n) (ret_both val) (ret_both st)))) with
-         | inl x => ResultMonad.Ok ((fst x), [])
+    match (is_pure (both_prog (@receive_OVN_tally v_Z v_G n _ _ _ _ _ _ _ _ (ret_both val) (ret_both st)))) with
+         | inl x => ResultMonad.Ok ((snd x), [])
          | inr x => ResultMonad.Err x
          end
     | _ =>
       ResultMonad.Err tt
-    end : ResultMonad.result (state_OVN * list ActionBody) t_ParseError.
+    end : ResultMonad.result (state_OVN (v_Z := v_Z) (n := n) * list ActionBody) t_ParseError.
 Fail Next Obligation.
-#[global] Program Instance state_OVN_Serializable : Serializable state_OVN :=
+#[global] Program Instance state_OVN_Serializable  {v_Z : _} {v_G : _} {n : both (uint_size)} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)}  `{ t_Group (v_G) (v_Z)} : Serializable (state_OVN  (v_Z := v_Z) (n := n)) :=
   _.
+Admit Obligations.
 Fail Next Obligation.
-#[global] Program Instance Msg_OVN_Serializable : Serializable Msg_OVN :=
-  Derive Serializable Msg_OVN_rect<msg_OVN_cast_vote,msg_OVN_commit_to_vote,msg_OVN_register,msg_OVN_tally>.
-Fail Next Obligation.
-Definition contract_OVN : Contract (state_OVN) (Msg_OVN) (state_OVN) (t_ParseError) :=
+(* #[global] Program Instance Msg_OVN_Serializable {v_Z : _} `{ t_Sized (v_Z)} `{ temp : t_Z_Field (v_Z)} : Serializable (Msg_OVN (v_Z := v_Z)) := *)
+(*   Derive Serializable Msg_OVN_rect<msg_OVN_cast_vote,msg_OVN_commit_to_vote,msg_OVN_register,msg_OVN_tally>. *)
+(* Fail Next Obligation. *)
+Definition contract_OVN  {v_Z : _} {v_G : _} {n : both (uint_size)}  : Contract (state_OVN (v_Z := v_Z) (n := n)) (Msg_OVN (v_Z := v_Z)) (state_OVN (v_Z := v_Z) (n := n)) (t_ParseError).
   build_contract init_OVN receive_OVN.
