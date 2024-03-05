@@ -24,8 +24,12 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
+From ConCert.Execution Require Import Serializable.
+From Hacspec Require Import ConCertLib.
+
 Class t_Z_Field (Self : choice_type) := {
   f_field_type : choice_type ;
+    f_field_type_Serializable : Serializable f_field_type;
   f_field_type_t_Serialize :> (t_Serialize f_field_type) ;
   f_field_type_t_Deserial :> (t_Deserial f_field_type) ;
   f_field_type_t_Serial :> (t_Serial f_field_type) ;
@@ -45,6 +49,7 @@ Class t_Z_Field (Self : choice_type) := {
 
 Class t_Group (Self : choice_type) `{t_Z_Field} := {
   f_group_type : choice_type ;
+    f_group_type_Serializable : Serializable f_group_type;
   f_group_type_t_Serialize :> (t_Serialize f_group_type) ;
   f_group_type_t_Deserial :> (t_Deserial f_group_type) ;
   f_group_type_t_Serial :> (t_Serial f_group_type) ;

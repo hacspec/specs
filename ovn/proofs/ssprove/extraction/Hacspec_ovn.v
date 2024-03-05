@@ -565,7 +565,11 @@ Fail Next Obligation.
     x.
 Fail Next Obligation.
 #[global] Program Instance state_OVN_t_HasActions {v_Z : _} {v_G : _} {n : both (uint_size)}`{ t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Group (v_G) (v_Z)} : t_HasActions (state_OVN (v_Z := v_Z) (n := n)).
-Admit Obligations.
+Next Obligation.
+  pose (init_ovn_contract_equation_1 v_Z v_G n H H0 H1 _ H2 (ret_both tt)).
+  set (solve_lift _) in e.
+  apply b.
+Defined.
 Fail Next Obligation.
 Obligation Tactic := intros.
 
@@ -599,10 +603,18 @@ Equations receive_OVN  {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} `{ t
 Fail Next Obligation.
 #[global] Program Instance state_OVN_Serializable  {v_Z : _} {v_G : _} {n : both (uint_size)} (* {impl_574521470_ : _} *) `{ t_Sized (v_Z)} `{ t_Sized (v_G)}  `{ t_Group (v_G) (v_Z)} : Serializable (state_OVN  (v_Z := v_Z) (n := n)) :=
   _.
-Admit Obligations.
+Next Obligation.
+  serialize_enum.
+  1-4: refine nseq_serializable ; serialize_enum.
+  7: refine nseq_serializable ; serialize_enum.
+  all: try refine f_group_type_Serializable.
+  all: try refine f_field_type_Serializable.
+  exact hacspec_int_serializable.
+Qed.
 Fail Next Obligation.
 #[global] Program Instance Msg_OVN_Serializable {v_Z : _} `{ temp0 : t_Sized (v_Z)} `{ temp1 : t_Z_Field (v_Z)} : Serializable (@Msg_OVN v_Z temp0 temp1).
+  (* Derive Serializable (@Msg_OVN_rect v_Z temp0 temp1) < (msg_OVN_cast_vote (v_Z := v_Z) (H := temp0) (temp := temp1)) , (msg_OVN_commit_to_vote (v_Z := v_Z) (H := temp0) (temp := temp1)), (msg_OVN_register (v_Z := v_Z) (H := temp0) (temp := temp1)),(msg_OVN_tally (v_Z := v_Z) (H := temp0) (temp := temp1)) >. *)
 Admit Obligations.
-(* Derive Serializable Msg_OVN_rect<msg_OVN_cast_vote,msg_OVN_commit_to_vote,msg_OVN_register,msg_OVN_tally>. *)
 Fail Next Obligation.
+
 Definition contract_OVN {v_Z : _} {v_G : _} {n : both (uint_size)} {v_A : _} `{ temp1 : t_Sized (v_Z)} `{ t_Sized (v_G)} `{ t_Sized (v_A)} `{ temp2 : t_Z_Field (v_Z)} `{ t_Group (v_G) (v_Z)} `{ t_HasActions (v_A)}  : @Contract _ (@state_OVN v_Z v_G n temp1 _ _ _ _) (@Msg_OVN v_Z temp1 H1 ) (state_OVN (v_Z := v_Z) (n := n)) (t_ParseError) state_OVN_Serializable Msg_OVN_Serializable state_OVN_Serializable _ := build_contract init_OVN receive_OVN.
