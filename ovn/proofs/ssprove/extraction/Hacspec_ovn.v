@@ -606,15 +606,29 @@ Equations receive_OVN (chain : Chain) (ctx : ContractCallContext) (st : state_OV
       ResultMonad.Err tt
     end : ResultMonad.result (state_OVN * list ActionBody) t_ParseError.
 Fail Next Obligation.
+
+Ltac make_hacspec_serializable :=
+  (serialize_enum ; repeat (refine nseq_serializable ; serialize_enum)
+  ; try ( exact f_group_type_Serializable 
+          || exact f_field_type_Serializable
+          || exact hacspec_int_serializable
+          || exact bool_serializable
+          || exact unit_serializable)).
+
 #[global] Program Instance state_OVN_Serializable : Serializable (state_OVN) :=
-  ltac:(serialize_enum ; repeat (refine nseq_serializable ; serialize_enum)
-  ; try refine f_group_type_Serializable
-  ; try refine f_field_type_Serializable
-  ; exact hacspec_int_serializable).
+  ltac:(make_hacspec_serializable).
 Fail Next Obligation.
-#[global] Program Instance Msg_OVN_Serializable : Serializable Msg_OVN := _.
-  (* Derive Serializable Msg_OVN_rect < msg_OVN_cast_vote , msg_OVN_commit_to_vote, msg_OVN_register,msg_OVN_tally >. *)
-Admit Obligations.
+
+#[global] Program Instance t_RegisterParam_Serializable : Serializable t_RegisterParam :=
+  ltac:(make_hacspec_serializable).
+Fail Next Obligation.
+
+#[global] Program Instance t_CastVoteParam_Serializable : Serializable t_TallyParameter :=
+  ltac:(make_hacspec_serializable).
+Fail Next Obligation.
+
+#[global] Program Instance Msg_OVN_Serializable : Serializable Msg_OVN :=
+  Derive Serializable Msg_OVN_rect < msg_OVN_cast_vote , msg_OVN_commit_to_vote, msg_OVN_register,msg_OVN_tally >.
 Fail Next Obligation.
 
 Definition contract_OVN  : @Contract _ (state_OVN) (Msg_OVN) (state_OVN) (t_ParseError) state_OVN_Serializable Msg_OVN_Serializable state_OVN_Serializable _ :=
