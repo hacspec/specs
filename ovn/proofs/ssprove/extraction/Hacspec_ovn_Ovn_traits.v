@@ -24,41 +24,43 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
+Notation both0 := (both (fset []) (fset [])).
+
 Class t_Z_Field (Self : choice_type) := {
   f_field_type : choice_type ;
-  f_field_type_t_Serialize :> t_Serialize (f_field_type) ;
-  f_field_type_t_Deserial :> t_Deserial (f_field_type) ;
-  f_field_type_t_Serial :> t_Serial (f_field_type) ;
-  f_field_type_t_Copy :> t_Copy (f_field_type) ;
-  f_field_type_t_Clone :> t_Clone (f_field_type) ;
-  f_field_type_t_Eq :> t_Eq (f_field_type) ;
-  f_field_type_t_PartialEq :> t_PartialEq (f_field_type) ;
-  f_field_type_t_Sized :> t_Sized (f_field_type) ;
-  f_q : both ('unit) -> both (f_field_type) ;
-  f_random_field_elem : both (int32) -> both (f_field_type) ;
-  f_field_zero : both ('unit) -> both (f_field_type) ;
-  f_field_one : both ('unit) -> both (f_field_type) ;
-  f_add : both (f_field_type) -> both (f_field_type) -> both (f_field_type) ;
-  f_sub : both (f_field_type) -> both (f_field_type) -> both (f_field_type) ;
-  f_mul : both (f_field_type) -> both (f_field_type) -> both (f_field_type) ;
+  f_field_type_t_Serialize :> (t_Serialize f_field_type) ;
+  f_field_type_t_Deserial :> (t_Deserial f_field_type) ;
+  f_field_type_t_Serial :> (t_Serial f_field_type) ;
+  f_field_type_t_Copy :> (t_Copy f_field_type) ;
+  f_field_type_t_Clone :> (t_Clone f_field_type) ;
+  f_field_type_t_Eq :> (t_Eq f_field_type) ;
+  f_field_type_t_PartialEq :> (t_PartialEq f_field_type) ;
+  f_field_type_t_Sized :> (t_Sized f_field_type) ;
+  f_q : (both0 f_field_type) ;
+  f_random_field_elem : (both0 int32 -> both0 f_field_type) ;
+  f_field_zero : (both0 f_field_type) ;
+  f_field_one : (both0 f_field_type) ;
+  f_add : (both0 f_field_type -> both0 f_field_type -> both0 f_field_type) ;
+  f_sub : (both0 f_field_type -> both0 f_field_type -> both0 f_field_type) ;
+  f_mul : (both0 f_field_type -> both0 f_field_type -> both0 f_field_type) ;
 }.
 
 Class t_Group (Self : choice_type) `{t_Z_Field} := {
   f_group_type : choice_type ;
-  f_group_type_t_Serialize :> t_Serialize (f_group_type) ;
-  f_group_type_t_Deserial :> t_Deserial (f_group_type) ;
-  f_group_type_t_Serial :> t_Serial (f_group_type) ;
-  f_group_type_t_Copy :> t_Copy (f_group_type) ;
-  f_group_type_t_Clone :> t_Clone (f_group_type) ;
-  f_group_type_t_Eq :> t_Eq (f_group_type) ;
-  f_group_type_t_PartialEq :> t_PartialEq (f_group_type) ;
-  f_group_type_t_Sized :> t_Sized (f_group_type) ;
-  f_g : both ('unit) -> both (f_group_type) ;
-  f_g_pow : both (f_field_type) -> both (f_group_type) ;
-  f_pow : both (f_group_type) -> both (f_field_type) -> both (f_group_type) ;
-  f_group_one : both ('unit) -> both (f_group_type) ;
-  f_prod : both (f_group_type) -> both (f_group_type) -> both (f_group_type) ;
-  f_inv : both (f_group_type) -> both (f_group_type) ;
-  f_div : both (f_group_type) -> both (f_group_type) -> both (f_group_type) ;
-  f_hash : both (t_Vec (f_group_type) (t_Global)) -> both (f_field_type) ;
+  f_group_type_t_Serialize :> (t_Serialize f_group_type) ;
+  f_group_type_t_Deserial :> (t_Deserial f_group_type) ;
+  f_group_type_t_Serial :> (t_Serial f_group_type) ;
+  f_group_type_t_Copy :> (t_Copy f_group_type) ;
+  f_group_type_t_Clone :> (t_Clone f_group_type) ;
+  f_group_type_t_Eq :> (t_Eq f_group_type) ;
+  f_group_type_t_PartialEq :> (t_PartialEq f_group_type) ;
+  f_group_type_t_Sized :> (t_Sized f_group_type) ;
+  f_g : (both0 f_group_type) ;
+  f_g_pow : (both0 f_field_type -> both0 f_group_type) ;
+  f_pow : (both0 f_group_type -> both0 f_field_type -> both0 f_group_type) ;
+  f_group_one : (both0 f_group_type) ;
+  f_prod : (both0 f_group_type -> both0 f_group_type -> both0 f_group_type) ;
+  f_inv : (both0 f_group_type -> both0 f_group_type) ;
+  f_div : (both0 f_group_type -> both0 f_group_type -> both0 f_group_type) ;
+  f_hash : (both0 (t_Vec f_group_type t_Global) -> both0 f_field_type) ;
 }.
