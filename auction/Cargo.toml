@@ -8,7 +8,7 @@ edition = "2018"
 path = "src/auction.rs"
 
 [dependencies]
-hax-lib-macros = { path = "../../hacspec-v2/hax-lib-macros/" }
+hax-lib-macros = { path = "../../hax/hax-lib-macros/" }
 hacspec-concordium = { path = "../concordium" }
 hacspec-concordium-derive = { path = "../concordium-derive" }
 

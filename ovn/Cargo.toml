@@ -5,12 +5,15 @@ authors = ["Lasse Letager Hanse <letager@cs.au.dk>"]
 edition = "2018"
 
 [lib]
-path = "src/ovn_no_group.rs"
+path = "src/ovn_zkgroup.rs"
 
 [dependencies]
 hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
-hax-lib-macros = { path = "../../hacspec-v2/hax-lib-macros/" }
+hax-lib-macros = { path = "../../hax/hax-lib-macros/" }
 hacspec-bip-340 = { path = "../bip-340/" }
+
+group = "0.13"
+rand_core = "0.6"
 
 hacspec-concordium = { path = "../concordium" } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
 hacspec-concordium-derive = { path = "../concordium-derive" } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
