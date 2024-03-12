@@ -323,7 +323,7 @@ pub fn verify(msg: Message, pubkey: PublicKey, sig: Signature) -> VerificationRe
 // Group trait //
 /////////////////
 
-mod GroupTrait {
+pub mod GroupTrait {
     use super::{PBytes32, Point, FieldElement, Scalar, ScalarCanvas, lift_x, AffinePoint, finite};
     use group::*;
     use hacspec_lib::*;
@@ -656,13 +656,6 @@ mod GroupTrait {
         }
     }
 
-    // impl GroupOps for p256 {
-
-    // }
-    // impl GroupOpsOwned for p256 {
-
-    // }
-
     impl From<u64> for Scalar {
         fn from(i: u64) -> Self {
             Scalar::from_literal(i as u128)
@@ -741,30 +734,30 @@ mod GroupTrait {
            Point::Affine(lift_x(FieldElement::from_public_byte_seq_be(PBytes32(*b))).unwrap())
         }
 
-          fn identity() -> Self { todo!() }
-    fn generator() -> Self {      
-           #[rustfmt::skip]
-        let gx = PBytes32([
-            0x79u8, 0xBEu8, 0x66u8, 0x7Eu8, 0xF9u8, 0xDCu8, 0xBBu8, 0xACu8,
-            0x55u8, 0xA0u8, 0x62u8, 0x95u8, 0xCEu8, 0x87u8, 0x0Bu8, 0x07u8,
-            0x02u8, 0x9Bu8, 0xFCu8, 0xDBu8, 0x2Du8, 0xCEu8, 0x28u8, 0xD9u8,
-            0x59u8, 0xF2u8, 0x81u8, 0x5Bu8, 0x16u8, 0xF8u8, 0x17u8, 0x98u8
-        ]);
-        #[rustfmt::skip]
-        let gy = PBytes32([
-            0x48u8, 0x3Au8, 0xDAu8, 0x77u8, 0x26u8, 0xA3u8, 0xC4u8, 0x65u8,
-            0x5Du8, 0xA4u8, 0xFBu8, 0xFCu8, 0x0Eu8, 0x11u8, 0x08u8, 0xA8u8,
-            0xFDu8, 0x17u8, 0xB4u8, 0x48u8, 0xA6u8, 0x85u8, 0x54u8, 0x19u8,
-            0x9Cu8, 0x47u8, 0xD0u8, 0x8Fu8, 0xFBu8, 0x10u8, 0xD4u8, 0xB8u8
-        ]);
-      Point::Affine((
+        fn identity() -> Self { todo!() }
+        fn generator() -> Self {
+            #[rustfmt::skip]
+            let gx = PBytes32([
+                0x79u8, 0xBEu8, 0x66u8, 0x7Eu8, 0xF9u8, 0xDCu8, 0xBBu8, 0xACu8,
+                0x55u8, 0xA0u8, 0x62u8, 0x95u8, 0xCEu8, 0x87u8, 0x0Bu8, 0x07u8,
+                0x02u8, 0x9Bu8, 0xFCu8, 0xDBu8, 0x2Du8, 0xCEu8, 0x28u8, 0xD9u8,
+                0x59u8, 0xF2u8, 0x81u8, 0x5Bu8, 0x16u8, 0xF8u8, 0x17u8, 0x98u8
+            ]);
+            #[rustfmt::skip]
+            let gy = PBytes32([
+                0x48u8, 0x3Au8, 0xDAu8, 0x77u8, 0x26u8, 0xA3u8, 0xC4u8, 0x65u8,
+                0x5Du8, 0xA4u8, 0xFBu8, 0xFCu8, 0x0Eu8, 0x11u8, 0x08u8, 0xA8u8,
+                0xFDu8, 0x17u8, 0xB4u8, 0x48u8, 0xA6u8, 0x85u8, 0x54u8, 0x19u8,
+                0x9Cu8, 0x47u8, 0xD0u8, 0x8Fu8, 0xFBu8, 0x10u8, 0xD4u8, 0xB8u8
+            ]);
+            Point::Affine((
                 FieldElement::from_public_byte_seq_be(gx),
                 FieldElement::from_public_byte_seq_be(gy),
             ))
-    }
-    fn is_identity(&self) -> Choice { todo!() }
+        }
+        fn is_identity(&self) -> Choice { todo!() }
         fn double(&self) -> Self { *self + *self }
-    }
+     }
 
     impl Curve for Point {
         type AffineRepr = AffinePoint;
