@@ -83,29 +83,29 @@ pub struct Reject {
     pub error_code: NonZeroI32,
 }
 
-/// Default error is i32::MIN.
-impl Default for Reject {
-    #[inline(always)]
-    #[exclude] // TODO: Unsafe
-    fn default() -> Self {
-        Self {
-            error_code: unsafe {NonZeroI32::new_unchecked(i32::MIN)},
-        }
-    }
-}
+// /// Default error is i32::MIN.
+// impl Default for Reject {
+//     #[inline(always)]
+//     #[exclude] // TODO: Unsafe
+//     fn default() -> Self {
+//         Self {
+//             error_code: unsafe {NonZeroI32::new_unchecked(i32::MIN)},
+//         }
+//     }
+// }
 
-impl Reject {
-    /// This returns `None` for all values >= 0 and `Some` otherwise.
-    #[exclude]
-    pub fn new(x: i32) -> Option<Self> {
-        if x < 0 {
-            let error_code = unsafe { NonZeroI32::new_unchecked(x) };
-            Some(Reject { error_code })
-        } else {
-            None
-        }
-    }
-}
+// impl Reject {
+//     /// This returns `None` for all values >= 0 and `Some` otherwise.
+//     #[exclude]
+//     pub fn new(x: i32) -> Option<Self> {
+//         if x < 0 {
+//             let error_code = unsafe { NonZeroI32::new_unchecked(x) };
+//             Some(Reject { error_code })
+//         } else {
+//             None
+//         }
+//     }
+// }
 
 // Macros for failing a contract function
 

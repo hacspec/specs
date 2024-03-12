@@ -1,0 +1,9 @@
+-R . Examples
+-arg -w
+-arg all
+
+./Hacspec_concordium.v
+./Hacspec_concordium_Concordium_traits.v
+./Hacspec_concordium_Concordium_types.v
+./Hacspec_concordium_Concordium_types_Sealed.v
+./Hacspec_concordium_Constants.v

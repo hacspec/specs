@@ -1,24 +1,24 @@
-use crate::{convert, mem, num, // prims, 
-            concordium_prims::*, concordium_traits::*, concordium_types::*};
-use concordium_contracts_common::*;
+// use crate::{convert, mem, num, // prims, 
+//             concordium_prims::*, concordium_traits::*, concordium_types::*};
+// use concordium_contracts_common::*;
 
-impl convert::From<()> for Reject {
-    #[inline(always)]
-    fn from(_: ()) -> Self {
-        Reject {
-            error_code: unsafe { num::NonZeroI32::new_unchecked(i32::MIN + 1) },
-        }
-    }
-}
+// impl convert::From<()> for Reject {
+//     #[inline(always)]
+//     fn from(_: ()) -> Self {
+//         Reject {
+//             error_code: unsafe { num::NonZeroI32::new_unchecked(i32::MIN + 1) },
+//         }
+//     }
+// }
 
-impl convert::From<ParseError> for Reject {
-    #[inline(always)]
-    fn from(_: ParseError) -> Self {
-        Reject {
-            error_code: unsafe { num::NonZeroI32::new_unchecked(i32::MIN + 2) },
-        }
-    }
-}
+// impl convert::From<ParseError> for Reject {
+//     #[inline(always)]
+//     fn from(_: ParseError) -> Self {
+//         Reject {
+//             error_code: unsafe { num::NonZeroI32::new_unchecked(i32::MIN + 2) },
+//         }
+//     }
+// }
 
 // /// Full is mapped to i32::MIN+3, Malformed is mapped to i32::MIN+4.
 // impl From<LogError> for Reject {

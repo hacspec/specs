@@ -51,12 +51,12 @@ pub use core::{convert, hash, marker, mem, num, result::*};
 pub use alloc::collections;
 
 pub mod constants;
-mod concordium_impls;
 mod concordium_prims;
+mod concordium_impls;
 mod concordium_types;
 mod concordium_traits;
 
-pub mod test_infrastructure;
+// pub mod test_infrastructure;
 
 use concordium_prims::*; // TODO: Does not re-export anything, nothing is public enough (removed pub)
 pub use concordium_impls::*;

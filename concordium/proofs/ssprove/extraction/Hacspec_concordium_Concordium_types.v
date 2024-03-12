@@ -24,33 +24,55 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-Definition t_ContractState : choice_type :=
-  (int32).
-Equations f_current_contract_state_position {L : {fset Location}} {I : Interface} (s : both L I (t_ContractState)) : both L I (int32) :=
-  f_current_contract_state_position s  :=
-    bind_both s (fun x =>
-      solve_lift (ret_both (x : int32))) : both L I (int32).
+Definition t_LogError : choice_type :=
+  ('unit ∐ 'unit).
+Notation "'LogError_Full_case'" := (inl tt) (at level 100).
+Equations LogError_Full {L : {fset Location}} {I : Interface} : both L I (t_LogError) :=
+  LogError_Full  :=
+    solve_lift (ret_both (inl (tt : 'unit) : t_LogError)) : both L I (t_LogError).
 Fail Next Obligation.
-Equations Build_t_ContractState {L0 : {fset Location}} {I0 : Interface} {f_current_contract_state_position : both L0 I0 (int32)} : both L0 I0 (t_ContractState) :=
-  Build_t_ContractState  :=
-    bind_both f_current_contract_state_position (fun f_current_contract_state_position =>
-      solve_lift (ret_both ((f_current_contract_state_position) : (t_ContractState)))) : both L0 I0 (t_ContractState).
+Notation "'LogError_Malformed_case'" := (inr tt) (at level 100).
+Equations LogError_Malformed {L : {fset Location}} {I : Interface} : both L I (t_LogError) :=
+  LogError_Malformed  :=
+    solve_lift (ret_both (inr (tt : 'unit) : t_LogError)) : both L I (t_LogError).
 Fail Next Obligation.
-Notation "'Build_t_ContractState' '[' x ']' '(' 'f_current_contract_state_position' ':=' y ')'" := (Build_t_ContractState (f_current_contract_state_position := y)).
 
-Definition t_Parameter : choice_type :=
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+Definition t_Action : choice_type :=
   (int32).
-Equations f_current_parameter_position {L : {fset Location}} {I : Interface} (s : both L I (t_Parameter)) : both L I (int32) :=
-  f_current_parameter_position s  :=
+Equations f__private_action {L : {fset Location}} {I : Interface} (s : both L I (t_Action)) : both L I (int32) :=
+  f__private_action s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (x : int32))) : both L I (int32).
 Fail Next Obligation.
-Equations Build_t_Parameter {L0 : {fset Location}} {I0 : Interface} {f_current_parameter_position : both L0 I0 (int32)} : both L0 I0 (t_Parameter) :=
-  Build_t_Parameter  :=
-    bind_both f_current_parameter_position (fun f_current_parameter_position =>
-      solve_lift (ret_both ((f_current_parameter_position) : (t_Parameter)))) : both L0 I0 (t_Parameter).
+Equations Build_t_Action {L0 : {fset Location}} {I0 : Interface} {f__private_action : both L0 I0 (int32)} : both L0 I0 (t_Action) :=
+  Build_t_Action  :=
+    bind_both f__private_action (fun f__private_action =>
+      solve_lift (ret_both ((f__private_action) : (t_Action)))) : both L0 I0 (t_Action).
 Fail Next Obligation.
-Notation "'Build_t_Parameter' '[' x ']' '(' 'f_current_parameter_position' ':=' y ')'" := (Build_t_Parameter (f_current_parameter_position := y)).
+Notation "'Build_t_Action' '[' x ']' '(' 'f__private_action' ':=' y ')'" := (Build_t_Action (f__private_action := y)).
+
+Equations impl__Action__tag {L1 : {fset Location}} {I1 : Interface} (self : both L1 I1 (t_Action)) : both L1 I1 (int32) :=
+  impl__Action__tag self  :=
+    solve_lift (f__private_action self) : both L1 I1 (int32).
+Fail Next Obligation.
 
 Definition t_AttributesCursor : choice_type :=
   (int32 × int16).
@@ -73,6 +95,48 @@ Fail Next Obligation.
 Notation "'Build_t_AttributesCursor' '[' x ']' '(' 'f_current_attribute_cursor_position' ':=' y ')'" := (Build_t_AttributesCursor (f_current_attribute_cursor_position := y) (f_remaining_items := f_remaining_items x)).
 Notation "'Build_t_AttributesCursor' '[' x ']' '(' 'f_remaining_items' ':=' y ')'" := (Build_t_AttributesCursor (f_current_attribute_cursor_position := f_current_attribute_cursor_position x) (f_remaining_items := y)).
 
+Definition t_ChainMetaExtern : choice_type :=
+  'unit.
+Equations Build_t_ChainMetaExtern : both (fset []) (fset []) (t_ChainMetaExtern) :=
+  Build_t_ChainMetaExtern  :=
+    solve_lift (ret_both (tt (* Empty tuple *) : (t_ChainMetaExtern))) : both (fset []) (fset []) (t_ChainMetaExtern).
+Fail Next Obligation.
+
+Definition t_ContractState : choice_type :=
+  (int32).
+Equations f_current_contract_state_position {L : {fset Location}} {I : Interface} (s : both L I (t_ContractState)) : both L I (int32) :=
+  f_current_contract_state_position s  :=
+    bind_both s (fun x =>
+      solve_lift (ret_both (x : int32))) : both L I (int32).
+Fail Next Obligation.
+Equations Build_t_ContractState {L0 : {fset Location}} {I0 : Interface} {f_current_contract_state_position : both L0 I0 (int32)} : both L0 I0 (t_ContractState) :=
+  Build_t_ContractState  :=
+    bind_both f_current_contract_state_position (fun f_current_contract_state_position =>
+      solve_lift (ret_both ((f_current_contract_state_position) : (t_ContractState)))) : both L0 I0 (t_ContractState).
+Fail Next Obligation.
+Notation "'Build_t_ContractState' '[' x ']' '(' 'f_current_contract_state_position' ':=' y ')'" := (Build_t_ContractState (f_current_contract_state_position := y)).
+
+Definition t_ExternContext {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} : choice_type :=
+  (t_PhantomData (v_T)).
+Equations f_marker {L : {fset Location}} {I : Interface} {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} (s : both L I (t_ExternContext)) : both L I (t_PhantomData (v_T)) :=
+  f_marker s  :=
+    bind_both s (fun x =>
+      solve_lift (ret_both (x : t_PhantomData (v_T)))) : both L I (t_PhantomData (v_T)).
+Fail Next Obligation.
+Equations Build_t_ExternContext {L0 : {fset Location}} {I0 : Interface} {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} {f_marker : both L0 I0 (t_PhantomData (v_T))} : both L0 I0 (t_ExternContext) :=
+  Build_t_ExternContext  :=
+    bind_both f_marker (fun f_marker =>
+      solve_lift (ret_both ((f_marker) : (t_ExternContext)))) : both L0 I0 (t_ExternContext).
+Fail Next Obligation.
+Notation "'Build_t_ExternContext' '[' x ']' '(' 'f_marker' ':=' y ')'" := (Build_t_ExternContext (f_marker := y)).
+
+Definition t_InitContextExtern : choice_type :=
+  'unit.
+Equations Build_t_InitContextExtern : both (fset []) (fset []) (t_InitContextExtern) :=
+  Build_t_InitContextExtern  :=
+    solve_lift (ret_both (tt (* Empty tuple *) : (t_InitContextExtern))) : both (fset []) (fset []) (t_InitContextExtern).
+Fail Next Obligation.
+
 Definition t_Logger : choice_type :=
   ('unit).
 Equations f__private_logger {L : {fset Location}} {I : Interface} (s : both L I (t_Logger)) : both L I ('unit) :=
@@ -87,51 +151,32 @@ Equations Build_t_Logger {L0 : {fset Location}} {I0 : Interface} {f__private_log
 Fail Next Obligation.
 Notation "'Build_t_Logger' '[' x ']' '(' 'f__private_logger' ':=' y ')'" := (Build_t_Logger (f__private_logger := y)).
 
-Definition t_LogError : choice_type :=
-  chFin (mkpos 2).
-Equations LogError_Full {L : {fset Location}} {I : Interface} : both L I t_LogError :=
-  LogError_Full  :=
-    solve_lift ret_both (fintype.Ordinal (n:=2) (m:=0) eq_refl : t_LogError) : both L I t_LogError.
-Fail Next Obligation.
-Equations LogError_Malformed {L : {fset Location}} {I : Interface} : both L I t_LogError :=
-  LogError_Malformed  :=
-    solve_lift ret_both (fintype.Ordinal (n:=2) (m:=1) eq_refl : t_LogError) : both L I t_LogError.
-Fail Next Obligation.
-
 Definition t_NotPayableError : choice_type :=
   'unit.
 Equations Build_t_NotPayableError : both (fset []) (fset []) (t_NotPayableError) :=
   Build_t_NotPayableError  :=
-    solve_lift (ret_both ((_) : (t_NotPayableError))) : both (fset []) (fset []) (t_NotPayableError).
+    solve_lift (ret_both (tt (* Empty tuple *) : (t_NotPayableError))) : both (fset []) (fset []) (t_NotPayableError).
 Fail Next Obligation.
 
-Definition t_Action : choice_type :=
+Definition t_Parameter : choice_type :=
   (int32).
-Equations f__private_action {L : {fset Location}} {I : Interface} (s : both L I (t_Action)) : both L I (int32) :=
-  f__private_action s  :=
+Equations f_current_parameter_position {L : {fset Location}} {I : Interface} (s : both L I (t_Parameter)) : both L I (int32) :=
+  f_current_parameter_position s  :=
     bind_both s (fun x =>
       solve_lift (ret_both (x : int32))) : both L I (int32).
 Fail Next Obligation.
-Equations Build_t_Action {L0 : {fset Location}} {I0 : Interface} {f__private_action : both L0 I0 (int32)} : both L0 I0 (t_Action) :=
-  Build_t_Action  :=
-    bind_both f__private_action (fun f__private_action =>
-      solve_lift (ret_both ((f__private_action) : (t_Action)))) : both L0 I0 (t_Action).
+Equations Build_t_Parameter {L0 : {fset Location}} {I0 : Interface} {f_current_parameter_position : both L0 I0 (int32)} : both L0 I0 (t_Parameter) :=
+  Build_t_Parameter  :=
+    bind_both f_current_parameter_position (fun f_current_parameter_position =>
+      solve_lift (ret_both ((f_current_parameter_position) : (t_Parameter)))) : both L0 I0 (t_Parameter).
 Fail Next Obligation.
-Notation "'Build_t_Action' '[' x ']' '(' 'f__private_action' ':=' y ')'" := (Build_t_Action (f__private_action := y)).
+Notation "'Build_t_Parameter' '[' x ']' '(' 'f_current_parameter_position' ':=' y ')'" := (Build_t_Parameter (f_current_parameter_position := y)).
 
-Equations tag {L1 : {fset Location}} {I1 : Interface} (self : both L1 I1 (t_Action)) : both L1 I1 (int32) :=
-  tag self  :=
-    solve_lift (f__private_action self) : both L1 I1 (int32).
-Fail Next Obligation.
-
-Equations v____ {L : {fset Location}} {I : Interface} : both L I ('unit) :=
-  v____  :=
-    solve_lift (ret_both (tt : 'unit)) : both L I ('unit).
-Fail Next Obligation.
-
-Equations v______refinement {L1 : {fset Location}} {I1 : Interface} (error_code : both L1 I1 (t_NonZeroI32)) : both L1 I1 ('bool) :=
-  v______refinement error_code  :=
-    solve_lift (ret_both (true : 'bool)) : both L1 I1 ('bool).
+Definition t_ReceiveContextExtern : choice_type :=
+  'unit.
+Equations Build_t_ReceiveContextExtern : both (fset []) (fset []) (t_ReceiveContextExtern) :=
+  Build_t_ReceiveContextExtern  :=
+    solve_lift (ret_both (tt (* Empty tuple *) : (t_ReceiveContextExtern))) : both (fset []) (fset []) (t_ReceiveContextExtern).
 Fail Next Obligation.
 
 Definition t_Reject : choice_type :=
@@ -148,66 +193,8 @@ Equations Build_t_Reject {L0 : {fset Location}} {I0 : Interface} {f_error_code :
 Fail Next Obligation.
 Notation "'Build_t_Reject' '[' x ']' '(' 'f_error_code' ':=' y ')'" := (Build_t_Reject (f_error_code := y)).
 
-#[global] Program Instance t_Reject_t_Default : t_Default t_Reject :=
-  _.
-Fail Next Obligation.
-Hint Unfold t_Reject_t_Default.
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-Definition t_ReceiveResult {v_A : _} `{ t_Sized (v_A)} : choice_type :=
-  t_Result (v_A) (t_Reject).
-
 Definition t_InitResult {v_S : _} `{ t_Sized (v_S)} : choice_type :=
   t_Result (v_S) (t_Reject).
 
-(*Not implemented yet? todo(item)*)
-
-Definition t_ExternContext {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} : choice_type :=
-  (t_PhantomData (v_T)).
-Equations f_marker {L : {fset Location}} {I : Interface} {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} (s : both L I (t_ExternContext)) : both L I (t_PhantomData (v_T)) :=
-  f_marker s  :=
-    bind_both s (fun x =>
-      solve_lift (ret_both (x : t_PhantomData (v_T)))) : both L I (t_PhantomData (v_T)).
-Fail Next Obligation.
-Equations Build_t_ExternContext {L0 : {fset Location}} {I0 : Interface} {v_T : _} `{ t_Sized (v_T)} `{ t_ContextType (v_T)} {f_marker : both L0 I0 (t_PhantomData (v_T))} : both L0 I0 (t_ExternContext) :=
-  Build_t_ExternContext  :=
-    bind_both f_marker (fun f_marker =>
-      solve_lift (ret_both ((f_marker) : (t_ExternContext)))) : both L0 I0 (t_ExternContext).
-Fail Next Obligation.
-Notation "'Build_t_ExternContext' '[' x ']' '(' 'f_marker' ':=' y ')'" := (Build_t_ExternContext (f_marker := y)).
-
-Definition t_ChainMetaExtern : choice_type :=
-  'unit.
-Equations Build_t_ChainMetaExtern : both (fset []) (fset []) (t_ChainMetaExtern) :=
-  Build_t_ChainMetaExtern  :=
-    solve_lift (ret_both ((_) : (t_ChainMetaExtern))) : both (fset []) (fset []) (t_ChainMetaExtern).
-Fail Next Obligation.
-
-Definition t_InitContextExtern : choice_type :=
-  'unit.
-Equations Build_t_InitContextExtern : both (fset []) (fset []) (t_InitContextExtern) :=
-  Build_t_InitContextExtern  :=
-    solve_lift (ret_both ((_) : (t_InitContextExtern))) : both (fset []) (fset []) (t_InitContextExtern).
-Fail Next Obligation.
-
-Definition t_ReceiveContextExtern : choice_type :=
-  'unit.
-Equations Build_t_ReceiveContextExtern : both (fset []) (fset []) (t_ReceiveContextExtern) :=
-  Build_t_ReceiveContextExtern  :=
-    solve_lift (ret_both ((_) : (t_ReceiveContextExtern))) : both (fset []) (fset []) (t_ReceiveContextExtern).
-Fail Next Obligation.
+Definition t_ReceiveResult {v_A : _} `{ t_Sized (v_A)} : choice_type :=
+  t_Result (v_A) (t_Reject).

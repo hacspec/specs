@@ -24,18 +24,6 @@ Import choice.Choice.Exports.
 
 Obligation Tactic := (* try timeout 8 *) solve_ssprove_obligations.
 
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-Definition t_Never : choice_type := 'unit.
-Definition abort : both (fset []) (fset []) t_Never := ret_both tt.
-Equations trap {L : {fset Location}} {I : Interface} : both L I (t_Never) :=
-  trap  :=
-    solve_lift abort : both L I (t_Never).
-Fail Next Obligation.
-
 Require Import Alloc.
 Export Alloc.
 
@@ -81,54 +69,11 @@ Export Core_Result.
 Require Import collections.
 Export collections.
 
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
-(*Not implemented yet? todo(item)*)
-
 Require Import Concordium_prims.
 Export Concordium_prims.
+
+Require Import Concordium_impls.
+Export Concordium_impls.
 
 Require Import Concordium_types.
 Export Concordium_types.
@@ -136,12 +81,71 @@ Export Concordium_types.
 Require Import Concordium_traits.
 Export Concordium_traits.
 
-(*Not implemented yet? todo(item)*)
-
 Require Import Concordium_contracts_common.
 Export Concordium_contracts_common.
 
-(*Not implemented yet? todo(item)*)
-
 Require Import Hacspec_concordium_derive.
 Export Hacspec_concordium_derive.
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+(*Not implemented yet? todo(item)*)
+
+Equations trap {L1 : {fset Location}} {I1 : Interface} (_ : both L1 I1 ('unit)) : both L1 I1 (t_Never) :=
+  trap _  :=
+    solve_lift (abort (ret_both (tt : 'unit))) : both L1 I1 (t_Never).
+Fail Next Obligation.
