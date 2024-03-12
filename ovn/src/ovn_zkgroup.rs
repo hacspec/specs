@@ -1,10 +1,4 @@
-#![no_std]
-#![feature(register_tool)]
-#![register_tool(hax)]
 #![feature(trait_alias)]
-
-#[hax_lib_macros::exclude]
-extern crate hax_lib_macros;
 
 #[hax_lib_macros::exclude]
 use hax_lib_macros::*;

@@ -1,10 +1,3 @@
-#![no_std]
-#![feature(register_tool)]
-#![register_tool(hax)]
-
-#[hax_lib_macros::exclude]
-extern crate hax_lib_macros;
-
 #[hax_lib_macros::exclude]
 use hax_lib_macros::*;
 
@@ -13,8 +6,7 @@ use hacspec_concordium::*;
 #[exclude]
 use hacspec_concordium_derive::*;
 
-mod ovn_traits;
-pub use ovn_traits::*;
+pub use crate::ovn_traits::*;
 
 ////////////////////
 // Implementation //

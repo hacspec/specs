@@ -5,7 +5,7 @@ authors = ["Lasse Letager Hanse <letager@cs.au.dk>"]
 edition = "2018"
 
 [lib]
-path = "src/ovn_zkgroup.rs"
+path = "src/lib.rs"
 
 [dependencies]
 hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
@@ -24,6 +24,7 @@ quickcheck_macros = "1"
 [dev-dependencies]
 criterion = "0.4"
 rand = "0.8"
+bls12_381 = "*"
 
 [features]
 hax_compilation = []
