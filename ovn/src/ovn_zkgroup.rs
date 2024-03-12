@@ -1,4 +1,3 @@
-#![feature(trait_alias)]
 
 #[hax_lib_macros::exclude]
 use hax_lib_macros::*;
@@ -12,21 +11,22 @@ use ff::Field;
 use group::*;
 use rand_core::RngCore;
 
-pub trait MGroup = Group + Field;
+pub trait MGroup = Group;
 
 fn pow<G: MGroup>(x: G, n: G::Scalar) -> G {
     if n == Field::ZERO {
         G::identity()
     } else {
-        x * pow(x, n - <G::Scalar as Field>::ONE)
+        x + pow(x, n - <G::Scalar as Field>::ONE)
     }
 }
 
+// Multiplicative group?
 fn g_pow<G: MGroup>(n: G::Scalar) -> G {
     if n == Field::ZERO {
         G::identity()
     } else {
-        G::generator() * g_pow::<G>(n - <G::Scalar as Field>::ONE)
+        G::generator() + g_pow::<G>(n - <G::Scalar as Field>::ONE)
     }
 }
 
@@ -35,7 +35,7 @@ fn hash<G: MGroup>(inp: Vec<G>) -> G::Scalar {
 }
 
 fn div<G: MGroup>(x: G, y: G) -> G {
-    x * y.invert().unwrap()
+    x - y
 }
 
 ////////////////////
@@ -71,7 +71,7 @@ pub fn schnorr_zkp<G: MGroup>(
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
 pub fn schnorr_zkp_validate<G: MGroup>(h: G, pi: SchnorrZKPCommit<G>) -> bool {
     pi.schnorr_zkp_c == hash::<G>(vec![G::generator(), h, pi.schnorr_zkp_u])
-        && g_pow::<G>(pi.schnorr_zkp_z) == pi.schnorr_zkp_u * pow::<G>(h, pi.schnorr_zkp_c)
+        && g_pow::<G>(pi.schnorr_zkp_z) == pi.schnorr_zkp_u + pow::<G>(h, pi.schnorr_zkp_c)
 }
 
 #[derive(SchemaType, Clone, Copy)]
@@ -106,10 +106,10 @@ pub fn zkp_one_out_of_two<G: MGroup>(
         let d1 = rand_d;
 
         let x = g_pow::<G>(xi);
-        let y = pow::<G>(h, xi) * G::generator();
+        let y = pow::<G>(h, xi) + G::generator();
 
-        let a1 = g_pow::<G>(r1) * pow::<G>(x, d1);
-        let b1 = pow::<G>(h, r1) * pow::<G>(y, d1);
+        let a1 = g_pow::<G>(r1) + pow::<G>(x, d1);
+        let b1 = pow::<G>(h, r1) + pow::<G>(y, d1);
 
         let a2 = g_pow::<G>(w);
         let b2 = pow::<G>(h, w);
@@ -142,8 +142,8 @@ pub fn zkp_one_out_of_two<G: MGroup>(
         let a1 = g_pow::<G>(w);
         let b1 = pow::<G>(h, w);
 
-        let a2 = g_pow::<G>(r2) * pow::<G>(x, d2);
-        let b2 = pow::<G>(h, r2) * pow::<G>(div::<G>(y, G::generator()), d2);
+        let a2 = g_pow::<G>(r2) + pow::<G>(x, d2);
+        let b2 = pow::<G>(h, r2) + pow::<G>(div::<G>(y, G::generator()), d2);
 
         let c = hash::<G>(vec![x, y, a1, b1, a2, b2]);
 
@@ -178,12 +178,12 @@ pub fn zkp_one_out_of_two_validate<G: MGroup>(h: G, zkp: OrZKPCommit<G>) -> bool
     ]); // TODO: add i
 
     (c == zkp.or_zkp_d1 + zkp.or_zkp_d2
-        && zkp.or_zkp_a1 == g_pow::<G>(zkp.or_zkp_r1) * pow::<G>(zkp.or_zkp_x, zkp.or_zkp_d1)
-        && zkp.or_zkp_b1 == pow::<G>(h, zkp.or_zkp_r1) * pow::<G>(zkp.or_zkp_y, zkp.or_zkp_d1)
-        && zkp.or_zkp_a2 == g_pow::<G>(zkp.or_zkp_r2) * pow::<G>(zkp.or_zkp_x, zkp.or_zkp_d2)
+        && zkp.or_zkp_a1 == g_pow::<G>(zkp.or_zkp_r1) + pow::<G>(zkp.or_zkp_x, zkp.or_zkp_d1)
+        && zkp.or_zkp_b1 == pow::<G>(h, zkp.or_zkp_r1) + pow::<G>(zkp.or_zkp_y, zkp.or_zkp_d1)
+        && zkp.or_zkp_a2 == g_pow::<G>(zkp.or_zkp_r2) + pow::<G>(zkp.or_zkp_x, zkp.or_zkp_d2)
         && zkp.or_zkp_b2
             == pow::<G>(h, zkp.or_zkp_r2)
-                * pow::<G>(div::<G>(zkp.or_zkp_y, G::generator()), zkp.or_zkp_d2))
+                + pow::<G>(div::<G>(zkp.or_zkp_y, G::generator()), zkp.or_zkp_d2))
 }
 
 pub fn commit_to<G: MGroup>(g_pow_xi_yi_vi: G) -> G::Scalar {
@@ -214,23 +214,23 @@ pub struct OvnContractState<G: MGroup, const n: usize> {
 pub fn init_ovn_contract<G: MGroup, const n: usize>(// _: &impl HasInitContext,
 ) -> InitResult<OvnContractState<G, n>> {
     Ok(OvnContractState::<G, n> {
-        g_pow_xis: [<G as Field>::ONE; n],
+        g_pow_xis: [G::identity(); n],
         zkp_xis: [SchnorrZKPCommit::<G> {
-            schnorr_zkp_u: <G as Field>::ONE,
+            schnorr_zkp_u: G::identity(),
             schnorr_zkp_z: G::Scalar::ZERO,
             schnorr_zkp_c: G::Scalar::ZERO,
         }; n],
 
         commit_vis: [G::Scalar::ZERO; n],
 
-        g_pow_xi_yi_vis: [<G as Field>::ONE; n],
+        g_pow_xi_yi_vis: [G::identity(); n],
         zkp_vis: [OrZKPCommit::<G> {
-            or_zkp_x: <G as Field>::ONE,
-            or_zkp_y: <G as Field>::ONE,
-            or_zkp_a1: <G as Field>::ONE,
-            or_zkp_b1: <G as Field>::ONE,
-            or_zkp_a2: <G as Field>::ONE,
-            or_zkp_b2: <G as Field>::ONE,
+            or_zkp_x: G::identity(),
+            or_zkp_y: G::identity(),
+            or_zkp_a1: G::identity(),
+            or_zkp_b1: G::identity(),
+            or_zkp_a2: G::identity(),
+            or_zkp_b2: G::identity(),
 
             or_zkp_c: G::Scalar::ZERO,
 
@@ -289,14 +289,14 @@ pub struct CastVoteParam<Z: Field + Serialize> {
 }
 
 pub fn compute_g_pow_yi<G: MGroup, const n: usize>(i: usize, xis: [G; n]) -> G {
-    let mut prod1 = <G as Field>::ONE;
+    let mut prod1 = G::identity();
     for j in 0..i {
-        prod1 = prod1 * xis[j];
+        prod1 = prod1 + xis[j];
     }
 
-    let mut prod2 = <G as Field>::ONE;
+    let mut prod2 = G::identity();
     for j in (i + 1)..n {
-        prod2 = prod2 * xis[j];
+        prod2 = prod2 + xis[j];
     }
 
     // implicitly: Y_i = g^y_i
@@ -306,7 +306,7 @@ pub fn compute_g_pow_yi<G: MGroup, const n: usize>(i: usize, xis: [G; n]) -> G {
 
 pub fn compute_group_element_for_vote<G: MGroup>(xi: G::Scalar, vote: bool, g_pow_yi: G) -> G {
     pow::<G>(g_pow_yi, xi)
-        * g_pow::<G>(if vote {
+        + g_pow::<G>(if vote {
             G::Scalar::ONE
         } else {
             G::Scalar::ZERO
@@ -386,9 +386,9 @@ pub fn tally_votes<G: MGroup, const n: usize, A: HasActions>(
         }
     }
 
-    let mut vote_result = <G as Field>::ONE;
+    let mut vote_result = G::identity();
     for g_pow_vote in state.g_pow_xi_yi_vis {
-        vote_result = vote_result * g_pow_vote;
+        vote_result = vote_result + g_pow_vote;
     }
 
     let mut tally = 0;

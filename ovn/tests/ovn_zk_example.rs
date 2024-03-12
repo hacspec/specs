@@ -15,24 +15,16 @@ extern crate quickcheck_macros;
 #[cfg(test)]
 use quickcheck::*;
 
-pub use bls12_381::*;
-pub use hacspec_ovn::ovn_zkgroup::*;
-pub use group::ff::Field;
+// pub use bls12_381::*;
+// pub use hacspec_ovn::ovn_zkgroup::*;
+// pub use group::ff::Field;
 
-struct bls_g_ty (Gt);
-
-impl Field for bls_g_ty {
-
-}
-
-impl Group for bls_g_ty {
-
-}
+use hacspec_bip_340::*;
 
 #[test]
 pub fn schorr_zkp_correctness() {
     fn test(random_x: u32, random_r: u32) -> bool {
-        type G = bls_g_ty;
+        type G = Point;
 
         let x: u32 = G::random(random_x);
         // let pow_x = G::g_pow(x);
