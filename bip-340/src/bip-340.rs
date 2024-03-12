@@ -33,7 +33,7 @@ pub type AffinePoint = (FieldElement, FieldElement);
 
 public_bytes!(PBytes32, 32);
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Point {
     Affine(AffinePoint),
     AtInfinity,
@@ -316,5 +316,460 @@ pub fn verify(msg: Message, pubkey: PublicKey, sig: Signature) -> VerificationRe
         VerificationResult::Err(Error::InvalidSignature)
     } else {
         VerificationResult::Ok(())
+    }
+}
+
+/////////////////
+// Group trait //
+/////////////////
+
+mod GroupTrait {
+    use super::{PBytes32, Point, FieldElement, Scalar, ScalarCanvas, lift_x, AffinePoint, finite};
+    use group::*;
+    use hacspec_lib::*;
+
+    use core::iter::{Product, Sum};
+    use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+    use ff::{Field, PrimeField};
+    use group::*;
+    use rand_core::RngCore;
+    use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
+
+    impl Sum for Point {
+        fn sum<I: Iterator<Item = Point>>(iter: I) -> Self {
+            let mut accum = Point::AtInfinity;
+            for x in iter {
+                accum = accum + x;
+            }
+            accum
+        }
+    }
+
+    impl<'b> Sum<&'b Point> for Point {
+        fn sum<I: Iterator<Item = &'b Point>>(iter: I) -> Self {
+            let mut accum = Point::AtInfinity;
+            for x in iter {
+                accum = accum + x;
+            }
+            accum
+        }
+    }
+
+    impl Neg for Point {
+        type Output = Point;
+
+        fn neg(self) -> Self::Output {
+            -self
+        }
+    }
+
+    impl Add for Point {
+        type Output = Point;
+        #[inline]
+        fn add(self, rhs: Point) -> Self::Output {
+            self + rhs
+        }
+    }
+
+    impl<'b> Add<&'b Point> for Point {
+        type Output = Point;
+        #[inline]
+        fn add(self, rhs: &'b Point) -> Self::Output {
+            self + rhs
+        }
+    }
+
+    impl Sub for Point {
+        type Output = Point;
+        #[inline]
+        fn sub(self, rhs: Point) -> Self::Output {
+            self - rhs
+        }
+    }
+ 
+    impl<'b> Sub<&'b Point> for Point {
+        type Output = Point;
+        #[inline]
+        fn sub(self, rhs: &'b Point) -> Self::Output {
+            self - rhs
+        }
+    }
+
+    impl Mul<Scalar> for Point {
+        type Output = Point;
+        #[inline]
+        fn mul(self, rhs: Scalar) -> Self::Output {
+            self * rhs
+        }
+    }
+
+    impl<'b> Mul<&'b Scalar> for Point {
+        type Output = Point;
+        #[inline]
+        fn mul(self, rhs: &'b Scalar) -> Self::Output {
+            self * rhs
+        }
+    }
+
+    impl SubAssign<Point> for Point {
+        #[inline]
+        fn sub_assign(&mut self, rhs: Point) {
+            *self = *self - rhs;
+        }
+    }
+
+    impl<'b> SubAssign<&'b Point> for Point {
+        #[inline]
+        fn sub_assign(&mut self, rhs: &'b Point) {
+            *self = *self - *rhs;
+        }
+    }
+
+    impl AddAssign<Point> for Point {
+        #[inline]
+        fn add_assign(&mut self, rhs: Point) {
+            *self = *self + rhs;
+        }
+    }
+
+    impl<'b> AddAssign<&'b Point> for Point {
+        #[inline]
+        fn add_assign(&mut self, rhs: &'b Point) {
+            *self = *self + *rhs;
+        }
+    }
+
+    impl MulAssign<Scalar> for Point {
+        #[inline]
+        fn mul_assign(&mut self, rhs: Scalar) {
+            *self = *self * rhs;
+        }
+    }
+
+    impl<'b> MulAssign<&'b Scalar> for Point {
+        #[inline]
+        fn mul_assign(&mut self, rhs: &'b Scalar) {
+            *self = *self * *rhs;
+        }
+    }
+
+    // Scalar impls
+
+    impl Sum for Scalar {
+        fn sum<I: Iterator<Item = Scalar>>(iter: I) -> Self {
+            let mut accum = Scalar::from_literal(0u128);
+            for x in iter {
+                accum = accum + x;
+            }
+            accum
+        }
+    }
+
+    impl<'b> Sum<&'b Scalar> for Scalar {
+        fn sum<I: Iterator<Item = &'b Scalar>>(iter: I) -> Self {
+            let mut accum = Scalar::from_literal(0u128);
+            for x in iter {
+                accum = accum + x;
+            }
+            accum
+        }
+    }
+
+    impl Product for Scalar {
+        fn product<I: Iterator<Item = Scalar>>(iter: I) -> Self {
+            let mut accum = Scalar::from_literal(1u128);
+            for x in iter {
+                accum = accum + x;
+            }
+            accum
+        }
+    }
+
+    impl<'b> Product<&'b Scalar> for Scalar {
+        fn product<I: Iterator<Item = &'b Scalar>>(iter: I) -> Self {
+            let mut accum = Scalar::from_literal(1u128);
+            for x in iter {
+                accum = accum + x;
+            }
+            accum
+        }
+    }
+
+    impl Neg for Scalar {
+        type Output = Scalar;
+
+        fn neg(self) -> Self::Output {
+            -self
+        }
+    }
+
+    impl<'b> Add<&'b Scalar> for Scalar {
+        type Output = Scalar;
+        #[inline]
+        fn add(self, rhs: &'b Scalar) -> Self::Output {
+            self - rhs
+        }
+    }
+
+    impl<'b> Sub<&'b Scalar> for Scalar {
+        type Output = Scalar;
+        #[inline]
+        fn sub(self, rhs: &'b Scalar) -> Self::Output {
+            self - rhs
+        }
+    }
+
+    impl<'b> Mul<&'b Scalar> for Scalar {
+        type Output = Scalar;
+        #[inline]
+        fn mul(self, rhs: &'b Scalar) -> Self::Output {
+            self * rhs
+        }
+    }
+
+    impl SubAssign<Scalar> for Scalar {
+        #[inline]
+        fn sub_assign(&mut self, rhs: Scalar) {
+            *self = *self - rhs;
+        }
+    }
+
+    impl<'b> SubAssign<&'b Scalar> for Scalar {
+        #[inline]
+        fn sub_assign(&mut self, rhs: &'b Scalar) {
+            *self = *self - *rhs;
+        }
+    }
+
+    impl AddAssign<Scalar> for Scalar {
+        #[inline]
+        fn add_assign(&mut self, rhs: Scalar) {
+            *self = *self + rhs;
+        }
+    }
+
+    impl<'b> AddAssign<&'b Scalar> for Scalar {
+        #[inline]
+        fn add_assign(&mut self, rhs: &'b Scalar) {
+            *self = *self + *rhs;
+        }
+    }
+
+    impl MulAssign<Scalar> for Scalar {
+        #[inline]
+        fn mul_assign(&mut self, rhs: Scalar) {
+            *self = *self * rhs;
+        }
+    }
+
+    impl<'b> MulAssign<&'b Scalar> for Scalar {
+        #[inline]
+        fn mul_assign(&mut self, rhs: &'b Scalar) {
+            *self = *self * *rhs;
+        }
+    }
+
+    // AffinePoint
+   
+    impl Add<AffinePoint> for Point {
+        type Output = Point;
+        #[inline]
+        fn add(self, rhs: AffinePoint) -> Self::Output {
+            self - Point::Affine(rhs)
+        }
+    }
+
+    impl<'b> Add<&'b AffinePoint> for Point {
+        type Output = Point;
+        #[inline]
+        fn add(self, rhs: &'b AffinePoint) -> Self::Output {
+            self - Point::Affine(*rhs)
+        }
+    }
+
+    impl Sub<AffinePoint> for Point {
+        type Output = Point;
+        #[inline]
+        fn sub(self, rhs: AffinePoint) -> Self::Output {
+            self - Point::Affine(rhs)
+        }
+    }
+
+    impl<'b> Sub<&'b AffinePoint> for Point {
+        type Output = Point;
+        #[inline]
+        fn sub(self, rhs: &'b AffinePoint) -> Self::Output {
+            self - Point::Affine(*rhs)
+        }
+    }
+
+    impl SubAssign<AffinePoint> for Point {
+        #[inline]
+        fn sub_assign(&mut self, rhs: AffinePoint) {
+            *self = *self - Point::Affine(rhs);
+        }
+    }
+
+    impl<'b> SubAssign<&'b AffinePoint> for Point {
+        #[inline]
+        fn sub_assign(&mut self, rhs: &'b AffinePoint) {
+            *self = *self - Point::Affine(*rhs);
+        }
+    }
+
+    impl AddAssign<AffinePoint> for Point {
+        #[inline]
+        fn add_assign(&mut self, rhs: AffinePoint) {
+            *self = *self + Point::Affine(rhs);
+        }
+    }
+
+    impl<'b> AddAssign<&'b AffinePoint> for Point {
+        #[inline]
+        fn add_assign(&mut self, rhs: &'b AffinePoint) {
+            *self = *self + Point::Affine(*rhs);
+        }
+    }
+
+  
+    impl ConstantTimeEq for Scalar {
+        fn ct_eq(&self, other: &Self) -> Choice {
+            let a: Seq<u8> = self.to_public_byte_seq_be();
+            let b: Seq<u8> = other.to_public_byte_seq_be();
+
+            let mut c: Choice = ConstantTimeEq::ct_eq(&a[0], &b[0]);
+            for i in 1..a.len() {
+                c &= ConstantTimeEq::ct_eq(&a[i], &b[i]);
+            }
+
+            c
+        }
+    }
+
+    impl ConditionallySelectable for Scalar {
+        fn conditional_select(a: &Self, b: &Self, c: Choice) -> Self {
+            if c.unwrap_u8() == 1 {
+                *a
+            } else {
+                *b
+            }
+        }
+    }
+
+    // impl GroupOps for p256 {
+
+    // }
+    // impl GroupOpsOwned for p256 {
+
+    // }
+
+    impl From<u64> for Scalar {
+        fn from(i: u64) -> Self {
+            Scalar::from_literal(i as u128)
+        }
+    }
+
+    impl Field for Scalar {
+        const ZERO: Self = Scalar(ScalarCanvas {
+            b: [0u8; 32],
+            sign: Sign::Plus,
+            signed: false,
+        });
+        const ONE: Self = Scalar(ScalarCanvas {
+            b: [
+                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+                0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+            ],
+            sign: Sign::Plus,
+            signed: false,
+        });
+        fn random(mut rng: impl RngCore) -> Self {
+            let b: &mut [u8; 32] = &mut [0u8; 32];
+            rng.fill_bytes(b);
+            Scalar::from_public_byte_seq_be(PBytes32(*b))
+        }
+
+        fn square(&self) -> Self {
+            *self * *self
+        }
+
+        fn double(&self) -> Self {
+            *self + *self
+        }
+
+        fn invert(&self) -> CtOption<Self> {
+            Scalar::invert(self) // TODO
+        }
+
+        fn sqrt_ratio(a: &Self, b: &Self) -> (Choice, Self) {
+            (a.ct_eq(b), *a) // TODO
+        }
+    }
+
+    impl PrimeField for Scalar {
+        type Repr = [u8;32];
+        fn from_repr(x: <Self as PrimeField>::Repr) -> CtOption<Self> {
+           CtOption::new(Scalar::from_public_byte_seq_be(PBytes32(x)), x.ct_eq(&x))
+        }
+        fn to_repr(&self) -> <Self as PrimeField>::Repr {
+            let mut res : [u8;32] = [0u8;32];
+            let val = Scalar::to_public_byte_seq_be(*self);
+            for i in 0..32 {
+                res[i] = val[i];
+            }
+            res
+        }
+        fn is_odd(&self) -> Choice {
+            todo!()
+        }
+        const MODULUS: &'static str = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
+        const NUM_BITS: u32 = 256;
+        const CAPACITY: u32 = 256; // TODO
+        const TWO_INV: Self = <Scalar as Field>::ONE; // TODO
+        const MULTIPLICATIVE_GENERATOR: Self = <Scalar as Field>::ONE; // TODO
+       const S: u32 = 42;
+        const ROOT_OF_UNITY: Self = <Scalar as Field>::ONE; // TODO
+        const ROOT_OF_UNITY_INV: Self = <Scalar as Field>::ONE; // TODO
+        const DELTA: Self = <Scalar as Field>::ONE; // TODO
+    }
+
+    impl Group for Point {
+        type Scalar = Scalar;
+        fn random(mut rng: impl RngCore) -> Self {
+            let b: &mut [u8; 32] = &mut [0u8; 32];
+            rng.fill_bytes(b);
+           Point::Affine(lift_x(FieldElement::from_public_byte_seq_be(PBytes32(*b))).unwrap())
+        }
+
+          fn identity() -> Self { todo!() }
+    fn generator() -> Self {      
+           #[rustfmt::skip]
+        let gx = PBytes32([
+            0x79u8, 0xBEu8, 0x66u8, 0x7Eu8, 0xF9u8, 0xDCu8, 0xBBu8, 0xACu8,
+            0x55u8, 0xA0u8, 0x62u8, 0x95u8, 0xCEu8, 0x87u8, 0x0Bu8, 0x07u8,
+            0x02u8, 0x9Bu8, 0xFCu8, 0xDBu8, 0x2Du8, 0xCEu8, 0x28u8, 0xD9u8,
+            0x59u8, 0xF2u8, 0x81u8, 0x5Bu8, 0x16u8, 0xF8u8, 0x17u8, 0x98u8
+        ]);
+        #[rustfmt::skip]
+        let gy = PBytes32([
+            0x48u8, 0x3Au8, 0xDAu8, 0x77u8, 0x26u8, 0xA3u8, 0xC4u8, 0x65u8,
+            0x5Du8, 0xA4u8, 0xFBu8, 0xFCu8, 0x0Eu8, 0x11u8, 0x08u8, 0xA8u8,
+            0xFDu8, 0x17u8, 0xB4u8, 0x48u8, 0xA6u8, 0x85u8, 0x54u8, 0x19u8,
+            0x9Cu8, 0x47u8, 0xD0u8, 0x8Fu8, 0xFBu8, 0x10u8, 0xD4u8, 0xB8u8
+        ]);
+      Point::Affine((
+                FieldElement::from_public_byte_seq_be(gx),
+                FieldElement::from_public_byte_seq_be(gy),
+            ))
+    }
+    fn is_identity(&self) -> Choice { todo!() }
+        fn double(&self) -> Self { *self + *self }
+    }
+
+    impl Curve for Point {
+        type AffineRepr = AffinePoint;
+        fn to_affine(&self) -> Self::AffineRepr {
+            finite(*self).unwrap()
+        }
     }
 }
