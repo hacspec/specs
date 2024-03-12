@@ -13,7 +13,7 @@ use rand_core::RngCore;
 
 pub trait MGroup = Group;
 
-fn pow<G: MGroup>(x: G, n: G::Scalar) -> G {
+pub fn pow<G: MGroup>(x: G, n: G::Scalar) -> G {
     if n == Field::ZERO {
         G::identity()
     } else {
@@ -22,7 +22,7 @@ fn pow<G: MGroup>(x: G, n: G::Scalar) -> G {
 }
 
 // Multiplicative group?
-fn g_pow<G: MGroup>(n: G::Scalar) -> G {
+pub fn g_pow<G: MGroup>(n: G::Scalar) -> G {
     if n == Field::ZERO {
         G::identity()
     } else {
@@ -30,11 +30,11 @@ fn g_pow<G: MGroup>(n: G::Scalar) -> G {
     }
 }
 
-fn hash<G: MGroup>(inp: Vec<G>) -> G::Scalar {
+pub fn hash<G: MGroup>(inp: Vec<G>) -> G::Scalar {
     Field::ONE
 }
 
-fn div<G: MGroup>(x: G, y: G) -> G {
+pub fn div<G: MGroup>(x: G, y: G) -> G {
     x - y
 }
 

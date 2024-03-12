@@ -323,7 +323,7 @@ pub fn verify(msg: Message, pubkey: PublicKey, sig: Signature) -> VerificationRe
 // Group trait //
 /////////////////
 
-mod GroupTrait {
+pub mod GroupTrait {
     use super::{PBytes32, Point, FieldElement, Scalar, ScalarCanvas, lift_x, AffinePoint, finite};
     use group::*;
     use hacspec_lib::*;
@@ -757,7 +757,7 @@ mod GroupTrait {
         }
         fn is_identity(&self) -> Choice { todo!() }
         fn double(&self) -> Self { *self + *self }
-    }
+     }
 
     impl Curve for Point {
         type AffineRepr = AffinePoint;
