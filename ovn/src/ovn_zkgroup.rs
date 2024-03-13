@@ -359,7 +359,7 @@ where
     Ok((A::accept(), cast_vote_state_ret))
 }
 
-#[derive(SchemaType)]
+#[derive(Serialize, SchemaType)]
 pub struct TallyParameter {}
 
 #[hax::receive(contract = "OVN", name = "tally", parameter = "TallyParameter")]

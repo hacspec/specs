@@ -11,6 +11,7 @@ pub use crate::ovn_zkgroup::*;
 
 use hacspec_bip_340::{GroupTrait::*, Point, *};
 
+
 impl MGroup for Point {
     fn pow (p: Self,exp: Self::Scalar) -> Self {
         point_mul(exp,p)

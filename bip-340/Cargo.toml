@@ -17,6 +17,9 @@ ff = "0.13"
 subtle = "*"
 rand_core = "0.6"
 
+hacspec-concordium = { path = "../concordium" } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
+hacspec-concordium-derive = { path = "../concordium-derive" } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
+
 [dev-dependencies]
 quickcheck = "1"
 quickcheck_macros = "1"

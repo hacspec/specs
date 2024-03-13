@@ -783,4 +783,28 @@ pub mod GroupTrait {
             finite(*self).unwrap()
         }
     }
+
+
+use hacspec_concordium::*;
+use hacspec_concordium_derive::*;
+
+impl hacspec_concordium::Deserial for Scalar {
+    // TODO:
+    fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
+        let buffer: &mut [u8] = &mut [];
+        let _ = _source.read(buffer)?;
+
+        Ok(Scalar::from_public_byte_seq_be(Seq::<u8>::from_native_slice(buffer)))
+    }
 }
+
+impl hacspec_concordium::Serial for Scalar {
+    // TODO:
+    fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
+        _out.write(self.to_public_byte_seq_be().native_slice());
+        Ok(())
+    }
+}
+
+}
+
