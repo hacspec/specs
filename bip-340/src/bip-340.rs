@@ -324,7 +324,10 @@ pub fn verify(msg: Message, pubkey: PublicKey, sig: Signature) -> VerificationRe
 /////////////////
 
 pub mod GroupTrait {
-    use super::{PBytes32, Point, FieldElement, Scalar, ScalarCanvas, lift_x, AffinePoint, finite};
+    use super::{
+        finite, lift_x, point_add, x, y, AffinePoint, FieldElement, PBytes32, Point, Scalar,
+        ScalarCanvas,
+    };
     use group::*;
     use hacspec_lib::*;
 
@@ -359,7 +362,10 @@ pub mod GroupTrait {
         type Output = Point;
 
         fn neg(self) -> Self::Output {
-            -self
+            match self {
+                Point::AtInfinity => Point::AtInfinity,
+                Point::Affine((x, y)) => Point::Affine((x, FieldElement::from_literal(0u128) - y)),
+            }
         }
     }
 
@@ -367,7 +373,7 @@ pub mod GroupTrait {
         type Output = Point;
         #[inline]
         fn add(self, rhs: Point) -> Self::Output {
-            self + rhs
+            point_add(self, rhs)
         }
     }
 
@@ -375,7 +381,7 @@ pub mod GroupTrait {
         type Output = Point;
         #[inline]
         fn add(self, rhs: &'b Point) -> Self::Output {
-            self + rhs
+            self + *rhs
         }
     }
 
@@ -383,15 +389,15 @@ pub mod GroupTrait {
         type Output = Point;
         #[inline]
         fn sub(self, rhs: Point) -> Self::Output {
-            self - rhs
+            self + (-rhs)
         }
     }
- 
+
     impl<'b> Sub<&'b Point> for Point {
         type Output = Point;
         #[inline]
         fn sub(self, rhs: &'b Point) -> Self::Output {
-            self - rhs
+            self - *rhs
         }
     }
 
@@ -407,7 +413,7 @@ pub mod GroupTrait {
         type Output = Point;
         #[inline]
         fn mul(self, rhs: &'b Scalar) -> Self::Output {
-            self * rhs
+            self * *rhs
         }
     }
 
@@ -479,7 +485,7 @@ pub mod GroupTrait {
         fn product<I: Iterator<Item = Scalar>>(iter: I) -> Self {
             let mut accum = Scalar::from_literal(1u128);
             for x in iter {
-                accum = accum + x;
+                accum = accum * x;
             }
             accum
         }
@@ -489,7 +495,7 @@ pub mod GroupTrait {
         fn product<I: Iterator<Item = &'b Scalar>>(iter: I) -> Self {
             let mut accum = Scalar::from_literal(1u128);
             for x in iter {
-                accum = accum + x;
+                accum = accum * x;
             }
             accum
         }
@@ -507,7 +513,7 @@ pub mod GroupTrait {
         type Output = Scalar;
         #[inline]
         fn add(self, rhs: &'b Scalar) -> Self::Output {
-            self - rhs
+            self + *rhs
         }
     }
 
@@ -515,7 +521,7 @@ pub mod GroupTrait {
         type Output = Scalar;
         #[inline]
         fn sub(self, rhs: &'b Scalar) -> Self::Output {
-            self - rhs
+            self - *rhs
         }
     }
 
@@ -523,7 +529,7 @@ pub mod GroupTrait {
         type Output = Scalar;
         #[inline]
         fn mul(self, rhs: &'b Scalar) -> Self::Output {
-            self * rhs
+            self * *rhs
         }
     }
 
@@ -570,7 +576,7 @@ pub mod GroupTrait {
     }
 
     // AffinePoint
-   
+
     impl Add<AffinePoint> for Point {
         type Output = Point;
         #[inline]
@@ -631,7 +637,6 @@ pub mod GroupTrait {
         }
     }
 
-  
     impl ConstantTimeEq for Scalar {
         fn ct_eq(&self, other: &Self) -> Choice {
             let a: Seq<u8> = self.to_public_byte_seq_be();
@@ -700,12 +705,12 @@ pub mod GroupTrait {
     }
 
     impl PrimeField for Scalar {
-        type Repr = [u8;32];
+        type Repr = [u8; 32];
         fn from_repr(x: <Self as PrimeField>::Repr) -> CtOption<Self> {
-           CtOption::new(Scalar::from_public_byte_seq_be(PBytes32(x)), x.ct_eq(&x))
+            CtOption::new(Scalar::from_public_byte_seq_be(PBytes32(x)), x.ct_eq(&x))
         }
         fn to_repr(&self) -> <Self as PrimeField>::Repr {
-            let mut res : [u8;32] = [0u8;32];
+            let mut res: [u8; 32] = [0u8; 32];
             let val = Scalar::to_public_byte_seq_be(*self);
             for i in 0..32 {
                 res[i] = val[i];
@@ -713,14 +718,15 @@ pub mod GroupTrait {
             res
         }
         fn is_odd(&self) -> Choice {
-            todo!()
+            Choice::from(if self.bit(0) {1} else {0})
         }
-        const MODULUS: &'static str = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
+        const MODULUS: &'static str =
+            "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
         const NUM_BITS: u32 = 256;
-        const CAPACITY: u32 = 256; // TODO
+        const CAPACITY: u32 = 255; // TODO
         const TWO_INV: Self = <Scalar as Field>::ONE; // TODO
         const MULTIPLICATIVE_GENERATOR: Self = <Scalar as Field>::ONE; // TODO
-       const S: u32 = 42;
+        const S: u32 = 42;
         const ROOT_OF_UNITY: Self = <Scalar as Field>::ONE; // TODO
         const ROOT_OF_UNITY_INV: Self = <Scalar as Field>::ONE; // TODO
         const DELTA: Self = <Scalar as Field>::ONE; // TODO
@@ -731,10 +737,13 @@ pub mod GroupTrait {
         fn random(mut rng: impl RngCore) -> Self {
             let b: &mut [u8; 32] = &mut [0u8; 32];
             rng.fill_bytes(b);
-           Point::Affine(lift_x(FieldElement::from_public_byte_seq_be(PBytes32(*b))).unwrap())
+            Point::Affine(lift_x(FieldElement::from_public_byte_seq_be(PBytes32(*b))).unwrap())
         }
 
-        fn identity() -> Self { todo!() }
+        fn identity() -> Self {
+            Point::AtInfinity
+        }
+
         fn generator() -> Self {
             #[rustfmt::skip]
             let gx = PBytes32([
@@ -755,9 +764,18 @@ pub mod GroupTrait {
                 FieldElement::from_public_byte_seq_be(gy),
             ))
         }
-        fn is_identity(&self) -> Choice { todo!() }
-        fn double(&self) -> Self { *self + *self }
-     }
+
+        fn is_identity(&self) -> Choice {
+            match self {
+                Point::AtInfinity => Choice::from(1),
+                _ => Choice::from(0),
+            }
+        }
+
+        fn double(&self) -> Self {
+            *self + *self
+        }
+    }
 
     impl Curve for Point {
         type AffineRepr = AffinePoint;
