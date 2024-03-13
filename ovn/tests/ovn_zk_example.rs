@@ -16,22 +16,22 @@ extern crate quickcheck_macros;
 use quickcheck::*;
 
 pub use bls12_381::*;
-pub use hacspec_ovn::ovn_zkgroup::*;
-pub use group::{Group, ff::Field};
+pub use group::{ff::Field, Group};
+pub use hacspec_ovn::{ovn_zkgroup::*, ovn_zk_secp256k1::*};
 
-use rand_core::{*, RngCore};
+use rand_core::{RngCore, *};
 // use quickcheck::RngCore;
-use hacspec_bip_340::{Point, GroupTrait::*,  *};
+use hacspec_bip_340::{GroupTrait::*, Point, *};
 
 use rand::rngs::StdRng;
 
 #[test]
 pub fn zk_group_schorr_zkp_correctness() {
     fn test() -> bool {
-        type G = Point;
+        type G = Point; // Gt;
 
-        let x: <G as Group>::Scalar = <G as Group>::Scalar::random(rand::thread_rng());
-        let pow_x = g_pow::<G>(x);
+        let mut x: <G as Group>::Scalar = <G as Group>::Scalar::random(rand::thread_rng());
+        let pow_x = G::g_pow(x);
 
         let random_r: <G as Group>::Scalar = <G as Group>::Scalar::random(rand::thread_rng());
         let pi: SchnorrZKPCommit<G> = schnorr_zkp(random_r, pow_x, x);
@@ -40,9 +40,7 @@ pub fn zk_group_schorr_zkp_correctness() {
         valid
     }
 
-    QuickCheck::new()
-        .tests(1)
-        .quickcheck(test as fn() -> bool)
+    QuickCheck::new().tests(1000).quickcheck(test as fn() -> bool)
 }
 
 // #[test]

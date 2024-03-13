@@ -19,7 +19,7 @@ use group::*;
 // Impl for Z/89Z //
 ////////////////////
 
-pub struct z_89 (u32);
+pub struct z_89(u32);
 
 // impl Group for z_89 {
 

@@ -36,7 +36,7 @@ pub struct Z_curve {
 impl hacspec_concordium::Deserial for Z_curve {
     // TODO:
     fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
-        let buffer : &mut [u8] = &mut [];
+        let buffer: &mut [u8] = &mut [];
         let _ = _source.read(buffer)?;
 
         Ok(Z_curve {
@@ -103,18 +103,22 @@ pub struct Group_curve {
 impl hacspec_concordium::Deserial for Group_curve {
     // TODO:
     fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
-        let buffer : &mut [u8] = &mut [];
+        let buffer: &mut [u8] = &mut [];
         let _ = _source.read(buffer)?;
         if let [0] = buffer {
-            return Ok(Group_curve { val: Point::AtInfinity })
+            return Ok(Group_curve {
+                val: Point::AtInfinity,
+            });
         }
 
-        let buffer_y : &mut [u8] = &mut [];
+        let buffer_y: &mut [u8] = &mut [];
         let _ = _source.read(buffer_y)?;
 
         Ok(Group_curve {
-            val: Point::Affine((FieldElement::from_public_byte_seq_be(Seq::<u8>::from_native_slice(buffer)),
-                                FieldElement::from_public_byte_seq_be(Seq::<u8>::from_native_slice(buffer_y)))),
+            val: Point::Affine((
+                FieldElement::from_public_byte_seq_be(Seq::<u8>::from_native_slice(buffer)),
+                FieldElement::from_public_byte_seq_be(Seq::<u8>::from_native_slice(buffer_y)),
+            )),
         })
     }
 }
@@ -123,11 +127,10 @@ impl hacspec_concordium::Serial for Group_curve {
     // TODO:
     fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
         match self.val {
-            Point::Affine(p) =>
-            {
+            Point::Affine(p) => {
                 _out.write(x(p).to_public_byte_seq_be().native_slice());
                 _out.write(y(p).to_public_byte_seq_be().native_slice())
-            },
+            }
             Point::AtInfinity => _out.write(&[0]),
         };
         Ok(())
@@ -187,9 +190,9 @@ impl Group<Z_curve> for Group_curve {
     fn inv(x: Self::group_type) -> Self::group_type {
         Group_curve {
             val: match x.val {
-                Point::Affine((a,b)) => Point::Affine((a, FieldElement::from_literal(0u128)-b)),
+                Point::Affine((a, b)) => Point::Affine((a, FieldElement::from_literal(0u128) - b)),
                 Point::AtInfinity => Point::AtInfinity, // TODO?
-            }
+            },
         }
     }
 

@@ -32,7 +32,11 @@ pub fn schnorr_zkp<Z: Z_Field, G: Group<Z>>(
     let c = G::hash(vec![G::g(), h, u]);
     let z = Z::add(r, Z::mul(c, x));
 
-    return SchnorrZKPCommit { schnorr_zkp_u: u, schnorr_zkp_c: c, schnorr_zkp_z: z };
+    return SchnorrZKPCommit {
+        schnorr_zkp_u: u,
+        schnorr_zkp_c: c,
+        schnorr_zkp_z: z,
+    };
 }
 
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
@@ -40,7 +44,8 @@ pub fn schnorr_zkp_validate<Z: Z_Field, G: Group<Z>>(
     h: G::group_type,
     pi: SchnorrZKPCommit<Z, G>,
 ) -> bool {
-    pi.schnorr_zkp_c == G::hash(vec![G::g(), h, pi.schnorr_zkp_u]) && G::g_pow(pi.schnorr_zkp_z) == G::prod(pi.schnorr_zkp_u, G::pow(h, pi.schnorr_zkp_c))
+    pi.schnorr_zkp_c == G::hash(vec![G::g(), h, pi.schnorr_zkp_u])
+        && G::g_pow(pi.schnorr_zkp_z) == G::prod(pi.schnorr_zkp_u, G::pow(h, pi.schnorr_zkp_c))
 }
 
 #[derive(Serialize, SchemaType, Clone, Copy)]
@@ -142,13 +147,28 @@ pub fn zkp_one_out_of_two_validate<Z: Z_Field, G: Group<Z>>(
     h: G::group_type,
     zkp: OrZKPCommit<Z, G>,
 ) -> bool {
-    let c = G::hash(vec![zkp.or_zkp_x, zkp.or_zkp_y, zkp.or_zkp_a1, zkp.or_zkp_b1, zkp.or_zkp_a2, zkp.or_zkp_b2]); // TODO: add i
+    let c = G::hash(vec![
+        zkp.or_zkp_x,
+        zkp.or_zkp_y,
+        zkp.or_zkp_a1,
+        zkp.or_zkp_b1,
+        zkp.or_zkp_a2,
+        zkp.or_zkp_b2,
+    ]); // TODO: add i
 
     (c == Z::add(zkp.or_zkp_d1, zkp.or_zkp_d2)
         && zkp.or_zkp_a1 == G::prod(G::g_pow(zkp.or_zkp_r1), G::pow(zkp.or_zkp_x, zkp.or_zkp_d1))
-        && zkp.or_zkp_b1 == G::prod(G::pow(h, zkp.or_zkp_r1), G::pow(zkp.or_zkp_y, zkp.or_zkp_d1))
+        && zkp.or_zkp_b1
+            == G::prod(
+                G::pow(h, zkp.or_zkp_r1),
+                G::pow(zkp.or_zkp_y, zkp.or_zkp_d1),
+            )
         && zkp.or_zkp_a2 == G::prod(G::g_pow(zkp.or_zkp_r2), G::pow(zkp.or_zkp_x, zkp.or_zkp_d2))
-        && zkp.or_zkp_b2 == G::prod(G::pow(h, zkp.or_zkp_r2), G::pow(G::div(zkp.or_zkp_y, G::g()), zkp.or_zkp_d2)))
+        && zkp.or_zkp_b2
+            == G::prod(
+                G::pow(h, zkp.or_zkp_r2),
+                G::pow(G::div(zkp.or_zkp_y, G::g()), zkp.or_zkp_d2),
+            ))
 }
 
 pub fn commit_to<Z: Z_Field, G: Group<Z>>(g_pow_xi_yi_vi: G::group_type) -> Z::field_type {

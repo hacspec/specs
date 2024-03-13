@@ -1,4 +1,3 @@
-
 #[hax_lib_macros::exclude]
 use hax_lib_macros::*;
 
@@ -7,35 +6,22 @@ use hacspec_concordium::*;
 #[exclude]
 use hacspec_concordium_derive::*;
 
-use ff::Field;
-use group::*;
+use group::{
+    ff::{Field, PrimeField},
+    Group,
+};
 use rand_core::RngCore;
 
-pub trait MGroup = Group;
-
-pub fn pow<G: MGroup>(x: G, n: G::Scalar) -> G {
-    if n == Field::ZERO {
-        G::identity()
-    } else {
-        x + pow(x, n - <G::Scalar as Field>::ONE)
+pub trait MGroup: Group {
+    fn pow(p: Self, exp: Self::Scalar) -> Self;
+    fn g_pow(n: Self::Scalar) -> Self {
+        Self::pow(Self::identity(), n - <Self::Scalar as Field>::ONE)
     }
-}
 
-// Multiplicative group?
-pub fn g_pow<G: MGroup>(n: G::Scalar) -> G {
-    if n == Field::ZERO {
-        G::identity()
-    } else {
-        G::generator() + g_pow::<G>(n - <G::Scalar as Field>::ONE)
+    fn hash(inp: Vec<Self>) -> Self::Scalar;
+    fn div(x: Self, y: Self) -> Self {
+        x - y
     }
-}
-
-pub fn hash<G: MGroup>(inp: Vec<G>) -> G::Scalar {
-    Field::ONE
-}
-
-pub fn div<G: MGroup>(x: G, y: G) -> G {
-    x - y
 }
 
 ////////////////////
@@ -57,8 +43,8 @@ pub fn schnorr_zkp<G: MGroup>(
     h: G,
     x: G::Scalar,
 ) -> SchnorrZKPCommit<G> {
-    let u = g_pow::<G>(r);
-    let c = hash::<G>(vec![G::generator(), h, u]);
+    let u = G::g_pow(r);
+    let c = G::hash(vec![G::generator(), h, u]);
     let z = r + c * x;
 
     return SchnorrZKPCommit {
@@ -70,8 +56,8 @@ pub fn schnorr_zkp<G: MGroup>(
 
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
 pub fn schnorr_zkp_validate<G: MGroup>(h: G, pi: SchnorrZKPCommit<G>) -> bool {
-    pi.schnorr_zkp_c == hash::<G>(vec![G::generator(), h, pi.schnorr_zkp_u])
-        && g_pow::<G>(pi.schnorr_zkp_z) == pi.schnorr_zkp_u + pow::<G>(h, pi.schnorr_zkp_c)
+    pi.schnorr_zkp_c == G::hash(vec![G::generator(), h, pi.schnorr_zkp_u])
+        && G::g_pow(pi.schnorr_zkp_z) == pi.schnorr_zkp_u + G::pow(h, pi.schnorr_zkp_c)
 }
 
 #[derive(SchemaType, Clone, Copy)]
@@ -105,16 +91,16 @@ pub fn zkp_one_out_of_two<G: MGroup>(
         let r1 = rand_r;
         let d1 = rand_d;
 
-        let x = g_pow::<G>(xi);
-        let y = pow::<G>(h, xi) + G::generator();
+        let x = G::g_pow(xi);
+        let y = G::pow(h, xi) + G::generator();
 
-        let a1 = g_pow::<G>(r1) + pow::<G>(x, d1);
-        let b1 = pow::<G>(h, r1) + pow::<G>(y, d1);
+        let a1 = G::g_pow(r1) + G::pow(x, d1);
+        let b1 = G::pow(h, r1) + G::pow(y, d1);
 
-        let a2 = g_pow::<G>(w);
-        let b2 = pow::<G>(h, w);
+        let a2 = G::g_pow(w);
+        let b2 = G::pow(h, w);
 
-        let c = hash::<G>(vec![x, y, a1, b1, a2, b2]);
+        let c = G::hash(vec![x, y, a1, b1, a2, b2]);
 
         let d2 = c - d1;
         let r2 = w - xi * d2;
@@ -136,16 +122,16 @@ pub fn zkp_one_out_of_two<G: MGroup>(
         let r2 = rand_r;
         let d2 = rand_d;
 
-        let x = g_pow::<G>(xi);
-        let y = pow::<G>(h, xi);
+        let x = G::g_pow(xi);
+        let y = G::pow(h, xi);
 
-        let a1 = g_pow::<G>(w);
-        let b1 = pow::<G>(h, w);
+        let a1 = G::g_pow(w);
+        let b1 = G::pow(h, w);
 
-        let a2 = g_pow::<G>(r2) + pow::<G>(x, d2);
-        let b2 = pow::<G>(h, r2) + pow::<G>(div::<G>(y, G::generator()), d2);
+        let a2 = G::g_pow(r2) + G::pow(x, d2);
+        let b2 = G::pow(h, r2) + G::pow(G::div(y, G::generator()), d2);
 
-        let c = hash::<G>(vec![x, y, a1, b1, a2, b2]);
+        let c = G::hash(vec![x, y, a1, b1, a2, b2]);
 
         let d1 = c - d2;
         let r1 = w - xi * d1;
@@ -168,7 +154,7 @@ pub fn zkp_one_out_of_two<G: MGroup>(
 
 // Anonymous voting by two-round public discussion
 pub fn zkp_one_out_of_two_validate<G: MGroup>(h: G, zkp: OrZKPCommit<G>) -> bool {
-    let c = hash::<G>(vec![
+    let c = G::hash(vec![
         zkp.or_zkp_x,
         zkp.or_zkp_y,
         zkp.or_zkp_a1,
@@ -178,20 +164,20 @@ pub fn zkp_one_out_of_two_validate<G: MGroup>(h: G, zkp: OrZKPCommit<G>) -> bool
     ]); // TODO: add i
 
     (c == zkp.or_zkp_d1 + zkp.or_zkp_d2
-        && zkp.or_zkp_a1 == g_pow::<G>(zkp.or_zkp_r1) + pow::<G>(zkp.or_zkp_x, zkp.or_zkp_d1)
-        && zkp.or_zkp_b1 == pow::<G>(h, zkp.or_zkp_r1) + pow::<G>(zkp.or_zkp_y, zkp.or_zkp_d1)
-        && zkp.or_zkp_a2 == g_pow::<G>(zkp.or_zkp_r2) + pow::<G>(zkp.or_zkp_x, zkp.or_zkp_d2)
+        && zkp.or_zkp_a1 == G::g_pow(zkp.or_zkp_r1) + G::pow(zkp.or_zkp_x, zkp.or_zkp_d1)
+        && zkp.or_zkp_b1 == G::pow(h, zkp.or_zkp_r1) + G::pow(zkp.or_zkp_y, zkp.or_zkp_d1)
+        && zkp.or_zkp_a2 == G::g_pow(zkp.or_zkp_r2) + G::pow(zkp.or_zkp_x, zkp.or_zkp_d2)
         && zkp.or_zkp_b2
-            == pow::<G>(h, zkp.or_zkp_r2)
-                + pow::<G>(div::<G>(zkp.or_zkp_y, G::generator()), zkp.or_zkp_d2))
+            == G::pow(h, zkp.or_zkp_r2)
+                + G::pow(G::div(zkp.or_zkp_y, G::generator()), zkp.or_zkp_d2))
 }
 
 pub fn commit_to<G: MGroup>(g_pow_xi_yi_vi: G) -> G::Scalar {
-    hash::<G>(vec![g_pow_xi_yi_vi])
+    G::hash(vec![g_pow_xi_yi_vi])
 }
 
 pub fn check_commitment<G: MGroup>(g_pow_xi_yi_vi: G, commitment: G::Scalar) -> bool {
-    hash::<G>(vec![g_pow_xi_yi_vi]) == commitment
+    G::hash(vec![g_pow_xi_yi_vi]) == commitment
 }
 
 #[hax::contract_state(contract = "OVN")]
@@ -246,9 +232,7 @@ pub fn init_ovn_contract<G: MGroup, const n: usize>(// _: &impl HasInitContext,
 }
 
 /** Currently randomness needs to be injected */
-pub fn select_private_voting_key<Z: Field>(
-    rand: impl RngCore + Copy,
-    ) -> Z {
+pub fn select_private_voting_key<Z: Field>(rand: impl RngCore + Copy) -> Z {
     Z::random(rand)
 }
 
@@ -265,9 +249,12 @@ pub struct RegisterParam<Z: Field + Serialize> {
 pub fn register_vote<G: MGroup, const n: usize, A: HasActions>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> where G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial {
+) -> Result<(A, OvnContractState<G, n>), ParseError>
+where
+    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
+{
     let params: RegisterParam<G::Scalar> = ctx.parameter_cursor().get()?;
-    let g_pow_xi = g_pow::<G>(params.rp_xi);
+    let g_pow_xi = G::g_pow(params.rp_xi);
 
     let zkp_xi = schnorr_zkp::<G>(params.rp_zkp_random, g_pow_xi, params.rp_xi);
 
@@ -300,13 +287,13 @@ pub fn compute_g_pow_yi<G: MGroup, const n: usize>(i: usize, xis: [G; n]) -> G {
     }
 
     // implicitly: Y_i = g^y_i
-    let g_pow_yi = div::<G>(prod1, prod2);
+    let g_pow_yi = G::div(prod1, prod2);
     g_pow_yi
 }
 
 pub fn compute_group_element_for_vote<G: MGroup>(xi: G::Scalar, vote: bool, g_pow_yi: G) -> G {
-    pow::<G>(g_pow_yi, xi)
-        + g_pow::<G>(if vote {
+    G::pow(g_pow_yi, xi)
+        + G::g_pow(if vote {
             G::Scalar::ONE
         } else {
             G::Scalar::ZERO
@@ -319,7 +306,10 @@ pub fn compute_group_element_for_vote<G: MGroup>(xi: G::Scalar, vote: bool, g_po
 pub fn commit_to_vote<G: MGroup, const n: usize, A: HasActions>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError> where G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial {
+) -> Result<(A, OvnContractState<G, n>), ParseError>
+where
+    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
+{
     let params: CastVoteParam<G::Scalar> = ctx.parameter_cursor().get()?;
 
     for i in 0..n {
@@ -344,7 +334,10 @@ pub fn commit_to_vote<G: MGroup, const n: usize, A: HasActions>(
 pub fn cast_vote<G: MGroup, const n: usize, A: HasActions>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError>where G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial {
+) -> Result<(A, OvnContractState<G, n>), ParseError>
+where
+    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
+{
     let params: CastVoteParam<G::Scalar> = ctx.parameter_cursor().get()?;
 
     let g_pow_yi = compute_g_pow_yi::<G, n>(params.cvp_i as usize, state.g_pow_xis);
@@ -375,7 +368,10 @@ pub struct TallyParameter {}
 pub fn tally_votes<G: MGroup, const n: usize, A: HasActions>(
     _: impl HasReceiveContext,
     state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError>where G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial {
+) -> Result<(A, OvnContractState<G, n>), ParseError>
+where
+    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
+{
     for i in 0..n {
         let g_pow_yi = compute_g_pow_yi::<G, n>(i as usize, state.g_pow_xis);
         if !zkp_one_out_of_two_validate::<G>(g_pow_yi, state.zkp_vis[i]) {
@@ -395,7 +391,7 @@ pub fn tally_votes<G: MGroup, const n: usize, A: HasActions>(
     let mut curr = G::Scalar::ZERO;
     for i in 0..n as u32 {
         // Should be while, but is bounded by n anyways!
-        if g_pow::<G>(curr) == vote_result {
+        if G::g_pow(curr) == vote_result {
             tally = i;
         }
 

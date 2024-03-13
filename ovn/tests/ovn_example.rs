@@ -22,9 +22,9 @@ extern crate quickcheck_macros;
 #[cfg(test)]
 use quickcheck::*;
 
-pub use hacspec_ovn::ovn_z_89::*;
-pub use hacspec_ovn::ovn_secp256k1::*;
 pub use hacspec_ovn::ovn_group::*;
+pub use hacspec_ovn::ovn_secp256k1::*;
+pub use hacspec_ovn::ovn_z_89::*;
 
 #[test]
 pub fn schorr_zkp_correctness() {
@@ -67,13 +67,13 @@ pub fn schorr_zkp_secp256k1_correctness() {
 }
 
 #[cfg(test)]
-pub fn or_zkp_correctness<Z : Z_Field, G : Group<Z>>(
-        random_w: u32,
-        random_r: u32,
-        random_d: u32,
-        random_h: u32,
-        random_x: u32,
-        v: bool,
+pub fn or_zkp_correctness<Z: Z_Field, G: Group<Z>>(
+    random_w: u32,
+    random_r: u32,
+    random_d: u32,
+    random_h: u32,
+    random_x: u32,
+    v: bool,
 ) -> bool {
     let mut h = G::g_pow(Z::random_field_elem(random_h));
     let x = Z::random_field_elem(random_x);
@@ -83,7 +83,7 @@ pub fn or_zkp_correctness<Z : Z_Field, G : Group<Z>>(
 }
 
 #[test]
-pub fn or_zkp_correctness_z89(){
+pub fn or_zkp_correctness_z89() {
     QuickCheck::new()
         .tests(10000)
         .quickcheck(or_zkp_correctness::<z_89, g_z_89> as fn(u32, u32, u32, u32, u32, bool) -> bool)
@@ -92,9 +92,9 @@ pub fn or_zkp_correctness_z89(){
 #[test]
 // TODO: Fix inverse opeation, should make this test parse
 pub fn or_zkp_secp256k1_correctness() {
-    QuickCheck::new()
-        .tests(10)
-        .quickcheck(or_zkp_correctness::<Z_curve, Group_curve> as fn(u32, u32, u32, u32, u32, bool) -> bool)
+    QuickCheck::new().tests(10).quickcheck(
+        or_zkp_correctness::<Z_curve, Group_curve> as fn(u32, u32, u32, u32, u32, bool) -> bool,
+    )
 }
 
 #[cfg(test)]
@@ -202,7 +202,7 @@ pub fn test_correctness<Z: Z_Field, G: Group<Z>, const n: usize, A: HasActions>(
 }
 
 #[cfg(test)]
-fn randomized_full_test<Z: Z_Field, G: Group<Z>, const n: usize> () -> bool {
+fn randomized_full_test<Z: Z_Field, G: Group<Z>, const n: usize>() -> bool {
     use rand::random;
     let mut votes: [bool; n] = [false; n];
     let mut xis: [Z::field_type; n] = [Z::field_zero(); n];
