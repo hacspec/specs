@@ -48,7 +48,7 @@ impl hacspec_concordium::Deserial for Z_curve {
 impl hacspec_concordium::Serial for Z_curve {
     // TODO:
     fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
-        _out.write(self.val.to_public_byte_seq_be().native_slice());
+        let _ = _out.write(self.val.to_public_byte_seq_be().native_slice());
         Ok(())
     }
 }

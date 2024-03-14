@@ -15,7 +15,7 @@ use rand_core::RngCore;
 pub trait MGroup: Group {
     fn pow(p: Self, exp: Self::Scalar) -> Self;
     fn g_pow(n: Self::Scalar) -> Self {
-        Self::pow(Self::identity(), n - <Self::Scalar as Field>::ONE)
+        Self::pow(Self::generator(), n)
     }
 
     fn hash(inp: Vec<Self>) -> Self::Scalar;
@@ -45,7 +45,7 @@ pub fn schnorr_zkp<G: MGroup>(
 ) -> SchnorrZKPCommit<G> {
     let u = G::g_pow(r);
     let c = G::hash(vec![G::generator(), h, u]);
-    let z = r + c * x;
+    let z = r + (c * x);
 
     return SchnorrZKPCommit {
         schnorr_zkp_u: u,
@@ -57,7 +57,7 @@ pub fn schnorr_zkp<G: MGroup>(
 // https://crypto.stanford.edu/cs355/19sp/lec5.pdf
 pub fn schnorr_zkp_validate<G: MGroup>(h: G, pi: SchnorrZKPCommit<G>) -> bool {
     pi.schnorr_zkp_c == G::hash(vec![G::generator(), h, pi.schnorr_zkp_u])
-        && G::g_pow(pi.schnorr_zkp_z) == pi.schnorr_zkp_u + G::pow(h, pi.schnorr_zkp_c)
+        && (G::g_pow(pi.schnorr_zkp_z) == (pi.schnorr_zkp_u + G::pow(h, pi.schnorr_zkp_c)))
 }
 
 #[derive(SchemaType, Clone, Copy)]
@@ -229,11 +229,6 @@ pub fn init_ovn_contract<G: MGroup, const n: usize>(// _: &impl HasInitContext,
 
         tally: 0,
     })
-}
-
-/** Currently randomness needs to be injected */
-pub fn select_private_voting_key<Z: Field>(rand: impl RngCore + Copy) -> Z {
-    Z::random(rand)
 }
 
 #[derive(Serialize, SchemaType)]

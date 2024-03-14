@@ -325,8 +325,8 @@ pub fn verify(msg: Message, pubkey: PublicKey, sig: Signature) -> VerificationRe
 
 pub mod GroupTrait {
     use super::{
-        finite, lift_x, point_add, x, y, AffinePoint, FieldElement, PBytes32, Point, Scalar,
-        ScalarCanvas,
+        finite, lift_x, point_add, point_mul_base, x, y, AffinePoint, FieldElement, PBytes32,
+        Point, Scalar, ScalarCanvas,
     };
     use group::*;
     use hacspec_lib::*;
@@ -718,7 +718,7 @@ pub mod GroupTrait {
             res
         }
         fn is_odd(&self) -> Choice {
-            Choice::from(if self.bit(0) {1} else {0})
+            Choice::from(if self.bit(0) { 1 } else { 0 })
         }
         const MODULUS: &'static str =
             "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
@@ -735,9 +735,7 @@ pub mod GroupTrait {
     impl Group for Point {
         type Scalar = Scalar;
         fn random(mut rng: impl RngCore) -> Self {
-            let b: &mut [u8; 32] = &mut [0u8; 32];
-            rng.fill_bytes(b);
-            Point::Affine(lift_x(FieldElement::from_public_byte_seq_be(PBytes32(*b))).unwrap())
+            point_mul_base(Scalar::random(rng))
         }
 
         fn identity() -> Self {
@@ -759,10 +757,11 @@ pub mod GroupTrait {
                 0xFDu8, 0x17u8, 0xB4u8, 0x48u8, 0xA6u8, 0x85u8, 0x54u8, 0x19u8,
                 0x9Cu8, 0x47u8, 0xD0u8, 0x8Fu8, 0xFBu8, 0x10u8, 0xD4u8, 0xB8u8
             ]);
-            Point::Affine((
+            let g = Point::Affine((
                 FieldElement::from_public_byte_seq_be(gx),
                 FieldElement::from_public_byte_seq_be(gy),
-            ))
+            ));
+            g
         }
 
         fn is_identity(&self) -> Choice {
@@ -784,27 +783,27 @@ pub mod GroupTrait {
         }
     }
 
+    use hacspec_concordium::*;
+    use hacspec_concordium_derive::*;
 
-use hacspec_concordium::*;
-use hacspec_concordium_derive::*;
+    impl hacspec_concordium::Deserial for Scalar {
+        // TODO:
+        fn deserial<R: Read>(source: &mut R) -> ParseResult<Self> {
+            let buffer : [u8;32] = source.get()?;
+            Ok(Scalar::from_public_byte_seq_be(Seq::<u8>::from_native_slice(&buffer)))
+        }
+    }
 
-impl hacspec_concordium::Deserial for Scalar {
-    // TODO:
-    fn deserial<R: Read>(_source: &mut R) -> ParseResult<Self> {
-        let buffer: &mut [u8] = &mut [];
-        let _ = _source.read(buffer)?;
-
-        Ok(Scalar::from_public_byte_seq_be(Seq::<u8>::from_native_slice(buffer)))
+    impl hacspec_concordium::Serial for Scalar {
+        // TODO:
+        fn serial<W: Write>(&self, out: &mut W) -> Result<(), W::Err> {
+            let mut buffer : [u8;32] = [0u8;32];
+            let temp = self.to_public_byte_seq_be();
+            for i in 0..32 {
+                buffer[i] = temp[i];
+            }
+            buffer.serial(out)?; 
+            Ok(())
+        }
     }
 }
-
-impl hacspec_concordium::Serial for Scalar {
-    // TODO:
-    fn serial<W: Write>(&self, _out: &mut W) -> Result<(), W::Err> {
-        _out.write(self.to_public_byte_seq_be().native_slice());
-        Ok(())
-    }
-}
-
-}
-
