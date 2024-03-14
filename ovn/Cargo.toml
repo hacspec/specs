@@ -20,11 +20,11 @@ hacspec-concordium-derive = { path = "../concordium-derive" } # 4d4b024b547a1f12
 
 quickcheck = "1"
 quickcheck_macros = "1"
+bls12_381 = "0.8"
 
 [dev-dependencies]
 criterion = "0.4"
 rand = "0.8"
-bls12_381 = "*"
 
 [features]
 hax_compilation = []

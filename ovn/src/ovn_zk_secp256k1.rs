@@ -22,3 +22,16 @@ impl MGroup for Point {
     }
 
 }
+
+use bls12_381::*;
+
+impl MGroup for Gt {
+    fn pow (p: Self,exp: Self::Scalar) -> Self {
+        p * exp
+    }
+
+    fn hash(inp: Vec<Self>) -> Self::Scalar {
+        return Self::Scalar::ONE // TODO
+    }
+
+}
