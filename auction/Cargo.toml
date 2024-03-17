@@ -1,0 +1,23 @@
+[package]
+name = "hacspec-auction"
+version = "0.1.0"
+authors = ["Lasse Letager Hanse <letager@cs.au.dk>"]
+edition = "2018"
+
+[lib]
+path = "src/auction.rs"
+
+[dependencies]
+hax-lib-macros = { path = "../../hax/hax-lib-macros/" }
+hacspec-concordium = { path = "../concordium" }
+hacspec-concordium-derive = { path = "../concordium-derive" }
+
+quickcheck = "1"
+quickcheck_macros = "1"
+
+[dev-dependencies]
+criterion = "0.4"
+rand = "0.8"
+
+[features]
+hax_compilation = []

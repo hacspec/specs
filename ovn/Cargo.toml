@@ -1,0 +1,30 @@
+[package]
+name = "hacspec-ovn"
+version = "0.1.0"
+authors = ["Lasse Letager Hanse <letager@cs.au.dk>"]
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+hacspec-lib = { git = "https://github.com/hacspec/hacspec.git" }
+hax-lib-macros = { path = "../../hax/hax-lib-macros/" }
+hacspec-bip-340 = { path = "../bip-340/" }
+
+group = "0.13"
+rand_core = "0.6"
+
+hacspec-concordium = { path = "../concordium" } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
+hacspec-concordium-derive = { path = "../concordium-derive" } # 4d4b024b547a1f120f6d6951cbc409c94f8f146a
+
+quickcheck = "1"
+quickcheck_macros = "1"
+bls12_381 = "0.8"
+
+[dev-dependencies]
+criterion = "0.4"
+rand = "0.8"
+
+[features]
+hax_compilation = []

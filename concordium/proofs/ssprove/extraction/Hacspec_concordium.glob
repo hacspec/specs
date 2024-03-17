@@ -1,0 +1,45 @@
+DIGEST 1fd1617ec37cda10bbc5e53eee59a9a9
+FExamples.Hacspec_concordium
+R126:136 Crypt.choice_type <> <> lib
+R138:144 Crypt.Package <> <> lib
+R146:152 Crypt.Prelude <> <> lib
+R162:176 Crypt.package.pkg_notation PackageNotation <> mod
+R211:213 extructures.ord <> <> lib
+R215:218 extructures.fset <> <> lib
+R250:258 mathcomp.word.word_ssrZ <> <> lib
+R260:263 mathcomp.word.word <> <> lib
+R293:296 Jasmin.word <> <> lib
+R324:329 Coq.ZArith.ZArith <> <> lib
+R356:369 Coq.Strings.String <> <> lib
+R379:396 Coq.Lists.List ListNotations <> mod
+R494:507 Hacspec.ChoiceEquality <> <> lib
+R538:552 Hacspec.LocationUtility <> <> lib
+R583:604 Hacspec.Hacspec_Lib_Comparable <> <> lib
+R635:649 Hacspec.Hacspec_Lib_Pre <> <> lib
+R680:690 Hacspec.Hacspec_Lib <> <> lib
+R727:747 mathcomp.ssreflect.choice Choice.Exports <> mod
+def 941:947 <> t_Never
+R951:961 Crypt.choice_type <> choice_type ind
+R966:970 Crypt.package.pkg_notation PackageNotation ::package_scope:'''unit' not
+def 984:988 <> abort
+R992:995 Hacspec.ChoiceEquality <> both rec
+R1017:1023 Examples.Hacspec_concordium <> t_Never def
+R1008:1011 extructures.fset <> fset def
+R1013:1014 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R998:1001 extructures.fset <> fset def
+R1003:1004 Coq.Lists.List ListNotations ::list_scope:'['_']' not
+R1028:1038 Hacspec.Hacspec_Lib <> :::'ret_both'_'tt' not
+def 1051:1054 <> trap
+R1061:1066 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R1075:1075 extructures.fset FSet.Exports ::type_scope:'{'_'fset'_x_'}' not
+R1067:1074 Crypt.package.pkg_core_definition <> Location def
+binder 1057:1057 <> L:1
+R1083:1091 Crypt.package.pkg_core_definition <> Interface def
+binder 1079:1079 <> I:2
+R1096:1099 Hacspec.ChoiceEquality <> both rec
+R1106:1112 Examples.Hacspec_concordium <> t_Never def
+R1120:1123 Examples.Hacspec_concordium <> trap:4 def
+R1152:1155 Hacspec.ChoiceEquality <> both rec
+R1162:1168 Examples.Hacspec_concordium <> t_Never def
+R1133:1143 Hacspec.ChoiceEquality <> :::'solve_lift'_x not
+R1144:1148 Examples.Hacspec_concordium <> abort def

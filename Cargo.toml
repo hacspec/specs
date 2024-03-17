@@ -23,4 +23,8 @@ members = [
     "pasta",
     "halo2",
     "weierstrass-curves",
+    "ovn",
+    "auction",
+    "concordium",
+    "concordium-derive",
 ]
