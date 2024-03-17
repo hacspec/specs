@@ -11,6 +11,7 @@ members = [
     "hmac",
     "hkdf",
     "p256",
+    "bip-340",
     "bls12-381",
     "ecdsa-p256-sha256",
     "aes",
