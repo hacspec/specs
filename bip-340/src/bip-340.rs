@@ -324,10 +324,7 @@ pub fn verify(msg: Message, pubkey: PublicKey, sig: Signature) -> VerificationRe
 /////////////////
 
 pub mod GroupTrait {
-    use super::{
-        finite, lift_x, point_add, x, y, AffinePoint, FieldElement, PBytes32, Point, Scalar,
-        ScalarCanvas,
-    };
+    use super::*;
     use group::*;
     use hacspec_lib::*;
 
@@ -405,7 +402,7 @@ pub mod GroupTrait {
         type Output = Point;
         #[inline]
         fn mul(self, rhs: Scalar) -> Self::Output {
-            self * rhs
+            point_mul(rhs, self)
         }
     }
 
@@ -718,7 +715,7 @@ pub mod GroupTrait {
             res
         }
         fn is_odd(&self) -> Choice {
-            Choice::from(if self.bit(0) {1} else {0})
+            Choice::from(if self.bit(0) { 1 } else { 0 })
         }
         const MODULUS: &'static str =
             "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
@@ -735,9 +732,7 @@ pub mod GroupTrait {
     impl Group for Point {
         type Scalar = Scalar;
         fn random(mut rng: impl RngCore) -> Self {
-            let b: &mut [u8; 32] = &mut [0u8; 32];
-            rng.fill_bytes(b);
-            Point::Affine(lift_x(FieldElement::from_public_byte_seq_be(PBytes32(*b))).unwrap())
+            point_mul_base(Scalar::random(rng))
         }
 
         fn identity() -> Self {
