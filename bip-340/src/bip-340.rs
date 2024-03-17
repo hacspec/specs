@@ -324,10 +324,7 @@ pub fn verify(msg: Message, pubkey: PublicKey, sig: Signature) -> VerificationRe
 /////////////////
 
 pub mod GroupTrait {
-    use super::{
-        finite, lift_x, point_add, point_mul, point_mul_base, x, y, AffinePoint, FieldElement, PBytes32,
-        Point, Scalar, ScalarCanvas,
-    };
+    use super::*;
     use group::*;
     use hacspec_lib::*;
 
@@ -757,11 +754,10 @@ pub mod GroupTrait {
                 0xFDu8, 0x17u8, 0xB4u8, 0x48u8, 0xA6u8, 0x85u8, 0x54u8, 0x19u8,
                 0x9Cu8, 0x47u8, 0xD0u8, 0x8Fu8, 0xFBu8, 0x10u8, 0xD4u8, 0xB8u8
             ]);
-            let g = Point::Affine((
+            Point::Affine((
                 FieldElement::from_public_byte_seq_be(gx),
                 FieldElement::from_public_byte_seq_be(gy),
-            ));
-            g
+            ))
         }
 
         fn is_identity(&self) -> Choice {
@@ -780,30 +776,6 @@ pub mod GroupTrait {
         type AffineRepr = AffinePoint;
         fn to_affine(&self) -> Self::AffineRepr {
             finite(*self).unwrap()
-        }
-    }
-
-    use hacspec_concordium::*;
-    use hacspec_concordium_derive::*;
-
-    impl hacspec_concordium::Deserial for Scalar {
-        // TODO:
-        fn deserial<R: Read>(source: &mut R) -> ParseResult<Self> {
-            let buffer : [u8;32] = source.get()?;
-            Ok(Scalar::from_public_byte_seq_be(Seq::<u8>::from_native_slice(&buffer)))
-        }
-    }
-
-    impl hacspec_concordium::Serial for Scalar {
-        // TODO:
-        fn serial<W: Write>(&self, out: &mut W) -> Result<(), W::Err> {
-            let mut buffer : [u8;32] = [0u8;32];
-            let temp = self.to_public_byte_seq_be();
-            for i in 0..32 {
-                buffer[i] = temp[i];
-            }
-            buffer.serial(out)?; 
-            Ok(())
         }
     }
 }
