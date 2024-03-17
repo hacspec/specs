@@ -325,7 +325,7 @@ pub fn verify(msg: Message, pubkey: PublicKey, sig: Signature) -> VerificationRe
 
 pub mod GroupTrait {
     use super::{
-        finite, lift_x, point_add, point_mul_base, x, y, AffinePoint, FieldElement, PBytes32,
+        finite, lift_x, point_add, point_mul, point_mul_base, x, y, AffinePoint, FieldElement, PBytes32,
         Point, Scalar, ScalarCanvas,
     };
     use group::*;
@@ -405,7 +405,7 @@ pub mod GroupTrait {
         type Output = Point;
         #[inline]
         fn mul(self, rhs: Scalar) -> Self::Output {
-            self * rhs
+            point_mul(rhs, self)
         }
     }
 

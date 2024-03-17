@@ -21,6 +21,9 @@ wee_alloc="0.4.5"
 # [features]
 # use_attributes = ["hacspec-attributes/print_attributes", "hacspec-attributes/hacspec_unsafe"]
 
+bls12_381 = "0.8"
+group = "0.13"
+
 [dev-dependencies]
 # hacspec-dev = { path = "../../utils/dev" }
 criterion = "0.3"

@@ -13,9 +13,12 @@ use group::{
 use rand_core::RngCore;
 
 pub trait MGroup: Group {
-    fn pow(p: Self, exp: Self::Scalar) -> Self;
+    fn pow(p: Self, exp: Self::Scalar) -> Self {
+        p * exp
+    }
+
     fn g_pow(n: Self::Scalar) -> Self {
-        Self::pow(Self::generator(), n)
+        Self::generator() * n
     }
 
     fn hash(inp: Vec<Self>) -> Self::Scalar;
@@ -231,24 +234,51 @@ pub fn init_ovn_contract<G: MGroup, const n: usize>(// _: &impl HasInitContext,
     })
 }
 
-#[derive(Serialize, SchemaType)]
-pub struct RegisterParam<Z: Field + Serialize> {
+use core::marker::PhantomData;
+#[derive(SchemaType)]
+pub struct RegisterParam<Z: Field, S: Serialize + From<Z> + Into<Z>> {
     pub rp_i: u32,
     pub rp_xi: Z,
     pub rp_zkp_random: Z,
+    pub phantom: PhantomData<S>,
+}
+
+impl<Z: Field, S: Serialize + From<Z> + Into<Z>> Serial for RegisterParam<Z, S> {
+    fn serial<W: Write>(&self, w: &mut W) -> Result<(), <W as Write>::Err> {
+        self.rp_i.serial(w)?;
+        <S as From<Z>>::from(self.rp_xi).serial(w)?;
+        <S as From<Z>>::from(self.rp_zkp_random).serial(w)?;
+        Ok(())
+    }
+}
+
+impl<Z: Field, S: Serialize + From<Z> + Into<Z>> Deserial for RegisterParam<Z, S> {
+    fn deserial<R: Read>(r: &mut R) -> Result<Self, ParseError> {
+        let rp_i: u32 = r.get()?;
+        let rp_xi: Z = <S as Into<Z>>::into(r.get()?);
+        let rp_zkp_random: Z = <S as Into<Z>>::into(r.get()?);
+        Ok(RegisterParam {
+            rp_i,
+            rp_xi,
+            rp_zkp_random,
+            phantom: PhantomData,
+        })
+    }
 }
 
 /** Primary function in round 1 */
 #[hax::receive(contract = "OVN", name = "register", parameter = "RegisterParam")]
 // #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "register", parameter = "RegisterParam"))]
-pub fn register_vote<G: MGroup, const n: usize, A: HasActions>(
+pub fn register_vote<
+    G: MGroup,
+    S: Serialize + From<G::Scalar> + Into<G::Scalar>,
+    const n: usize,
+    A: HasActions,
+>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError>
-where
-    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
-{
-    let params: RegisterParam<G::Scalar> = ctx.parameter_cursor().get()?;
+) -> Result<(A, OvnContractState<G, n>), ParseError> {
+    let params: RegisterParam<G::Scalar, S> = ctx.parameter_cursor().get()?;
     let g_pow_xi = G::g_pow(params.rp_xi);
 
     let zkp_xi = schnorr_zkp::<G>(params.rp_zkp_random, g_pow_xi, params.rp_xi);
@@ -260,14 +290,47 @@ where
     Ok((A::accept(), register_vote_state_ret))
 }
 
-#[derive(Serialize, SchemaType)]
-pub struct CastVoteParam<Z: Field + Serialize> {
+#[derive(SchemaType)]
+pub struct CastVoteParam<Z: Field, S: Serialize + From<Z> + Into<Z>> {
     pub cvp_i: u32,
     pub cvp_xi: Z,
     pub cvp_zkp_random_w: Z,
     pub cvp_zkp_random_r: Z,
     pub cvp_zkp_random_d: Z,
     pub cvp_vote: bool,
+    pub phantom: PhantomData<S>,
+}
+
+impl<Z: Field, S: Serialize + From<Z> + Into<Z>> Serial for CastVoteParam<Z, S> {
+    fn serial<W: Write>(&self, w: &mut W) -> Result<(), <W as Write>::Err> {
+        self.cvp_i.serial(w)?;
+        <S as From<Z>>::from(self.cvp_xi).serial(w)?;
+        <S as From<Z>>::from(self.cvp_zkp_random_w).serial(w)?;
+        <S as From<Z>>::from(self.cvp_zkp_random_r).serial(w)?;
+        <S as From<Z>>::from(self.cvp_zkp_random_d).serial(w)?;
+        self.cvp_vote.serial(w)?;
+        Ok(())
+    }
+}
+
+impl<Z: Field, S: Serialize + From<Z> + Into<Z>> Deserial for CastVoteParam<Z, S> {
+    fn deserial<R: Read>(r: &mut R) -> Result<Self, ParseError> {
+        let cvp_i: u32 = r.get()?;
+        let cvp_xi: Z = <S as Into<Z>>::into(r.get()?);
+        let cvp_zkp_random_w: Z = <S as Into<Z>>::into(r.get()?);
+        let cvp_zkp_random_r: Z = <S as Into<Z>>::into(r.get()?);
+        let cvp_zkp_random_d: Z = <S as Into<Z>>::into(r.get()?);
+        let cvp_vote: bool = r.get()?;
+        Ok(CastVoteParam {
+            cvp_i,
+            cvp_xi,
+            cvp_zkp_random_w,
+            cvp_zkp_random_r,
+            cvp_zkp_random_d,
+            cvp_vote,
+            phantom: PhantomData,
+        })
+    }
 }
 
 pub fn compute_g_pow_yi<G: MGroup, const n: usize>(i: usize, xis: [G; n]) -> G {
@@ -298,14 +361,16 @@ pub fn compute_group_element_for_vote<G: MGroup>(xi: G::Scalar, vote: bool, g_po
 /** Commitment before round 2 */
 #[hax::receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam")]
 // #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "commit_to_vote", parameter = "CastVoteParam"))]
-pub fn commit_to_vote<G: MGroup, const n: usize, A: HasActions>(
+pub fn commit_to_vote<
+    G: MGroup,
+    S: Serialize + From<G::Scalar> + Into<G::Scalar>,
+    const n: usize,
+    A: HasActions,
+>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<G, n>,
-) -> Result<(A, OvnContractState<G, n>), ParseError>
-where
-    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
-{
-    let params: CastVoteParam<G::Scalar> = ctx.parameter_cursor().get()?;
+) -> Result<(A, OvnContractState<G, n>), ParseError> {
+    let params: CastVoteParam<G::Scalar, S> = ctx.parameter_cursor().get()?;
 
     for i in 0..n {
         if !schnorr_zkp_validate(state.g_pow_xis[i], state.zkp_xis[i]) {
@@ -326,14 +391,12 @@ where
 /** Primary function in round 2, also opens commitment */
 #[hax::receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam")]
 // #[cfg_attr(not(feature = "hax_compilation"), receive(contract = "OVN", name = "cast_vote", parameter = "CastVoteParam"))]
-pub fn cast_vote<G: MGroup, const n: usize, A: HasActions>(
+pub fn cast_vote<G: MGroup, S: Serialize + From<G::Scalar> + Into<G::Scalar>, const n: usize, A: HasActions>(
     ctx: impl HasReceiveContext,
     state: OvnContractState<G, n>,
 ) -> Result<(A, OvnContractState<G, n>), ParseError>
-where
-    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
 {
-    let params: CastVoteParam<G::Scalar> = ctx.parameter_cursor().get()?;
+    let params: CastVoteParam<G::Scalar, S> = ctx.parameter_cursor().get()?;
 
     let g_pow_yi = compute_g_pow_yi::<G, n>(params.cvp_i as usize, state.g_pow_xis);
     let g_pow_xi_yi_vi =
@@ -364,8 +427,6 @@ pub fn tally_votes<G: MGroup, const n: usize, A: HasActions>(
     _: impl HasReceiveContext,
     state: OvnContractState<G, n>,
 ) -> Result<(A, OvnContractState<G, n>), ParseError>
-where
-    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
 {
     for i in 0..n {
         let g_pow_yi = compute_g_pow_yi::<G, n>(i as usize, state.g_pow_xis);

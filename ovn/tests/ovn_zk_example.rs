@@ -15,22 +15,66 @@ extern crate quickcheck_macros;
 #[cfg(test)]
 use quickcheck::*;
 
-pub use bls12_381::*;
+pub use bls12_381::{*, Scalar as BlsScalar};
 pub use group::{ff::Field, Group};
 pub use hacspec_ovn::{ovn_zk_secp256k1::*, ovn_zkgroup::*};
+use core::marker::PhantomData;
 
 use rand_core::{RngCore, *};
 // use quickcheck::RngCore;
-use hacspec_bip_340::{GroupTrait::*, Point, *};
+use hacspec_bip_340::{GroupTrait::*, Point, Scalar as BipScalar, *};
 
 use rand::random;
 use rand::rngs::StdRng;
+
+#[derive(Serialize)]
+struct GroupBits<const n: usize> {
+    val: [u8; n],
+}
+
+impl From<BlsScalar> for GroupBits<32> {
+    fn from(value: BlsScalar) -> Self {
+        Self { val: value.to_bytes() }
+    }
+}
+
+impl Into<BlsScalar> for GroupBits<32> {
+    fn into(self) -> BlsScalar {
+        BlsScalar::from_bytes(&self.val).unwrap()
+    }
+}
+
+impl From<BipScalar> for GroupBits<32> {
+    fn from(value: BipScalar) -> Self {
+        let mut val : [u8; 32] = [0u8; 32];
+        let temp = value.to_be_bytes();
+        for i in 0..32 {
+val[i] = temp[i];
+        }
+        Self { val }
+    }
+}
+
+impl Into<BipScalar> for GroupBits<32> {
+    fn into(self) -> BipScalar {
+        BipScalar::from_be_bytes(&self.val)
+    }
+}
+
+
+////////////////////////////
+// Group operations tests //
+////////////////////////////
 
 #[cfg(test)]
 pub fn group_test<G: MGroup>() {
     let r: <G as Group>::Scalar = <G as Group>::Scalar::random(rand::thread_rng());
     let x: <G as Group>::Scalar = <G as Group>::Scalar::random(rand::thread_rng());
-    assert_eq!(G::g_pow(r + x), (G::g_pow(r) + G::g_pow(x)), "!!temp aa!!");
+    assert_eq!(
+        G::generator() * (r + x),
+        (G::generator() * r + G::generator() * (x)),
+        "!!temp aa!!"
+    );
 }
 
 #[test]
@@ -38,16 +82,16 @@ pub fn secp256k1_group_correctness() {
     group_test::<Point>()
 }
 
-// #[test]
-// pub fn bls12_381_real_group_correctness() {
-//     group_test::<Gt>()
-// }
+#[test]
+pub fn bls12_381_real_group_correctness() {
+    group_test::<Gt>()
+}
 
 #[cfg(test)]
 pub fn schnorr_zkp_correctness<G: MGroup>() -> bool {
     let random_r: <G as Group>::Scalar = <G as Group>::Scalar::random(rand::thread_rng());
     let x: <G as Group>::Scalar = <G as Group>::Scalar::random(rand::thread_rng());
-    let pow_x = G::g_pow(x);
+    let pow_x = G::generator() * x; // G::g_pow(x);
 
     let pi: SchnorrZKPCommit<G> = schnorr_zkp(random_r, pow_x, x);
 
@@ -64,7 +108,7 @@ pub fn schnorr_zkp_secp256k1_correctness() {
 }
 
 #[test]
-pub fn bls12_381_real_schnorr_correctness() {
+pub fn schnorr_correctness_bls12_381_real() {
     assert!(schnorr_zkp_correctness::<Gt>())
 }
 
@@ -116,11 +160,6 @@ pub fn sum_to_zero<G: MGroup, const n: usize>() {
     assert!(res == G::identity());
 }
 
-// #[test]
-// pub fn sum_to_zero_z89() {
-//     sum_to_zero::<z_89, g_z_89, 55>()
-// }
-
 #[test]
 pub fn sum_to_zero_secp256k1() {
     sum_to_zero::<Point, 55>()
@@ -128,25 +167,27 @@ pub fn sum_to_zero_secp256k1() {
 
 #[test]
 pub fn sum_to_zero_bls12_381_real() {
-    sum_to_zero::<Point, 55>()
+    sum_to_zero::<Gt, 55>()
 }
 
-
 #[cfg(test)]
-pub fn test_params_of_group<G: MGroup, A: HasActions>()
-where
-    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
+pub fn test_params_of_group<
+    G: MGroup,
+    S: Serialize + From<G::Scalar> + Into<G::Scalar>,
+    A: HasActions,
+>()
 {
     // Setup the context
     let mut ctx = hacspec_concordium::test_infrastructure::ReceiveContextTest::empty();
-    let parameter = RegisterParam::<G::Scalar> {
+    let parameter = RegisterParam::<G::Scalar, S> {
         rp_i: random(),
         rp_xi: G::Scalar::random(rand::thread_rng()),
         rp_zkp_random: G::Scalar::random(rand::thread_rng()),
+        phantom: PhantomData,
     };
     let parameter_bytes = to_bytes(&parameter);
     let ctx_params = ctx.clone().set_parameter(&parameter_bytes);
-    let param_back: Result<RegisterParam<G::Scalar>, ParseError> =
+    let param_back: Result<RegisterParam<G::Scalar, S>, ParseError> =
         ctx_params.parameter_cursor().get();
     assert!(param_back.is_ok());
 
@@ -158,11 +199,22 @@ where
 
 #[test]
 pub fn test_params_of_group_zk259() {
-    test_params_of_group::<Point, hacspec_concordium::test_infrastructure::ActionsTree>()
+    test_params_of_group::<Point, GroupBits<32>, hacspec_concordium::test_infrastructure::ActionsTree>()
+}
+
+
+#[test]
+pub fn test_params_of_group_bls12_381_real() {
+    test_params_of_group::<Gt, GroupBits<32>, hacspec_concordium::test_infrastructure::ActionsTree>()
 }
 
 #[cfg(test)]
-pub fn test_correctness<G: MGroup, const n: usize, A: HasActions>(
+pub fn test_correctness<
+    G: MGroup,
+    S: Serialize + From<G::Scalar> + Into<G::Scalar>,
+    const n: usize,
+    A: HasActions,
+>(
     votes: [bool; n],
     xis: [G::Scalar; n],
     rp_zkp_randoms: [G::Scalar; n],
@@ -173,8 +225,6 @@ pub fn test_correctness<G: MGroup, const n: usize, A: HasActions>(
     cvp_zkp_random_rs2: [G::Scalar; n],
     cvp_zkp_random_ds2: [G::Scalar; n],
 ) -> bool
-where
-    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
 {
     // Setup the context
     let ctx = hacspec_concordium::test_infrastructure::ReceiveContextTest::empty();
@@ -182,42 +232,45 @@ where
     let mut state: OvnContractState<G, n> = init_ovn_contract().unwrap();
 
     for i in 0..n {
-        let parameter = RegisterParam::<G::Scalar> {
+        let parameter = RegisterParam::<G::Scalar, S> {
             rp_i: i as u32,
             rp_xi: xis[i],
             rp_zkp_random: rp_zkp_randoms[i],
+        phantom: PhantomData,
         };
         let parameter_bytes = to_bytes(&parameter);
         (_, state) =
-            register_vote::<G, n, A>(ctx.clone().set_parameter(&parameter_bytes), state).unwrap();
+            register_vote::<G, S, n, A>(ctx.clone().set_parameter(&parameter_bytes), state).unwrap();
     }
 
     for i in 0..n {
-        let parameter = CastVoteParam::<G::Scalar> {
+        let parameter = CastVoteParam::<G::Scalar, S> {
             cvp_i: i as u32,
             cvp_xi: xis[i],
             cvp_zkp_random_w: cvp_zkp_random_ws1[i],
             cvp_zkp_random_r: cvp_zkp_random_rs1[i],
             cvp_zkp_random_d: cvp_zkp_random_ds1[i],
             cvp_vote: votes[i],
+        phantom: PhantomData,
         };
         let parameter_bytes = to_bytes(&parameter);
         (_, state) =
-            commit_to_vote::<G, n, A>(ctx.clone().set_parameter(&parameter_bytes), state).unwrap();
+            commit_to_vote::<G, S, n, A>(ctx.clone().set_parameter(&parameter_bytes), state).unwrap();
     }
 
     for i in 0..n {
-        let parameter = CastVoteParam::<G::Scalar> {
+        let parameter = CastVoteParam::<G::Scalar, S> {
             cvp_i: i as u32,
             cvp_xi: xis[i],
             cvp_zkp_random_w: cvp_zkp_random_ws2[i],
             cvp_zkp_random_r: cvp_zkp_random_rs2[i],
             cvp_zkp_random_d: cvp_zkp_random_ds2[i],
             cvp_vote: votes[i],
+        phantom: PhantomData,
         };
         let parameter_bytes = to_bytes(&parameter);
         (_, state) =
-            cast_vote::<G, n, A>(ctx.clone().set_parameter(&parameter_bytes), state).unwrap();
+            cast_vote::<G, S, n, A>(ctx.clone().set_parameter(&parameter_bytes), state).unwrap();
     }
 
     let parameter = TallyParameter {};
@@ -238,9 +291,7 @@ where
 }
 
 #[cfg(test)]
-fn randomized_full_test<G: MGroup, const n: usize>() -> bool
-where
-    G::Scalar: hacspec_concordium::Serial + hacspec_concordium::Deserial,
+fn randomized_full_test<G: MGroup, S: Serialize + From<G::Scalar> + Into<G::Scalar>, const n: usize>() -> bool
 {
     let mut votes: [bool; n] = [false; n];
     let mut xis: [G::Scalar; n] = [G::Scalar::ONE; n];
@@ -265,7 +316,7 @@ where
         cvp_zkp_random_ds2[i] = G::Scalar::random(rand::thread_rng());
     }
 
-    test_correctness::<G, n, hacspec_concordium::test_infrastructure::ActionsTree>(
+    test_correctness::<G, S, n, hacspec_concordium::test_infrastructure::ActionsTree>(
         votes,
         xis,
         rp_zkp_randoms,
@@ -278,25 +329,16 @@ where
     )
 }
 
-// // // #[concordium_test]
-// // #[test]
-// // fn test_full_z89() {
-// //     QuickCheck::new()
-// //         .tests(100)
-// //         .quickcheck(randomized_full_test::<z_89, g_z_89, 55> as fn() -> bool)
-// // }
-
-// #[concordium_test]
 #[test]
 fn test_full_secp256k1() {
     QuickCheck::new()
         .tests(1)
-        .quickcheck(randomized_full_test::<Point, 15> as fn() -> bool)
+        .quickcheck(randomized_full_test::<Point, GroupBits<32>, 15> as fn() -> bool)
 }
 
-// #[test]
-// fn test_full_bls12_381_real() {
-//     QuickCheck::new()
-//         .tests(1)
-//         .quickcheck(randomized_full_test::<Gt, 15> as fn() -> bool)
-// }
+#[test]
+fn test_full_bls12_381_real() {
+    QuickCheck::new()
+        .tests(1)
+        .quickcheck(randomized_full_test::<Gt, GroupBits<32>, 15> as fn() -> bool)
+}
