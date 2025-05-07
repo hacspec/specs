@@ -4,6 +4,7 @@ members = [
     "curve25519",
     "chacha20",
     "poly1305",
+    "poly1305-rust",
     "chacha20poly1305",
     "gimli",
     "sha256",
