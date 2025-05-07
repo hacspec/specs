@@ -1,0 +1,6 @@
+-R . Hacspec_ovn
+-arg -w
+-arg all
+
+./Hacspec_ovn_Ovn_traits.v
+# ./Hacspec_ovn_Ovn_group.v

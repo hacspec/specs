@@ -1,0 +1,3 @@
+Hacspec_ovn_Ovn_traits.vo Hacspec_ovn_Ovn_traits.glob Hacspec_ovn_Ovn_traits.v.beautified Hacspec_ovn_Ovn_traits.required_vo: Hacspec_ovn_Ovn_traits.v 
+Hacspec_ovn_Ovn_traits.vio: Hacspec_ovn_Ovn_traits.v 
+Hacspec_ovn_Ovn_traits.vos Hacspec_ovn_Ovn_traits.vok Hacspec_ovn_Ovn_traits.required_vos: Hacspec_ovn_Ovn_traits.v 

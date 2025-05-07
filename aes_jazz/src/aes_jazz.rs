@@ -1,10 +1,11 @@
 use hacspec_lib::*;
 
-public_bytes!(SBox, 256);
-public_bytes!(RCon, 15);
+type SBox = [u8; 256];
+type RCon = [u8; 15];
 
-public_bytes!(PBytes256, 256);
-const SBOX: SBox = SBox([
+type PBytes256 = [u8; 256];
+
+const SBOX: SBox = [
     0x63u8, 0x7Cu8, 0x77u8, 0x7Bu8, 0xF2u8, 0x6Bu8, 0x6Fu8, 0xC5u8, 0x30u8, 0x01u8, 0x67u8, 0x2Bu8,
     0xFEu8, 0xD7u8, 0xABu8, 0x76u8, 0xCAu8, 0x82u8, 0xC9u8, 0x7Du8, 0xFAu8, 0x59u8, 0x47u8, 0xF0u8,
     0xADu8, 0xD4u8, 0xA2u8, 0xAFu8, 0x9Cu8, 0xA4u8, 0x72u8, 0xC0u8, 0xB7u8, 0xFDu8, 0x93u8, 0x26u8,
@@ -27,12 +28,12 @@ const SBOX: SBox = SBox([
     0x69u8, 0xD9u8, 0x8Eu8, 0x94u8, 0x9Bu8, 0x1Eu8, 0x87u8, 0xE9u8, 0xCEu8, 0x55u8, 0x28u8, 0xDFu8,
     0x8Cu8, 0xA1u8, 0x89u8, 0x0Du8, 0xBFu8, 0xE6u8, 0x42u8, 0x68u8, 0x41u8, 0x99u8, 0x2Du8, 0x0Fu8,
     0xB0u8, 0x54u8, 0xBBu8, 0x16u8
-]);
+];
 
-const RCON: RCon = RCon([
+const RCON: RCon = [
     0x8du8, 0x01u8, 0x02u8, 0x04u8, 0x08u8, 0x10u8, 0x20u8, 0x40u8, 0x80u8, 0x1bu8, 0x36u8, 0x6cu8,
     0xd8u8, 0xabu8, 0x4du8
-]);
+];
 
 fn index_u32 (s : u128, i : usize) -> u32 {
     ((s >> i * 32) % (1_u128 << 32)) as u32
@@ -49,10 +50,10 @@ fn rebuild_u128(s0 : u32, s1 : u32, s2 : u32, s3 : u32) -> u128 {
 }
 
 fn subword(v : u32) -> u32 {
-    rebuild_u32(SBOX[index_u8(v, 0)],
-                SBOX[index_u8(v, 1)],
-                SBOX[index_u8(v, 2)],
-                SBOX[index_u8(v, 3)])
+    rebuild_u32(SBOX[index_u8(v, 0) as usize],
+                SBOX[index_u8(v, 1) as usize],
+                SBOX[index_u8(v, 2) as usize],
+                SBOX[index_u8(v, 3) as usize])
 }
 
 fn rotword(v: u32) -> u32 {
@@ -114,19 +115,19 @@ fn key_expand(rcon: u8, rkey: u128, temp2: u128) -> (u128, u128) {
     (rkey, temp2)
 }
 
-type KeyList = Seq<u128>;
+type KeyList = [u128;12];
 
 fn keys_expand(key : u128) -> KeyList {
-    let mut rkeys : KeyList = KeyList::new(0);
+    let mut rkeys : KeyList = [0;12];
     let mut key = key;
-    rkeys = rkeys.push(&key);
+    rkeys[0] = key;
     let mut temp2 : u128 = 0;
     for round in 1 .. 11 {
         let rcon = RCON[round];
         let (key_temp, temp2_temp) = key_expand(rcon, key, temp2);
         key = key_temp;
         temp2 = temp2_temp;
-        rkeys = rkeys.push(&key);
+        rkeys[round] = key;
     }
     rkeys
 }

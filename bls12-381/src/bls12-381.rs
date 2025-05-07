@@ -76,11 +76,11 @@ pub fn fp2conjugate(n: Fp2) -> Fp2 {
 
 /* Arithmetic for Fp6 elements */
 //Algorithms from: https://eprint.iacr.org/2010/354.pdf
-fn fp6fromfp2(n: Fp2) -> Fp6 {
+pub fn fp6fromfp2(n: Fp2) -> Fp6 {
     (n, fp2zero(), fp2zero())
 }
 
-fn fp6zero() -> Fp6 {
+pub fn fp6zero() -> Fp6 {
     fp6fromfp2(fp2zero())
 }
 
@@ -509,6 +509,7 @@ fn final_exponentiation(f: Fp12) -> Fp12 {
     let t1 = fp12mul(t1, t2); //t1t2
     t1
 }
+
 //ate-pairing used for BLS
 pub fn pairing(p: G1, q: G2) -> Fp12 {
     let t = Scalar::from_literal(0xd201000000010000u128);
@@ -810,15 +811,15 @@ fn test_g2_add_double_special_case() {
 //https://tools.ietf.org/id/draft-yonezawa-pairing-friendly-curves-02.html#rfc.section.4.2.2
 
 //THIS IS A CORRECT G1 GENERATOR :)
-#[cfg(test)]
-fn g1() -> G1 {
+// #[cfg(test)]
+pub fn g1() -> G1 {
     (Fp::from_hex("17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb"),
      Fp::from_hex("08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1"), false)
 }
 
 //THIS IS A CORRECT G2 GENERATOR :)
-#[cfg(test)]
-fn g2() -> G2 {
+// #[cfg(test)]
+pub fn g2() -> G2 {
     ((Fp::from_hex("24aa2b2f08f0a91260805272dc51051c6e47ad4fa403b02b4510b647ae3d1770bac0326a805bbefd48056c8c121bdb8"),
       Fp::from_hex("13e02b6052719f607dacd3a088274f65596bd0d09920b61ab5da61bbdc7f5049334cf11213945d57e5ac7d055d042b7e")),
      (Fp::from_hex("0ce5d527727d6e118cc9cdc6da2e351aadfd9baa8cbdd3a76d429a695160d12c923ac9cc3baca289e193548608b82801"),
